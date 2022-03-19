@@ -1,3 +1,2 @@
-from .main import main
-
-__version__ = '0.1.0'
+from ._version import __version__  # NOQA
+from .main import main  # NOQA
