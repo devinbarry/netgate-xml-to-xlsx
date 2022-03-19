@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netgate-xml-to-xlsx"
-version = "0.9.1a1"
+version = "0.9.1a2"
 description = "Translate Netgate firewall rules to spreadsheet for review."
 authors = ["Raymond GA Côté <ray@AppropriateSolutions.com>"]
 keywords = ["firewall", "netgate"]
@@ -9,7 +9,8 @@ license = "BSD-3-Clause"
 homepage = "https://gitlab.com/appropriate-solutions-inc/open/netgate-xml-to-xlsx"
 repository = "https://gitlab.com/appropriate-solutions-inc/open/netgate-xml-to-xlsx.git"
 include = [
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
