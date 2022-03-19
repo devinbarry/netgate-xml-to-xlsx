@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netgate-xml-to-xlsx"
-version = "0.1.0"
+version = "0.9.1a1"
 description = "Translate Netgate firewall rules to spreadsheet for review."
 authors = ["Raymond GA Côté <ray@AppropriateSolutions.com>"]
 keywords = ["firewall", "netgate"]
@@ -36,8 +36,29 @@ openpyxl = "^3.0.9"
 [tool.poetry.dev-dependencies]
 pytest = "^7"
 black = "^22"
-flake8 = "^4"
 pylint = "^2"
+flakeheaven = "^0.11.1"
+flake8-2020 = "*"
+flake8-bandit = "*"
+flake8-black = "*"
+flake8-broken-line = "*"
+flake8-bugbear = "*"
+flake8-builtins = "*"
+flake8-cognitive-complexity = "*"
+flake8-comprehensions = "*"
+flake8-docstrings = "*"
+flake8-eradicate = "*"
+flake8-executable = "*"
+flake8-expression-complexity = "*"
+flake8-fixme = "*"
+flake8-functions = "*"  #  "mr_proper==0.0.4",  # support py36
+flake8-logging-format = "*"
+flake8-mutable = "*"
+flake8-mypy = "*"
+flake8-printf-formatting = "*"
+flake8-pytest-style = "*"
+flake8-pytest = "*"
+pre-commit = "^2.17.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -48,3 +69,35 @@ netgate-xml-to-xlsx = "netgate_xml_to_xlsx.main:main"
 
 [tool.black]
 target-version = ["py310",]
+
+[tool.flakeheaven]
+# See canonical example: https://raw.githubusercontent.com/flakeheaven/flakeheaven/master/pyproject.toml
+exclude = [".git"]
+max_line_length = 99
+format = "grouped"
+# show_source = true
+
+[tool.flakeheaven.plugins]
+pycodestyle = ["+*"]
+pyflakes = ["+*"]
+flake8-bandit = ["+*", "-**/test_*.py"]
+flake8-black = ["+*"]
+flake8-broken-line = ["+*"]
+flake8-bugbear = ["+*"]
+flake8-builtins = ["+*"]
+flake8-cognitive-complexity = ["+*"]
+flake8-comprehensions = ["+*"]
+flake8-docstrings = ["+*"]
+flake8-eradicate = ["+*"]
+flake8-executable = ["+*"]
+flake8-expression-complexity = ["+*"]
+# flake8-fixme = ["+*"]
+flake8-functions = ["+*", "-CFQ004"]
+flake8-logging-format = ["+*"]
+flake8-mutable = ["+*"]
+flake8-mypy = ["+*"]
+flake8-printf-formatting = ["+*"]
+flake8-pytest-style = ["+*"]
+flake8-pytest = ["+*"]
+
+[tool.flake8-functions]
