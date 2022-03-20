@@ -81,7 +81,7 @@ format = "grouped"
 pycodestyle = ["+*"]
 pyflakes = ["+*"]
 flake8-aaa = ["+*", "+**/test_*"]
-flake8-bandit = ["+*", "-**/test_*.py"]
+flake8-bandit = ["+*", "-**/test_*.py", "-S101"]
 # flake8-black unnecessary as black runs as a pre-commit
 #flake8-black = ["+*"]
 flake8-broken-line = ["+*"]

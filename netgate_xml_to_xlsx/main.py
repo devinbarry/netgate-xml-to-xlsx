@@ -64,12 +64,16 @@ def parse_args():
     return args
 
 
-def _format_privs(privs: list | str) -> str:
+def _format_privs(privs: list[tuple[str, str | None]] | str | None) -> str | None:
     """Format privileges into a string paragraph.
 
     Single privileges are presented as a string.
     Multiple privileges as a list of string.
     """
+    if privs is None:
+        return None
+    assert privs is not None
+
     if isinstance(privs, str):
         return privs
 
@@ -77,20 +81,23 @@ def _format_privs(privs: list | str) -> str:
     return "\n".join(privs)
 
 
-def _unescape(value: str) -> str | None:
+def _unescape(value: str | None) -> str | None:
     """Unescape XML entities."""
     if value is None:
         return value
+    assert value is not None
+
     return html.unescape(value)
 
 
-def _adjust_field_value(*, field_name: str, value: str | None) -> str:
+def _adjust_field_value(*, field_name: str, value: str | None) -> str | None:
     """Make adjustments based on field_name."""
     if value is None:
         return None
+    assert value is not None
 
     # Convert XML escape codes
-    value = _unescape(value)
+    assert value is not None
 
     if field_name == "descr":
         value = value.replace("<br />", "\n")
@@ -264,7 +271,7 @@ class PfSense:
             sheet[coordinate] = value
             sheet[coordinate].style = style_name
 
-    def _sheet_header(self, sheet: Worksheet, columns: list, column_widths: list):
+    def _sheet_header(self, sheet: Worksheet, columns: list, column_widths: list[int]):
         """Write header row then set the column widths."""
         self._write_row(sheet, columns, 1, "header")
 
@@ -286,7 +293,7 @@ class PfSense:
         out_path = self.args.output_dir / self.ss_filename
         self.workbook.save(out_path)
 
-    def _nice_address_sort(self, data: str) -> list[str]:
+    def _nice_address_sort(self, data: str) -> str:
         """Sort addresses that may consist of domains and IPv4/v6 addresses."""
         addresses = [x.strip() for x in data.split(" ")]
         numeric = [x for x in addresses if len(x) > 1 and x[0] in ("0123456789")]
@@ -302,7 +309,7 @@ class PfSense:
         result.extend(numeric)
         return "\n".join(result)
 
-    def _clean_split(self, data: str, split_char: str = ",") -> list[str]:
+    def _clean_split(self, data: str, split_char: str = ",") -> str:
         """Convert str to list of strings.
 
         Split string on split_char.
@@ -321,19 +328,23 @@ class PfSense:
         """
         rows = []
         field_names = "name,value".split(",")
-        column_widths = "40,40".split(",")
+        column_widths = [int(x) for x in "40,40".split(",")]
 
         node = self.pfsense
         for key in "version,lastchange".split(","):
-            rows.append((key, _unescape(node.get(key, ""))))
+            rows.append([key, _unescape(node.get(key, ""))])
 
         # Check version number.
-        if int(float(rows[0][1])) != 21:
-            print("Warning: Only tested on version 21 XML formats.")
+        if (version := int(float(rows[0][1]))) != 21:
+            assert version is not None
+            print(
+                f"Warning: File uses version {version}.x. "
+                "Script is only tested on version 21 XML formats."
+            )
 
         node = self.pfsense["system"]
         for key in "optimization,hostname,domain,timezone".split(","):
-            rows.append((key, _unescape(node.get(key, ""))))
+            rows.append([key, _unescape(node.get(key, ""))])
 
         # Ugly getting this twice.
         self.ss_filename = (
@@ -341,12 +352,12 @@ class PfSense:
         )
 
         time_servers = "\n".join(node.get("timeservers", "").split(" "))
-        rows.append(("timeservers", time_servers))
+        rows.append(["timeservers", time_servers])
 
         # TODO: TBD Elements while determining how Netgate uses blank elements.
-        rows.append(("bogons", _get_element(node, "bogons,interval".split(","), "TBD")))
-        rows.append(("ssh", _get_element(node, "ssh,enabled".split(","), "TBD")))
-        rows.append(("dnsserver", "\n".join(node.get("dnsserver", ""))))
+        rows.append(["bogons", _get_element(node, "bogons,interval".split(","), "TBD")])
+        rows.append(["ssh", _get_element(node, "ssh,enabled".split(","), "TBD")])
+        rows.append(["dnsserver", "\n".join(node.get("dnsserver", ""))])
 
         self._write_sheet(
             name="System",
@@ -364,7 +375,7 @@ class PfSense:
         """
         rows = []
         field_names = "name,description,scope,gid,priv".split(",")
-        column_widths = "40,80,20,20,80".split(",")
+        column_widths = [int(x) for x in "40,80,20,20,80".split(",")]
 
         nodes = self.pfsense["system"]["group"]
         nodes.sort(key=lambda x: x["name"].casefold())
@@ -394,7 +405,7 @@ class PfSense:
         """
         rows = []
         field_names = "name,descr,scope,expires,ipsecpk,uid,cert".split(",")
-        column_widths = "40,60,20,20,20,10,60".split(",")
+        column_widths = [int(x) for x in "40,60,20,20,20,10,60".split(",")]
 
         nodes = self.pfsense["system"]["user"]
         nodes.sort(key=lambda x: x["name"].casefold())
@@ -416,7 +427,7 @@ class PfSense:
         """Create the aliases sheet."""
         rows = []
         field_names = "name,type,address,url,updatefreq,descr,detail".split(",")
-        column_widths = "40,40,40,80,20,80,80".split(",")
+        column_widths = [int(x) for x in "40,40,40,80,20,80,80".split(",")]
 
         nodes = self.pfsense["aliases"]["alias"]
         nodes.sort(key=lambda x: x["name"].casefold())
@@ -429,7 +440,7 @@ class PfSense:
             rows=rows,
         )
 
-    def _updated_or_created(self, data: str) -> None:
+    def _updated_or_created(self, data: OrderedDict) -> str:
         """Return updated or created timestamp."""
         if _unescape(data.get("updated")):
             return data["updated"]["time"]
@@ -500,9 +511,12 @@ class PfSense:
             "max_src-conn,max-src-states,statetimeout,statetype,os,source,destination,"
             "log,descr,created,updated"
         ).split(",")
-        column_widths = (
-            "10,20,10,15,15,10,10,10,20,20,20,20,30,50,50,50,10,80,85,85".split(",")
-        )
+        column_widths = [
+            int(x)
+            for x in (
+                "10,20,10,15,15,10,10,10,20,20,20,20,30,50,50,50,10,80,85,85".split(",")
+            )
+        ]
         source_index = field_names.index("source")
         destination_index = field_names.index("destination")
         created_index = field_names.index("created")
@@ -549,7 +563,7 @@ class PfSense:
             "descr,alias-address,alias-subnet,spoofmac,enable,"
             "blockpriv,blockbogons,ipaddr,subnet,gateway"
         ).split(",")
-        column_widths = ("20,40,20,20,20,20,20,20,20,40").split(",")
+        column_widths = [int(x) for x in "20,40,20,20,20,20,20,20,20,40".split(",")]
 
         # Don't sort interfaces. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
@@ -580,7 +594,7 @@ class PfSense:
         field_names = (
             "name,descr,interface,gateway,weight,ipprotocol,monitor_disable"
         ).split(",")
-        column_widths = "20,40,20,20,10,30,30,20,20".split(",")
+        column_widths = [int(x) for x in "20,40,20,20,10,30,30,20,20".split(",")]
 
         # Load default IPV4 and IPV6 gateways.
         # Don't want "None" for default gateway.
@@ -630,14 +644,17 @@ class PfSense:
             "keepalive_timeout,ping_seconds,ping_push,ping_action,ping_action_seconds,"
             "ping_action_push,inactive_seconds,data_ciphers,data_ciphers_fallback"
         ).split(",")
-        column_widths = (
-            "20,20,20,20,20,30,20,20,30,20,"  # 10
-            "40,20,20,30,30,30,30,20,20,30,"  # 20
-            "20,20,20,30,20,20,20,20,40,40,"  # 30
-            "40,40,40,50,20,20,20,20,20,20,"  # 40
-            "20,20,20,30,30,20,20,20,30,30,"  # 50
-            "20,20,50"
-        ).split(",")
+        column_widths = [
+            int(x)
+            for x in (
+                "20,20,20,20,20,30,20,20,30,20,"  # 10
+                "40,20,20,30,30,30,30,20,20,30,"  # 20
+                "20,20,20,30,20,20,20,20,40,40,"  # 30
+                "40,40,40,50,20,20,20,20,20,20,"  # 40
+                "20,20,20,30,30,20,20,20,30,30,"  # 50
+                "20,20,50"
+            ).split(",")
+        ]
 
         # Don't sort OpenVPN Servers. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
@@ -658,7 +675,7 @@ class PfSense:
             "name,internal_name,descr,version,configuration_file,include_file,"
             "website,pkginfolink,filter_rule_function"
         ).split(",")
-        column_widths = ("40,40,50,20,50,50,80,80,50").split(",")
+        column_widths = [int(x) for x in "40,40,50,20,50,50,80,80,50".split(",")]
 
         nodes = self.pfsense["installedpackages"]["package"]
         nodes.sort(key=lambda x: x["name"].casefold())
