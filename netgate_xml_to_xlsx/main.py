@@ -236,7 +236,9 @@ class PfSense:
         sheet = self.workbook.create_sheet(name)
         self._sheet_header(sheet, field_names, column_widths)
 
-        for row_num, row in enumerate(rows, start=2):
+        # Define starting row num in case there are no rows to display.
+        row_num = 2
+        for row_num, row in enumerate(rows, start=row_num):
             self._write_row(sheet, row, row_num)
         self._sheet_footer(sheet, row_num)
 
