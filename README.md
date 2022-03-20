@@ -33,6 +33,7 @@ netgate-xml-to-xlsx --help
 netgate-xml-to-xlsx firewall-config.xml
 ```
 
+## Notes
 
-
-
+### Using flakeheaven
+The large collection of flakeheaven plugins is a bit overboard while I continue to find the best mixture of plugins that work best for my projects.
