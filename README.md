@@ -29,8 +29,14 @@ netgate-xml-to-xlsx --help
 ```
 
 ```
+# Sanitize a Netgate configuration file for review.
+netgate-xml-to-xlsx --sanitize firewall-config.xml
+
 # Convert a Netgate firewall configuration file.
 netgate-xml-to-xlsx firewall-config.xml
+
+# Convert all files in a directory.
+netgate-xml-to-xlsx ../source/*-sanitized.xml
 ```
 
 ## Notes

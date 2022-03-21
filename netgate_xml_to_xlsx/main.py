@@ -6,7 +6,9 @@ from collections import OrderedDict
 import datetime
 import html
 import ipaddress
+import os
 from pathlib import Path
+import re
 import sys
 
 from openpyxl import Workbook
@@ -44,7 +46,12 @@ def parse_args():
         help=f"Output directory. Default: {default}",
     )
     parser.add_argument(
-        "infile_names", nargs="+", help="One or more Netgate .xml files to process."
+        "in_filenames", nargs="+", help="One or more Netgate .xml files to process."
+    )
+    parser.add_argument(
+        "--sanitize",
+        action="store_true",
+        help="Sanitize the input xml files and save as <filename>-sanitized.",
     )
     parser.add_argument(
         "--version",
@@ -64,6 +71,21 @@ def parse_args():
         print(f"Error: {err}")
         sys.exit(-1)
     return args
+
+
+def _sanitize_xml(raw_xml: str) -> str:
+    """Sanitize the xml."""
+    regexes = (
+        re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
+        re.compile("(<radius_secret>).*?(</radios_secret>)"),
+        re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
+        re.compile("(<stats_password>).*?(</stats_password>)"),
+        re.compile("(<password>).*?(</password>)"),
+        re.compile("(<tls>).*?(</tls>)"),
+    )
+    for regex in regexes:
+        raw_xml = regex.sub(r"\1SANITIZED\2", raw_xml)
+    return raw_xml
 
 
 def _format_privs(privs: list[tuple[str, str | None]] | str | None) -> str | None:
@@ -168,14 +190,16 @@ def _load_standard_nodes(*, nodes: OrderedDict, field_names: list[str]) -> list[
 class PfSense:
     """Handle all pfSense parsing and conversion."""
 
-    def __init__(self, args: argparse.Namespace, infile_name: str) -> None:
+    def __init__(self, args: argparse.Namespace, in_filename: str) -> None:
         """
         Initialize and load XML.
 
         Technically a bit too much work to do in an init (since it can fail).
         """
         self.args = args
-        self.infile_name = infile_name
+        self.in_filename = in_filename
+        self.raw_xml: dict = {}
+        self.pfsense: dict = {}
         self.workbook: Workbook = Workbook()
 
         # ss_filename is expected to be overwritten by
@@ -183,7 +207,7 @@ class PfSense:
         self._init_styles()
         self.default_alignment = Alignment(wrap_text=True, vertical="top")
 
-        self.pfsense: dict = self._load()
+        self._load()
 
     def _init_styles(self) -> None:
         """Iniitalized worksheet styles."""
@@ -234,11 +258,10 @@ class PfSense:
 
         Return pfsense keys.
         """
-        with open(self.infile_name, encoding="utf-8") as fh:
-            source = fh.read()
-        data = xmltodict.parse(source)
-        pfsense = data["pfsense"]
-        return pfsense
+        with open(self.in_filename, encoding="utf-8") as fh:
+            self.raw_xml = fh.read()
+        data = xmltodict.parse(self.raw_xml)
+        self.pfsense = data["pfsense"]
 
     def _write_sheet(
         self,
@@ -293,6 +316,23 @@ class PfSense:
         run_date = f"Run date: {now}"
 
         self._write_row(sheet, [run_date], row_number + 1, style_name="footer")
+
+    def sanitize(self) -> None:
+        """
+        Sanitize the raw XML and save as original filename + '-sanitized'.
+
+        The Netgate configuration file XML is well ordered and thus searchable via regex.
+        """
+        self.raw_xml = _sanitize_xml(self.raw_xml)
+
+        # Save sanitized XML
+        parts = os.path.splitext(self.in_filename)
+        if len(parts) == 1:
+            out_path = Path(f"{parts[0]}-sanitized")
+        else:
+            out_path = Path(f"{parts[0]}-sanitized{parts[1]}")
+        out_path.write_text(self.raw_xml, encoding="utf-8")
+        print(f"Sanitized file written: {out_path}.")
 
     def save(self) -> None:
         """Delete empty first sheet and then save Workbook."""
@@ -706,8 +746,12 @@ def main() -> None:
     """Driver."""
     args = parse_args()
 
-    for infile_name in args.infile_names:
-        pfsense = PfSense(args, infile_name)
+    for in_filename in args.in_filenames:
+        pfsense = PfSense(args, in_filename)
+
+        if args.sanitize:
+            pfsense.sanitize()
+            continue
 
         # Worksheet creation order.
         pfsense.system()
