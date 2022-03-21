@@ -169,9 +169,19 @@ def _get_element(root_node, els, default="Missing") -> str:
         return default
 
 
-def _load_standard_nodes(*, nodes: OrderedDict, field_names: list[str]) -> list[list]:
+def _load_standard_nodes(
+    *, nodes: OrderedDict | list | None, field_names: list[str]
+) -> list[list]:
     """Load nodes that do not require special handling into rows."""
     rows = []
+    if nodes is None:
+        return rows
+    assert nodes is not None
+
+    # If a single dictionary, put it into a list
+    if isinstance(nodes, OrderedDict):
+        nodes = [nodes]
+
     for node in nodes:
         if node is None:
             # blank <openvpn-server></openvpn-server> for example.
