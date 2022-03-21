@@ -656,8 +656,8 @@ class PfSense:
 
         # Load default IPV4 and IPV6 gateways.
         # Don't want "None" for default gateway.
-        default_gw4 = self.pfsense["gateways"]["defaultgw4"] or ""
-        default_gw6 = self.pfsense["gateways"]["defaultgw6"] or ""
+        default_gw4 = _get_element(self.pfsense, "gateways,defaultgw4", "")
+        default_gw6 = _get_element(self.pfsense, "gateways,defaultgw6", "")
 
         # Which column has the gateway name.
         gw_name_col = 0
