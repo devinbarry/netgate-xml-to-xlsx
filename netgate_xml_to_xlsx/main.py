@@ -43,7 +43,9 @@ def parse_args():
         default=default,
         help=f"Output directory. Default: {default}",
     )
-    parser.add_argument("infile", type=argparse.FileType("r"))
+    parser.add_argument(
+        "infile_names", nargs="+", help="One or more Netgate .xml files to process."
+    )
     parser.add_argument(
         "--version",
         action="version",
@@ -166,20 +168,22 @@ def _load_standard_nodes(*, nodes: OrderedDict, field_names: list[str]) -> list[
 class PfSense:
     """Handle all pfSense parsing and conversion."""
 
-    def __init__(self, args: argparse.Namespace) -> None:
+    def __init__(self, args: argparse.Namespace, infile_name: str) -> None:
         """
         Initialize and load XML.
 
         Technically a bit too much work to do in an init (since it can fail).
         """
         self.args = args
+        self.infile_name = infile_name
         self.workbook: Workbook = Workbook()
-        self.pfsense: dict = self._load()
-        self.default_alignment = Alignment(wrap_text=True, vertical="top")
 
         # ss_filename is expected to be overwritten by
         self.ss_filename = "output.xlxs"
         self._init_styles()
+        self.default_alignment = Alignment(wrap_text=True, vertical="top")
+
+        self.pfsense: dict = self._load()
 
     def _init_styles(self) -> None:
         """Iniitalized worksheet styles."""
@@ -230,7 +234,8 @@ class PfSense:
 
         Return pfsense keys.
         """
-        source = self.args.infile.read()
+        with open(self.infile_name, encoding="utf-8") as fh:
+            source = fh.read()
         data = xmltodict.parse(source)
         pfsense = data["pfsense"]
         return pfsense
@@ -700,22 +705,24 @@ def banner(pfsense: PfSense) -> None:
 def main() -> None:
     """Driver."""
     args = parse_args()
-    pfsense = PfSense(args)
 
-    # Worksheet creation order.
-    pfsense.system()
+    for infile_name in args.infile_names:
+        pfsense = PfSense(args, infile_name)
 
-    # Need to parse system before banner has the information it needs.
-    banner(pfsense)
-    pfsense.system_groups()
-    pfsense.system_users()
-    pfsense.aliases()
-    pfsense.rules()
-    pfsense.interfaces()
-    pfsense.gateways()
-    pfsense.openvpn_server()
-    pfsense.installed_packages()
-    pfsense.save()
+        # Worksheet creation order.
+        pfsense.system()
+
+        # Need to parse system before banner has the information it needs.
+        banner(pfsense)
+        pfsense.system_groups()
+        pfsense.system_users()
+        pfsense.aliases()
+        pfsense.rules()
+        pfsense.interfaces()
+        pfsense.gateways()
+        pfsense.openvpn_server()
+        pfsense.installed_packages()
+        pfsense.save()
 
 
 if __name__ == "__main__":
