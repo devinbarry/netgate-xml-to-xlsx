@@ -149,6 +149,9 @@ def _load_standard_nodes(*, nodes: OrderedDict, field_names: list[str]) -> list[
     """Load nodes that do not require special handling into rows."""
     rows = []
     for node in nodes:
+        if node is None:
+            # blank <openvpn-server></openvpn-server> for example.
+            continue
         row = []
         for field_name in field_names:
             row.append(
