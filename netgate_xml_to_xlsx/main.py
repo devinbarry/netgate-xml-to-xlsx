@@ -35,7 +35,7 @@ def parse_args():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser("Netgate XML to XLSX")
 
-    default = "./"
+    default = "./output"
     parser.add_argument(
         "--output-dir",
         "-o",
