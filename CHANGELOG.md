@@ -1,9 +1,12 @@
 # CHANGELOG
 
-## Unreleased 0.9.4-alpha --
+## Release 0.9.5-a2 -- 2022-03-22
 
 * Unbound sheet.
 * Improve access to possibly missing elements.
+* Add --sanitized option.
+* Delete unsanitized file after it is sanitized.
+* Only process sanitized files.
 
 ## Release 0.9.3-alpha -- 2022-03-21
 

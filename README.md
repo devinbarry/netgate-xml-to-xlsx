@@ -19,19 +19,31 @@ Once installed, the `netgate-xml-to-xlsx` command is available on your path.
 
 ## Usage
 
-* By default, output is sent to the current directory.
-* Use the `--output-dir` parameter to set a specific output directory.
-* The output filename is based on the `hostname` and `domain` elements of the XML `system` element.
-
+### Help
 ```
 # Display help
 netgate-xml-to-xlsx --help
 ```
 
-```
-# Sanitize a Netgate configuration file for review.
-netgate-xml-to-xlsx --sanitize firewall-config.xml
+### Sanitize Before Use
+Netgate configuration files contains sensitive information.
+Sanitize the files before processing.
+Only sanitized files can be processed.
+The original (unsanitized) file is deleted.
 
+```
+# Sanitize Netgate configuration file(s) for review.
+netgate-xml-to-xlsx --sanitize firewall-config.xml
+netgate-xml-to-xlsx --sanitize dir/*
+```
+
+### Convert to Spreadsheet
+* By default, output is sent to the `./output` directory.
+* Use the `--output-dir` parameter to set a specific output directory.
+* The output filename is based on the `hostname` and `domain` elements of the XML `system` element.
+* Only sanitized files can generate a spreadsheet output.
+
+```
 # Convert a Netgate firewall configuration file.
 netgate-xml-to-xlsx firewall-config.xml
 
