@@ -34,7 +34,11 @@ class MissingField(ScriptError):
 
 
 def parse_args():
-    """Parse command line arguments."""
+    """
+    Parse command line arguments.
+
+    Process in_files and out_dir.
+    """
     parser = argparse.ArgumentParser("Netgate XML to XLSX")
 
     default = "./output"
@@ -46,7 +50,7 @@ def parse_args():
         help=f"Output directory. Default: {default}",
     )
     parser.add_argument(
-        "in_filenames", nargs="+", help="One or more Netgate .xml files to process."
+        "in_files", nargs="+", help="One or more Netgate .xml files to process."
     )
     parser.add_argument(
         "--sanitize",
@@ -61,6 +65,26 @@ def parse_args():
     )
 
     args = parser.parse_args()
+
+    # Filter files in/out.
+    if args.sanitize:
+        args.in_files = _filter_infiles(args.in_files, include=False)
+        msg = "All files already sanitized."
+    else:
+        args.in_files = _filter_infiles(args.in_files)
+        msg = (
+            "No files contain 'sanitized' in the name.\n"
+            "Run --sanitize before processing."
+        )
+
+    if not args.in_files:
+        print(msg)
+        exit(-1)
+
+    # Convert list of in_files to list of Path objects.
+    # Ensure they are files, not directories.
+    args.in_files = [Path(x) for x in args.in_files]
+    args.in_files = [x for x in args.in_files if x.is_file()]
 
     # Convert output-dir to path and optionally create path.
     out_dir = Path(args.output_dir)
@@ -224,7 +248,7 @@ class PfSense:
         Technically a bit too much work to do in an init (since it can fail).
         """
         self.args = args
-        self.in_filename = in_filename
+        self.in_file = Path(in_filename)
         self.raw_xml: dict = {}
         self.pfsense: dict = {}
         self.workbook: Workbook = Workbook()
@@ -285,8 +309,9 @@ class PfSense:
 
         Return pfsense keys.
         """
-        with open(self.in_filename, encoding="utf-8") as fh:
-            self.raw_xml = fh.read()
+        # with open(self.in_file, encoding="utf-8") as fh:
+        self.raw_xml = self.in_file.read_text(encoding="utf-8")
+        # self.raw_xml = fh.read()
         data = xmltodict.parse(self.raw_xml)
         self.pfsense = data["pfsense"]
 
@@ -353,13 +378,17 @@ class PfSense:
         self.raw_xml = _sanitize_xml(self.raw_xml)
 
         # Save sanitized XML
-        parts = os.path.splitext(self.in_filename)
+        parts = os.path.splitext(self.in_file)
         if len(parts) == 1:
             out_path = Path(f"{parts[0]}-sanitized")
         else:
             out_path = Path(f"{parts[0]}-sanitized{parts[1]}")
         out_path.write_text(self.raw_xml, encoding="utf-8")
         print(f"Sanitized file written: {out_path}.")
+
+        # Delete the unsanitized file.
+        self.in_file.unlink()
+        print(f"Deleted original file: {self.in_file}.")
 
     def save(self) -> None:
         """Delete empty first sheet and then save Workbook."""
@@ -869,11 +898,23 @@ def banner(pfsense: PfSense) -> None:
     print(f"Output will be: {pfsense.args.output_dir / pfsense.ss_filename}.")
 
 
+def _filter_infiles(in_files: list[str], include=True) -> list[str]:
+    """
+    Return list of in_files that contain (include) or do not contain (exclused) 'sanitized'.
+
+    """
+    if include:
+        return [x for x in in_files if "sanitized" in x]
+    return [x for x in in_files if "sanitized" not in x]
+
+
 def main() -> None:
     """Driver."""
     args = parse_args()
 
-    for in_filename in args.in_filenames:
+    in_files = args.in_files
+
+    for in_filename in in_files:
         pfsense = PfSense(args, in_filename)
 
         if args.sanitize:
