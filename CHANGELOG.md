@@ -2,7 +2,8 @@
 
 ## Unreleased 0.9.4-alpha --
 
-* Unbound
+* Unbound sheet.
+* Improve access to possibly missing elements.
 
 ## Release 0.9.3-alpha -- 2022-03-21
 

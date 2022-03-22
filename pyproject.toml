@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netgate-xml-to-xlsx"
-version = "0.9.4a1"
+version = "0.9.5a1"
 description = "Translate Netgate firewall rules to spreadsheet for review."
 authors = ["Raymond GA Côté <ray@AppropriateSolutions.com>"]
 keywords = ["firewall", "netgate"]
