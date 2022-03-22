@@ -156,13 +156,13 @@ def _adjust_field_value(*, field_name: str, value: str | None) -> str | None:
 
 def _updated_or_created(node: OrderedDict) -> str:
     """Return "updated" or "created" value, or ""."""
-    if updated := _get_element(node, "updated,time".split(",")):
+    if updated := _get_element(node, "updated,time"):
         return updated
-    return _get_element(node, "created,time".split(","))
+    return _get_element(node, "created,time")
 
 
 def _get_element(
-    root_node: OrderedDict, els: OrderedDict | str, default=""
+    root_node: OrderedDict, els: list[str] | str, default=""
 ) -> OrderedDict | str | None:
     """
     Iterate down the tree and return path.
@@ -170,7 +170,7 @@ def _get_element(
     Use try/except for missing keys as None is a valid return value.
     """
     if isinstance(els, str):
-        els = [els]
+        els = els.split(",")
 
     if root_node is None:
         return default
@@ -179,6 +179,8 @@ def _get_element(
     try:
         for el in els:
             node = node[el]
+            if node is None:
+                return default
         return node
     except KeyError:
         return default
@@ -427,9 +429,8 @@ class PfSense:
         time_servers = "\n".join(node.get("timeservers", "").split(" "))
         rows.append(["timeservers", time_servers])
 
-        # TODO: TBD Elements while determining how Netgate uses blank elements.
-        rows.append(["bogons", _get_element(node, "bogons,interval".split(","), "TBD")])
-        rows.append(["ssh", _get_element(node, "ssh,enabled".split(","), "TBD")])
+        rows.append(["bogons", _get_element(node, "bogons,interval", "TBD")])
+        rows.append(["ssh", _get_element(node, "ssh,enabled", "TBD")])
         rows.append(["dnsserver", "\n".join(node.get("dnsserver", ""))])
 
         self._write_sheet(
@@ -450,7 +451,9 @@ class PfSense:
         field_names = "name,description,scope,gid,priv".split(",")
         column_widths = [int(x) for x in "40,80,20,20,80".split(",")]
 
-        nodes = self.pfsense["system"]["group"]
+        nodes = _get_element(self.pfsense, "system,group")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
@@ -484,7 +487,9 @@ class PfSense:
         field_names = "name,descr,scope,expires,ipsecpk,uid,cert".split(",")
         column_widths = [int(x) for x in "40,60,20,20,20,10,60".split(",")]
 
-        nodes = self.pfsense["system"]["user"]
+        nodes = _get_element(self.pfsense, "system,user")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
@@ -509,7 +514,9 @@ class PfSense:
         field_names = "name,type,address,url,updatefreq,descr,detail".split(",")
         column_widths = [int(x) for x in "40,40,40,80,20,80,80".split(",")]
 
-        nodes = self.pfsense["aliases"]["alias"]
+        nodes = _get_element(self.pfsense, "aliases,alias")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
@@ -525,9 +532,9 @@ class PfSense:
 
     def _updated_or_created(self, data: OrderedDict) -> str:
         """Return updated or created timestamp."""
-        if updated := _get_element(data, "updated,time".split(",")):
+        if updated := _get_element(data, "updated,time"):
             return updated
-        return _get_element(data, "created,time".split(","))
+        return _get_element(data, "created,time")
 
     def _rules_source(self, row: list, field_index: int) -> str:
         """Extract source or 'any'."""
@@ -605,13 +612,15 @@ class PfSense:
         created_index = field_names.index("created")
         updated_index = field_names.index("updated")
 
-        nodes = self.pfsense["filter"]["rule"]
+        nodes = _get_element(self.pfsense, "filter,rule")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
         # Sort rules so that latest changes are at the top.
         nodes.sort(
-            key=lambda x: _updated_or_created(x),
+            key=_updated_or_created,
             reverse=True,
         )
 
@@ -651,17 +660,15 @@ class PfSense:
 
         # Don't sort interfaces. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
-        nodes = self.pfsense["interfaces"]
-        if isinstance(nodes, OrderedDict):
-            # Only found one.
-            nodes = [nodes]
-
+        nodes = _get_element(self.pfsense, "interfaces")
+        if not nodes:
+            return
+        # In this case we want a single OrderedDict.
         # Remove 'name' from the field_names as we're going to replace that with the key.
         del field_names[0]
+
         for name, node in nodes.items():
-            row = [
-                name,
-            ]
+            row = [name]
             for field_name in field_names:
                 row.append(_unescape(node.get(field_name, "")))
             rows.append(row)
@@ -692,7 +699,9 @@ class PfSense:
         gw_name_col = 0
 
         # Don't sort nodes for now. Leave in order found.
-        nodes = self.pfsense["gateways"]["gateway_item"]
+        nodes = _get_element(self.pfsense, "gateways,gateway_item")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
@@ -703,10 +712,8 @@ class PfSense:
                 try:
                     row.append(_unescape(node.get(field_name, "")))
                 except AttributeError as err:
-                    import pdb
-
-                    pdb.set_trace()
                     print(err)
+                    sys.exit(-1)
             if default_gw4 == row[gw_name_col]:
                 row.append("YES")
             else:
@@ -754,7 +761,11 @@ class PfSense:
 
         # Don't sort OpenVPN Servers. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
-        nodes = self.pfsense["openvpn"]["openvpn-server"]
+        nodes = _get_element(self.pfsense, "openvpn,openvpn-server")
+        if not nodes:
+            return
+        if isinstance(nodes, OrderedDict):
+            nodes = [nodes]
 
         rows = _load_standard_nodes(nodes=nodes, field_names=field_names)
         self._write_sheet(
@@ -773,7 +784,9 @@ class PfSense:
         ).split(",")
         column_widths = [int(x) for x in "40,40,50,20,50,50,80,80,50".split(",")]
 
-        nodes = self.pfsense["installedpackages"]["package"]
+        nodes = _get_element(self.pfsense, "installedpackages,package")
+        if not nodes:
+            return
         if isinstance(nodes, OrderedDict):
             # Only found one.
             nodes = [nodes]
@@ -804,7 +817,7 @@ class PfSense:
         rows = _load_standard_nodes(nodes=node, field_names=field_names)
 
         # Only expect one row returned.
-        assert not len(rows) > 1
+        assert len(rows) <= 1
 
         if not rows:
             # No unbound values. Nothing to output.
