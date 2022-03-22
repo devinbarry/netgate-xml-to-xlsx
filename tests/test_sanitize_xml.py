@@ -3,7 +3,7 @@
 
 import pytest
 
-from netgate_xml_to_xlsx.main import _sanitize_xml
+from netgate_xml_to_xlsx.elements import sanitize_xml
 
 
 @pytest.mark.parametrize(
@@ -21,5 +21,5 @@ from netgate_xml_to_xlsx.main import _sanitize_xml
     ],
 )
 def test_sanitize(source, sanitized):
-    result = _sanitize_xml(source)
+    result = sanitize_xml(source)
     assert result == sanitized

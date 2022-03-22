@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pytest
 
-from netgate_xml_to_xlsx.main import _load_standard_nodes
+from netgate_xml_to_xlsx.elements import load_standard_nodes
 
 
 @pytest.mark.parametrize(
@@ -36,5 +36,5 @@ def test_load_standard_nodes(nodes, target):
 
     Hard code checking for 'field1, field2'.
     """
-    result = _load_standard_nodes(nodes=nodes, field_names="field1,field2".split(","))
+    result = load_standard_nodes(nodes=nodes, field_names="field1,field2".split(","))
     assert result == target

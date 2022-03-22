@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Unreleased 0.9.6 -- 
+
+* Refactor original script into modules.
+
 ## Release 0.9.5-a2 -- 2022-03-22
 
 * Unbound sheet.
