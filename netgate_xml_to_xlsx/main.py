@@ -154,6 +154,13 @@ def _adjust_field_value(*, field_name: str, value: str | None) -> str | None:
     return value
 
 
+def _updated_or_created(node: OrderedDict) -> str:
+    """Return "updated" or "created" value, or ""."""
+    if updated := _get_element(node, "updated,time".split(",")):
+        return updated
+    return _get_element(node, "created,time".split(","))
+
+
 def _get_element(
     root_node: OrderedDict, els: OrderedDict | str, default=""
 ) -> OrderedDict | str | None:
@@ -444,6 +451,10 @@ class PfSense:
         column_widths = [int(x) for x in "40,80,20,20,80".split(",")]
 
         nodes = self.pfsense["system"]["group"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
+
         nodes.sort(key=lambda x: x["name"].casefold())
 
         for node in nodes:
@@ -474,6 +485,9 @@ class PfSense:
         column_widths = [int(x) for x in "40,60,20,20,20,10,60".split(",")]
 
         nodes = self.pfsense["system"]["user"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
         nodes.sort(key=lambda x: x["name"].casefold())
 
         for node in nodes:
@@ -496,6 +510,9 @@ class PfSense:
         column_widths = [int(x) for x in "40,40,40,80,20,80,80".split(",")]
 
         nodes = self.pfsense["aliases"]["alias"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
         nodes.sort(key=lambda x: x["name"].casefold())
 
         rows = _load_standard_nodes(nodes=nodes, field_names=field_names)
@@ -508,9 +525,9 @@ class PfSense:
 
     def _updated_or_created(self, data: OrderedDict) -> str:
         """Return updated or created timestamp."""
-        if _unescape(data.get("updated")):
-            return data["updated"]["time"]
-        return data["created"]["time"]
+        if updated := _get_element(data, "updated,time".split(",")):
+            return updated
+        return _get_element(data, "created,time".split(","))
 
     def _rules_source(self, row: list, field_index: int) -> str:
         """Extract source or 'any'."""
@@ -589,11 +606,12 @@ class PfSense:
         updated_index = field_names.index("updated")
 
         nodes = self.pfsense["filter"]["rule"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
         # Sort rules so that latest changes are at the top.
         nodes.sort(
-            key=lambda x: x["updated"]["time"]
-            if x.get("updated")
-            else x["created"]["time"],
+            key=lambda x: _updated_or_created(x),
             reverse=True,
         )
 
@@ -634,6 +652,9 @@ class PfSense:
         # Don't sort interfaces. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
         nodes = self.pfsense["interfaces"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
 
         # Remove 'name' from the field_names as we're going to replace that with the key.
         del field_names[0]
@@ -672,11 +693,20 @@ class PfSense:
 
         # Don't sort nodes for now. Leave in order found.
         nodes = self.pfsense["gateways"]["gateway_item"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
 
         for node in nodes:
             row = []
             for field_name in field_names:
-                row.append(_unescape(node.get(field_name, "")))
+                try:
+                    row.append(_unescape(node.get(field_name, "")))
+                except AttributeError as err:
+                    import pdb
+
+                    pdb.set_trace()
+                    print(err)
             if default_gw4 == row[gw_name_col]:
                 row.append("YES")
             else:
@@ -744,6 +774,9 @@ class PfSense:
         column_widths = [int(x) for x in "40,40,50,20,50,50,80,80,50".split(",")]
 
         nodes = self.pfsense["installedpackages"]["package"]
+        if isinstance(nodes, OrderedDict):
+            # Only found one.
+            nodes = [nodes]
         nodes.sort(key=lambda x: x["name"].casefold())
 
         rows = _load_standard_nodes(nodes=nodes, field_names=field_names)
