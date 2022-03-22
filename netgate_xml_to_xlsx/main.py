@@ -309,9 +309,7 @@ class PfSense:
 
         Return pfsense keys.
         """
-        # with open(self.in_file, encoding="utf-8") as fh:
         self.raw_xml = self.in_file.read_text(encoding="utf-8")
-        # self.raw_xml = fh.read()
         data = xmltodict.parse(self.raw_xml)
         self.pfsense = data["pfsense"]
 
