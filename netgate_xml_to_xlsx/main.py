@@ -154,12 +154,20 @@ def _adjust_field_value(*, field_name: str, value: str | None) -> str | None:
     return value
 
 
-def _get_element(root_node, els, default="Missing") -> str:
+def _get_element(
+    root_node: OrderedDict, els: OrderedDict | str, default=""
+) -> OrderedDict | str | None:
     """
     Iterate down the tree and return path.
 
     Use try/except for missing keys as None is a valid return value.
     """
+    if isinstance(els, str):
+        els = [els]
+
+    if root_node is None:
+        return default
+
     node = root_node
     try:
         for el in els:
@@ -746,6 +754,69 @@ class PfSense:
             rows=rows,
         )
 
+    def unbound(self) -> None:
+        """Document unbound elements."""
+        rows = []
+
+        # field names for acquiring information
+        field_names = (
+            "enable,active_interface,outgoing_interface,custom_options,custom_options,"
+            "hideversion,dnssecstripped,port,system_domain_local_zone_type,sslcertref,"
+            "dnssec,tlsport"
+        ).split(",")
+        column_widths = [
+            int(x) for x in "20,20,20,20,20,20,20,20,20,20,20,20,80,80".split(",")
+        ]
+        node = _get_element(self.pfsense, "unbound")
+        rows = _load_standard_nodes(nodes=node, field_names=field_names)
+
+        # Only expect one row returned.
+        assert not len(rows) > 1
+
+        if not rows:
+            # No unbound values. Nothing to output.
+            return
+
+        # Load multi-element items.
+        domain_overrides_fieldnames = "domain,ip,descr,tls_hostname".split(",")
+        domain_overrides = _load_standard_nodes(
+            nodes=_get_element(node, "domainoverrides"),
+            field_names=domain_overrides_fieldnames,
+        )
+
+        hosts_fieldnames = "host,domain,ip,descr,aliases".split(",")
+        hosts = _load_standard_nodes(
+            nodes=_get_element(node, "hosts"), field_names=hosts_fieldnames
+        )
+
+        subrows = []
+        for domain_override in domain_overrides:
+            zipped = OrderedDict(zip(domain_overrides_fieldnames, domain_override))
+            subrows.append(
+                "\n".join([f"{key}: {value}" for key, value in zipped.items()])
+            )
+
+        rows[0].append("\n\n".join(subrows))
+
+        subrows = []
+        for host in hosts:
+            zipped = OrderedDict(zip(hosts_fieldnames, host))
+            subrows.append(
+                "\n".join([f"{key}: {value}" for key, value in zipped.items()])
+            )
+
+        rows[0].append("\n\n".join(subrows))
+
+        # Add the two subrows columns to the field names.
+        field_names.extend(("domainoverrides", "hosts"))
+
+        self._write_sheet(
+            name="Unbound",
+            field_names=field_names,
+            column_widths=column_widths,
+            rows=rows,
+        )
+
 
 def banner(pfsense: PfSense) -> None:
     """Tell people what we're doing."""
@@ -776,6 +847,7 @@ def main() -> None:
         pfsense.gateways()
         pfsense.openvpn_server()
         pfsense.installed_packages()
+        pfsense.unbound()
         pfsense.save()
 
 
