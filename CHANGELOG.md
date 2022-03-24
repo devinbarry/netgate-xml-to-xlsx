@@ -1,8 +1,9 @@
 # CHANGELOG
 
-## Unreleased 0.9.6 -- 
+## Released 0.9.6-a1 -- 2022-03-24
 
 * Refactor original script into modules.
+* Convert to plugin architecture.
 
 ## Release 0.9.5-a2 -- 2022-03-22
 
