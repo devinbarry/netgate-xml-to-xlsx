@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 import pytest
 
-from netgate_xml_to_xlsx.elements import load_standard_nodes
+from netgate_xml_to_xlsx.plugins.support.elements import load_standard_nodes
 
 
 @pytest.mark.parametrize(

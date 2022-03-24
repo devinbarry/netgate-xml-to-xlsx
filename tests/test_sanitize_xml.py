@@ -3,7 +3,7 @@
 
 import pytest
 
-from netgate_xml_to_xlsx.elements import sanitize_xml
+from netgate_xml_to_xlsx.plugins.support.elements import sanitize_xml
 
 
 @pytest.mark.parametrize(
