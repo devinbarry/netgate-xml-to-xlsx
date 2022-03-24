@@ -15,6 +15,11 @@ Recommend installing this in a virtual environment.
 python -m pip install netgate-xml-to-xlsx
 ```
 
+Or by using pipx
+```
+pipx install netgate-xml-to-xlsx
+```
+
 Once installed, the `netgate-xml-to-xlsx` command is available on your path.
 
 ## Usage
@@ -51,7 +56,23 @@ netgate-xml-to-xlsx firewall-config.xml
 netgate-xml-to-xlsx ../source/*-sanitized.xml
 ```
 
-## Notes
+## Implementation Notes
+
+### Why a plugin architecture?
+
+This is an explicit decision to provide flexibility vs. speed/efficiency.
+A standard interface only gets so far and attempting to shoe-horn some of the complex elements into a standardized approach seemed futile.
+Some additional advantages are:
+
+* Simplifies testing.
+  Plugins parse XML and return a list of rows to be output.
+  Plugins do not do their own output.
+  This allows tests to provide source XML and check the returned rows.
+* There are numerous Netgate plugins which I'll probably never see.
+  Now people can add their own plugins, along with tests.
+* Allows us to have a configuration file that defines what plugins to run, and the order in which to run them.
+
+
 
 ### Using flakeheaven
 The large collection of flakeheaven plugins is a bit overboard while I continue to find the best mixture of plugins that work best for my projects.

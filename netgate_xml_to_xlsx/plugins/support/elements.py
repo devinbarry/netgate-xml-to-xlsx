@@ -7,7 +7,7 @@ import html
 import ipaddress
 import re
 
-from .errors import UnknownField
+from ...errors import UnknownField
 
 
 def sanitize_xml(raw_xml: str) -> str:
@@ -34,14 +34,20 @@ def unescape(value: str | None) -> str | None:
     return html.unescape(value)
 
 
-def adjust_field_value(*, field_name: str, value: str | None) -> str | None:
+def adjust_field_value(
+    *, field_name: str, value: str | int | OrderedDict | None
+) -> str | None:
     """Make adjustments based on field_name."""
     if value is None:
         return None
     assert value is not None
 
-    # Convert XML escape codes
-    assert value is not None
+    if isinstance(value, dict):
+        return value
+    assert not isinstance(value, OrderedDict)
+
+    if isinstance(value, str):
+        value = unescape(value)
 
     if field_name == "descr":
         value = value.replace("<br />", "\n")
@@ -73,6 +79,9 @@ def adjust_field_value(*, field_name: str, value: str | None) -> str | None:
 
     if field_name == "address":
         return nice_address_sort(value)
+
+    if field_name == "priv":
+        return format_privs(value)
 
     return value
 
@@ -107,7 +116,7 @@ def load_standard_nodes(
 
 def get_element(
     root_node: OrderedDict, els: list[str] | str, default=""
-) -> OrderedDict | str | None:
+) -> OrderedDict | str | int | None:
     """
     Iterate down the tree and return path.
 
@@ -125,6 +134,9 @@ def get_element(
             node = node[el]
             if node is None:
                 return default
+
+            if isinstance(node, str) or isinstance(node, list):
+                return adjust_field_value(field_name=el, value=node)
         return node
     except KeyError:
         return default
