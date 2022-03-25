@@ -149,7 +149,7 @@ class PfSense:
         """
         plugin = self.plugins[plugin_name]
         for sheet_data in plugin.run(self.pfsense):
-            if not sheet_data:
+            if sheet_data is None or not sheet_data.data_rows:
                 continue
 
             self._write_sheet(

@@ -4,7 +4,7 @@
 from collections import OrderedDict
 
 
-def _split_commas(data: str | list, make_int=False) -> list:
+def split_commas(data: str | list, make_int=False) -> list:
     """
     Create list from comma-delimited string (or list).
 
@@ -68,8 +68,8 @@ class BasePlugin:
 
         """
         self.display_name = display_name
-        self.field_names = _split_commas(field_names)
-        self.column_widths = _split_commas(column_widths, make_int=True)
+        self.field_names = split_commas(field_names)
+        self.column_widths = split_commas(column_widths, make_int=True)
 
     def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
         """
