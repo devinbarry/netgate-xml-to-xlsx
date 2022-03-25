@@ -21,6 +21,10 @@ def split_commas(data: str | list, make_int=False) -> list:
         list
 
     """
+    if not data:
+        # Don't mess with empty strings.
+        return data
+
     if isinstance(data, str):
         data = data.split(",")
 

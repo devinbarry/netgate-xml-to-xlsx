@@ -50,10 +50,10 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name="HAProxy",
-        field_names: str = FIELD_NAMES,
-        column_widths: str = WIDTHS,
+        field_names: str = "",
+        column_widths: str = "",
     ):
-        """Initialize."""
+        """Ignore field_names and column_widths as we create them individually."""
         super().__init__(display_name, field_names, column_widths)
 
     def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
