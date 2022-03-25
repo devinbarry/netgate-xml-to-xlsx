@@ -3,7 +3,7 @@
 
 from collections import OrderedDict
 
-from ..base_plugin import BasePlugin
+from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
     get_element,
 )
@@ -63,4 +63,9 @@ class Plugin(BasePlugin):
         rows.append(["ssh", get_element(node, "ssh,enabled")])
         rows.append(["dnsserver", "\n".join(get_element(node, "dnsserver"))])
 
-        return rows
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.field_names,
+            data_rows=rows,
+            column_widths=self.column_widths,
+        )

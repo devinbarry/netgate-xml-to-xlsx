@@ -3,7 +3,7 @@
 
 from collections import OrderedDict
 
-from ..base_plugin import BasePlugin
+from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
     get_element,
     rules_destination,
@@ -67,4 +67,9 @@ class Plugin(BasePlugin):
 
             rows.append(row)
 
-        return rows
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.field_names,
+            data_rows=rows,
+            column_widths=self.column_widths,
+        )

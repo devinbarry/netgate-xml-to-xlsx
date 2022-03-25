@@ -29,6 +29,24 @@ def _split_commas(data: str | list, make_int=False) -> list:
     return data
 
 
+class SheetData:
+    """All information required to display a worksheet."""
+
+    def __init__(
+        self,
+        *,
+        sheet_name: str,
+        header_row=list[str | int],
+        data_rows: list[list],
+        column_widths: list[int],
+    ) -> None:
+        """Gather all necessary information."""
+        self.sheet_name = sheet_name
+        self.header_row = header_row
+        self.data_rows = data_rows
+        self.column_widths = column_widths
+
+
 class BasePlugin:
     """Base of all plugins."""
 

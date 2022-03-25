@@ -106,12 +106,12 @@ class PfSense:
         self,
         *,
         sheet_name: str,
-        field_names: list[str],
+        header_row: list[str],
         column_widths: list[int],
         rows: list[list],
     ):
         sheet = self.workbook.create_sheet(sheet_name)
-        sheet_header(sheet, field_names, column_widths)
+        sheet_header(sheet, header_row, column_widths)
 
         # Define starting row num in case there are no rows to display.
         row_num = 2
@@ -141,19 +141,23 @@ class PfSense:
         print(f"Deleted original file: {self.in_file}.")
 
     def run(self, plugin_name: BasePlugin) -> None:
-        """Run specific plugin and write sheet."""
-        plugin = self.plugins[plugin_name]
-        rows = plugin.run(self.pfsense)
-        if not len(rows):
-            # No data returned
-            return
+        """
+        Run specific plugin and write sheet(s).
 
-        self._write_sheet(
-            sheet_name=plugin.display_name,
-            field_names=plugin.field_names,
-            column_widths=plugin.column_widths,
-            rows=rows,
-        )
+        Plugins yield a SheetData object.
+        Continue iterating if it is None.
+        """
+        plugin = self.plugins[plugin_name]
+        for sheet_data in plugin.run(self.pfsense):
+            if not sheet_data:
+                continue
+
+            self._write_sheet(
+                sheet_name=sheet_data.sheet_name,
+                header_row=sheet_data.header_row,
+                column_widths=sheet_data.column_widths,
+                rows=sheet_data.data_rows,
+            )
 
     def save(self) -> None:
         """Delete empty first sheet and then save Workbook."""

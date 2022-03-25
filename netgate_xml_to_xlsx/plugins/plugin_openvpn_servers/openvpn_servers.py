@@ -3,7 +3,7 @@
 
 from collections import OrderedDict
 
-from ..base_plugin import BasePlugin
+from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
     get_element,
     load_standard_nodes,
@@ -56,4 +56,10 @@ class Plugin(BasePlugin):
             nodes = [nodes]
 
         rows.extend(load_standard_nodes(nodes=nodes, field_names=self.field_names))
-        return rows
+
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.field_names,
+            data_rows=rows,
+            column_widths=self.column_widths,
+        )

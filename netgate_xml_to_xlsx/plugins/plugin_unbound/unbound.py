@@ -3,7 +3,7 @@
 
 from collections import OrderedDict
 
-from ..base_plugin import BasePlugin
+from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
     get_element,
     load_standard_nodes,
@@ -76,4 +76,9 @@ class Plugin(BasePlugin):
         # Add the two subrows columns to the field names.
         self.field_names.extend(("domainoverrides", "hosts"))
 
-        return rows
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.field_names,
+            data_rows=rows,
+            column_widths=self.column_widths,
+        )
