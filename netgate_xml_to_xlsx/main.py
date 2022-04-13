@@ -10,7 +10,7 @@ from .pfsense import PfSense
 # Eventually allow commandline argument to run additional plugins.
 PLUGINS_TO_RUN = (
     "system,system_groups,system_users,aliases,rules,interfaces,gateways,"
-    "openvpn_servers,installed_packages,unbound"
+    "openvpn_servers,installed_packages,unbound,"
     "haproxy"
 ).split(",")
 
