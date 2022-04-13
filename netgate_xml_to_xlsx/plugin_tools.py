@@ -10,7 +10,7 @@ from . import plugins
 from .plugins.base_plugin import BasePlugin
 
 
-def iter_namespace(ns_pkg: ModuleType) -> Iterator:
+def iter_namespace(ns_pkg: ModuleType) -> Iterator[pkgutil.ModuleInfo]:
     """Gather all modules in namespace."""
     return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
 
