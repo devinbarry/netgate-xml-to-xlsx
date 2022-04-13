@@ -44,14 +44,14 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Document all OpenVPN servers."""
-        rows = super().run(pfsense)
+        rows = []
 
         # Don't sort OpenVPN Servers. Want them in the order they are encountered.
         nodes = get_element(pfsense, "openvpn,openvpn-server")
         if not nodes:
-            return []
+            return
 
         if isinstance(nodes, OrderedDict):
             nodes = [nodes]

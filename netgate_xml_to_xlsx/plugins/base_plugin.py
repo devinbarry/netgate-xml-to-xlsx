@@ -1,11 +1,12 @@
 """Base plugin class."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
+from abc import ABC, abstractmethod
 from collections import OrderedDict
-from typing import Generator
+from typing import Generator, cast
 
 
-def split_commas(data: str | list, make_int: bool = False) -> list:
+def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
     """
     Create list from comma-delimited string (or list).
 
@@ -24,7 +25,7 @@ def split_commas(data: str | list, make_int: bool = False) -> list:
     """
     if not data:
         # Don't mess with empty strings.
-        return data
+        return []
 
     if isinstance(data, str):
         data = data.split(",")
@@ -41,7 +42,7 @@ class SheetData:
         self,
         *,
         sheet_name: str,
-        header_row=list[str | int],
+        header_row: list[str | int],
         data_rows: list[list],
         column_widths: list[int],
     ) -> None:
@@ -52,7 +53,7 @@ class SheetData:
         self.column_widths = column_widths
 
 
-class BasePlugin:
+class BasePlugin(ABC):
     """Base of all plugins."""
 
     def __init__(
@@ -72,11 +73,14 @@ class BasePlugin:
             Comma-delimited list of sheet column widths.
 
         """
-        self.display_name = display_name
-        self.field_names = split_commas(field_names)
-        self.column_widths = split_commas(column_widths, make_int=True)
+        self.display_name: str = display_name
+        self.field_names: list[str] = cast(list[str], split_commas(field_names))
+        self.column_widths: list[int] = cast(
+            list[int], split_commas(column_widths, make_int=True)
+        )
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    @abstractmethod
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """
         Run plugin.
 
@@ -88,6 +92,4 @@ class BasePlugin:
             List of rows to write to spreadsheet.
 
         """
-        # Placeholder for future possible functionality.
-        _ = pfsense
-        return []
+        pass

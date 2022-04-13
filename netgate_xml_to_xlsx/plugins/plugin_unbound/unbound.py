@@ -30,10 +30,8 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
-        rows = super().run(pfsense)
-
         node = get_element(pfsense, "unbound")
         rows = load_standard_nodes(nodes=node, field_names=self.field_names)
 
@@ -42,7 +40,7 @@ class Plugin(BasePlugin):
 
         if not rows:
             # No unbound values. Nothing to output.
-            return []
+            return
 
         # Load multi-element items.
         domain_overrides_fieldnames = "domain,ip,descr,tls_hostname".split(",")

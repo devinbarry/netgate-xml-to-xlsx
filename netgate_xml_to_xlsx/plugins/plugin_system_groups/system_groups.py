@@ -25,18 +25,17 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """
         Sheet with system.group information.
 
         Multiple groups with multiple privileges.
         Display privileges alpha sorted.
         """
-        rows = super().run(pfsense)
-
+        rows = []
         nodes = get_element(pfsense, "system,group")
         if not nodes:
-            return []
+            return
 
         if isinstance(nodes, OrderedDict):
             # Only found one.

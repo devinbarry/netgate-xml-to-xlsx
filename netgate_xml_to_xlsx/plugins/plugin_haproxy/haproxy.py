@@ -2,6 +2,7 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from collections import OrderedDict
+from typing import Generator, cast
 
 from ..base_plugin import BasePlugin, SheetData, split_commas
 from ..support.elements import (
@@ -10,7 +11,7 @@ from ..support.elements import (
 )
 
 
-def _haproxy_overview(nodes: OrderedDict) -> SheetData:
+def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
     """Top-level haproxy elements.
 
     Return two columns: Name/Value.
@@ -33,11 +34,13 @@ def _haproxy_overview(nodes: OrderedDict) -> SheetData:
         sheet_name="HAProxy",
         header_row=split_commas("Name,Value"),
         data_rows=rows,
-        column_widths=split_commas(column_widths),
+        column_widths=cast(list[int], split_commas(column_widths)),
     )
 
 
-def _haproxy_backends(nodes: OrderedDict | list[OrderedDict]) -> SheetData:
+def _haproxy_backends(
+    nodes: OrderedDict | list[OrderedDict],
+) -> Generator[SheetData, None, None]:
     """HAProxy backends can have 1 or more items."""
     rows = []
     field_names = split_commas(
@@ -47,8 +50,9 @@ def _haproxy_backends(nodes: OrderedDict | list[OrderedDict]) -> SheetData:
         "dcertadv,ssloffloadcert,advanced,ha_acls,httpclose"  # 20
     )
 
-    column_widths = split_commas(
-        "20,20,20,25,25,20,20,20,20,40,20,20,20,20,20,80,20,20,20,20,20"
+    column_widths = cast(
+        list[int],
+        split_commas("20,20,20,25,25,20,20,20,20,40,20,20,20,20,20,80,20,20,20,20,20"),
     )
 
     if isinstance(nodes, OrderedDict):
@@ -86,9 +90,12 @@ def _haproxy_backends(nodes: OrderedDict | list[OrderedDict]) -> SheetData:
     )
 
 
-def _haproxy_pools(nodes: OrderedDict | list[OrderedDict]) -> SheetData:
+def _haproxy_pools(
+    nodes: OrderedDict | list[OrderedDict],
+) -> Generator[SheetData, None, None]:
     """HAProxy pools."""
     rows = []
+
     field_names = split_commas(
         "name,id,servers,check_type,checkinter,log-health-checks,httpcheck_method,"
         "balance,balance_urilen,balance_uridepth,balance_uriwhole,"
@@ -107,13 +114,16 @@ def _haproxy_pools(nodes: OrderedDict | list[OrderedDict]) -> SheetData:
         "haproxy_cookie_dynamic_cookie_key,strict_transport_security,"
         "cookie_attribute_secure,email_level,email_to"
     )
-    column_widths = split_commas(
-        "20,20,80,20,20,30,25,20,20,25,"
-        "25,20,20,20,20,25,25,30,20,25,"
-        "25,25,20,25,20,20,20,25,20,20,"
-        "25,30,25,30,25,40,25,25,30,25,"
-        "30,30,30,30,30,30,30,30,30,30,"
-        "30,30,30,30,30,30,30,20,20"
+    column_widths = cast(
+        list[int],
+        split_commas(
+            "20,20,80,20,20,30,25,20,20,25,"
+            "25,20,20,20,20,25,25,30,20,25,"
+            "25,25,20,25,20,20,20,25,20,20,"
+            "25,30,25,30,25,40,25,25,30,25,"
+            "30,30,30,30,30,30,30,30,30,30,"
+            "30,30,30,30,30,30,30,20,20"
+        ),
     )
 
     if isinstance(nodes, OrderedDict):
@@ -169,9 +179,9 @@ class Plugin(BasePlugin):
         """Ignore field_names and column_widths as we create them individually."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
-        super().run(pfsense)
+        rows: list[SheetData] = []
 
         haproxy = get_element(pfsense, "installedpackages,haproxy")
         for overview in _haproxy_overview(haproxy):

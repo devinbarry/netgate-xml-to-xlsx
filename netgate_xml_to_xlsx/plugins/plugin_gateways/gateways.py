@@ -1,4 +1,4 @@
-"""Gateways plugin."""
+"Gateways plugin." ""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from collections import OrderedDict
@@ -27,9 +27,9 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Gather data for Gateways."""
-        rows = super().run(pfsense)
+        rows = []
 
         # Load default IPV4 and IPV6 gateways.
         # Don't want "None" for default gateway.
@@ -42,7 +42,7 @@ class Plugin(BasePlugin):
         # Don't sort nodes for now. Leave in order found.
         nodes = get_element(pfsense, "gateways,gateway_item")
         if not nodes:
-            return []
+            return
 
         if isinstance(nodes, OrderedDict):
             # Only found one.

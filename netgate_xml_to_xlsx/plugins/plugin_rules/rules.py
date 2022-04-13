@@ -33,9 +33,10 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Create the rules sheet."""
-        rows = super().run(pfsense)
+        rows = []
+
         source_index = self.field_names.index("source")
         destination_index = self.field_names.index("destination")
         created_index = self.field_names.index("created")
@@ -43,7 +44,7 @@ class Plugin(BasePlugin):
 
         nodes = get_element(pfsense, "filter,rule")
         if not nodes:
-            return []
+            return
 
         if isinstance(nodes, OrderedDict):
             # Only found one.

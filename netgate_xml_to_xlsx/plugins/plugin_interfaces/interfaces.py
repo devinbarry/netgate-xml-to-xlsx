@@ -28,20 +28,21 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """
         Document all interfaces.
 
         TODO: Review blockbogons. Does existence == On?
         """
         rows = []
+
         # Prepend 'name' before calling _write_sheet.
 
         # Don't sort interfaces. Want them in the order they are encountered.
         # Interfaces is an OrderedDict
         nodes = get_element(pfsense, "interfaces")
         if not nodes:
-            return []
+            return
 
         # Don't put nodes in a list as we want a single element
 

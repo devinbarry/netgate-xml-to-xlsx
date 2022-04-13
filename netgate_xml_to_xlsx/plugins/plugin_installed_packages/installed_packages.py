@@ -29,13 +29,13 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Gather data for Installed Packages. Sort by name."""
-        rows = super().run(pfsense)
+        rows = []
 
         nodes = get_element(pfsense, "installedpackages,package")
         if not nodes:
-            return []
+            return
 
         if isinstance(nodes, OrderedDict):
             # Only found one.

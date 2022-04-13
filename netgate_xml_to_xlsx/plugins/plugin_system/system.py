@@ -25,13 +25,13 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
+    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """
         System-level information.
 
         Only showing interesting information (at least to me at the moment).
         """
-        rows = super().run(pfsense)
+        rows = []
 
         # Version and change information.
         node = pfsense
