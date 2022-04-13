@@ -32,7 +32,9 @@ def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
 
     if make_int:
         return [int(x) for x in data]
-    return data
+    # Yes, we know it is a list[str]...
+    # Without cast mypy thinks we're returning list[Any].
+    return cast(list[int | str], data)
 
 
 class SheetData:
@@ -42,7 +44,7 @@ class SheetData:
         self,
         *,
         sheet_name: str,
-        header_row: list[str | int],
+        header_row: list[str],
         data_rows: list[list],
         column_widths: list[int],
     ) -> None:

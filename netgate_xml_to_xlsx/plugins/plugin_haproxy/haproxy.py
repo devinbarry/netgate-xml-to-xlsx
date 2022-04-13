@@ -32,7 +32,7 @@ def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
 
     yield SheetData(
         sheet_name="HAProxy",
-        header_row=split_commas("Name,Value"),
+        header_row=cast(list[str], split_commas("Name,Value")),
         data_rows=rows,
         column_widths=cast(list[int], split_commas(column_widths)),
     )
@@ -43,11 +43,14 @@ def _haproxy_backends(
 ) -> Generator[SheetData, None, None]:
     """HAProxy backends can have 1 or more items."""
     rows = []
-    field_names = split_commas(
-        "name,status,type,primary_frontend,backend_serverpool,"  # 5
-        "forwardfor,dontlognull,log-detailed,socket-stats,a_extaddr,"  # 10
-        "ha_certificate,clientcert_ca,clientcert_crl,a_actionitems,a_errorfiles,"  # 15
-        "dcertadv,ssloffloadcert,advanced,ha_acls,httpclose"  # 20
+    field_names = cast(
+        list[str],
+        split_commas(
+            "name,status,type,primary_frontend,backend_serverpool,"  # 5
+            "forwardfor,dontlognull,log-detailed,socket-stats,a_extaddr,"  # 10
+            "ha_certificate,clientcert_ca,clientcert_crl,a_actionitems,a_errorfiles,"  # 15
+            "dcertadv,ssloffloadcert,advanced,ha_acls,httpclose"  # 20
+        ),
     )
 
     column_widths = cast(
@@ -96,23 +99,26 @@ def _haproxy_pools(
     """HAProxy pools."""
     rows = []
 
-    field_names = split_commas(
-        "name,id,servers,check_type,checkinter,log-health-checks,httpcheck_method,"
-        "balance,balance_urilen,balance_uridepth,balance_uriwhole,"
-        "a_acl,a_actionitems,errorfiles,advanced,advanced_backend,"
-        "transparent_clientip,transparent_interface,"
-        "monitor_uri,monitor_httpversion,monitor_username,monitor_domain,"
-        "monitor_agentport,agent_check,agent_port,agent_port,"
-        "connection_timeout,server_timeout,retries,"
-        "stats_enabled,stats_username,stats_password,stats_uri,stats_scope,stats_realm,"
-        "stats_admin,stats_node,stats_desc,stats_refresh,"
-        "persist_stick_expire,persist_stick_tablesize,persist_stick_length,"
-        "persist_stick_cookiename,persist_sticky_type,persist_cookie_enabled,"
-        "persist_cookie_name,persist_cookie_mode,persist_cookie_cachable,"
-        "persist_cookie_postonly,persist_cookie_httponly,persist_cookie_secure,"
-        "haproxy_cookie_maxidle,haproxy_cookie_maxlife,haproxy_cookie_domains,"
-        "haproxy_cookie_dynamic_cookie_key,strict_transport_security,"
-        "cookie_attribute_secure,email_level,email_to"
+    field_names = cast(
+        list[str],
+        split_commas(
+            "name,id,servers,check_type,checkinter,log-health-checks,httpcheck_method,"
+            "balance,balance_urilen,balance_uridepth,balance_uriwhole,"
+            "a_acl,a_actionitems,errorfiles,advanced,advanced_backend,"
+            "transparent_clientip,transparent_interface,"
+            "monitor_uri,monitor_httpversion,monitor_username,monitor_domain,"
+            "monitor_agentport,agent_check,agent_port,agent_port,"
+            "connection_timeout,server_timeout,retries,"
+            "stats_enabled,stats_username,stats_password,stats_uri,stats_scope,stats_realm,"
+            "stats_admin,stats_node,stats_desc,stats_refresh,"
+            "persist_stick_expire,persist_stick_tablesize,persist_stick_length,"
+            "persist_stick_cookiename,persist_sticky_type,persist_cookie_enabled,"
+            "persist_cookie_name,persist_cookie_mode,persist_cookie_cachable,"
+            "persist_cookie_postonly,persist_cookie_httponly,persist_cookie_secure,"
+            "haproxy_cookie_maxidle,haproxy_cookie_maxlife,haproxy_cookie_domains,"
+            "haproxy_cookie_dynamic_cookie_key,strict_transport_security,"
+            "cookie_attribute_secure,email_level,email_to"
+        ),
     )
     column_widths = cast(
         list[int],

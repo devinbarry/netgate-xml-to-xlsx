@@ -3,12 +3,14 @@
 
 import importlib
 import pkgutil
+from types import ModuleType
+from typing import Iterator
 
 from . import plugins
 from .plugins.base_plugin import BasePlugin
 
 
-def iter_namespace(ns_pkg):
+def iter_namespace(ns_pkg: ModuleType) -> Iterator:
     """Gather all modules in namespace."""
     return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
 

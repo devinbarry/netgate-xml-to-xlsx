@@ -5,6 +5,7 @@ import argparse
 from collections import OrderedDict
 import os
 from pathlib import Path
+from typing import cast
 
 from openpyxl import Workbook
 from openpyxl.styles.alignment import Alignment
@@ -31,8 +32,8 @@ class PfSense:
         """
         self.args = args
         self.in_file = (in_path := Path(in_filename))
-        self.raw_xml: dict = {}
-        self.pfsense: dict = {}
+        self.raw_xml: str = ""
+        self.pfsense: OrderedDict = OrderedDict()
         self.workbook: Workbook = Workbook()
 
         # ss_filename is expected to be overwritten by
@@ -46,7 +47,8 @@ class PfSense:
 
     def _get_output_path(self, in_path: Path) -> Path:
         """Generate output path based on args and in_filename."""
-        out_path = self.args.output_dir / Path(f"{in_path.name}.xlsx")
+        # out_path = self.args.output_dir / Path(f"{in_path.name}.xlsx")
+        out_path = cast(Path, self.args.output_dir) / Path(f"{in_path.name}.xlsx")
         return out_path
 
     def _init_styles(self) -> None:
