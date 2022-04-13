@@ -1,5 +1,8 @@
 # Netgate Firewall Converter
 
+## IMPORTANT
+This is a first-draft alpha walk through the Netgate XML to get a feel for the type of data to be extracted.
+
 The `netgate-xml-to-xlsx` converts a standard Netgate firewall .xml configuration file to an .xlsx spreadsheet with multiple tabs.
 
 * Supports Python 3.10+.
