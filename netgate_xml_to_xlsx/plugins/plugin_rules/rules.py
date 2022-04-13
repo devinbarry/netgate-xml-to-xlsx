@@ -2,6 +2,7 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from collections import OrderedDict
+from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
@@ -25,14 +26,14 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name="Rules",
+        display_name: str = "Rules",
         field_names: str = FIELD_NAMES,
         column_widths: str = WIDTHS,
-    ):
+    ) -> None:
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
+    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
         """Create the rules sheet."""
         rows = super().run(pfsense)
         source_index = self.field_names.index("source")

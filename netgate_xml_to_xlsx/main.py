@@ -11,6 +11,7 @@ from .pfsense import PfSense
 PLUGINS_TO_RUN = (
     "system,system_groups,system_users,aliases,rules,interfaces,gateways,"
     "openvpn_servers,installed_packages,unbound"
+    #    "haproxy"
 ).split(",")
 
 

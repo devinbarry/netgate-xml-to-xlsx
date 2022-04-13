@@ -93,7 +93,7 @@ class PfSense:
         self.workbook.add_named_style(normal)
         self.workbook.add_named_style(footer)
 
-    def _load(self) -> OrderedDict:
+    def _load(self) -> None:
         """Load and parse Netgate xml firewall configuration.
 
         Return pfsense keys.
@@ -109,7 +109,7 @@ class PfSense:
         header_row: list[str],
         column_widths: list[int],
         rows: list[list],
-    ):
+    ) -> None:
         sheet = self.workbook.create_sheet(sheet_name)
         sheet_header(sheet, header_row, column_widths)
 
@@ -133,14 +133,14 @@ class PfSense:
             out_path = Path(f"{parts[0]}-sanitized")
         else:
             out_path = Path(f"{parts[0]}-sanitized{parts[1]}")
-        out_path.write_text(self.raw_xml, encoding="utf-8")
+        out_path.write_text(f"{self.raw_xml}", encoding="utf-8")
         print(f"Sanitized file written: {out_path}.")
 
         # Delete the unsanitized file.
         self.in_file.unlink()
         print(f"Deleted original file: {self.in_file}.")
 
-    def run(self, plugin_name: BasePlugin) -> None:
+    def run(self, plugin_name: str) -> None:
         """
         Run specific plugin and write sheet(s).
 
@@ -149,7 +149,7 @@ class PfSense:
         """
         plugin = self.plugins[plugin_name]
         for sheet_data in plugin.run(self.pfsense):
-            if not sheet_data:
+            if sheet_data is None or not sheet_data.data_rows:
                 continue
 
             self._write_sheet(

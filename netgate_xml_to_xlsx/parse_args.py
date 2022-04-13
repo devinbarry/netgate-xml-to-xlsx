@@ -8,14 +8,14 @@ import sys
 from ._version import __version__
 
 
-def filter_infiles(in_files: list[str], include=True) -> list[str]:
+def filter_infiles(in_files: list[str], include: bool = True) -> list[str]:
     """Return list of in_files that include or exclude 'sanitized'."""
     if include:
         return [x for x in in_files if "sanitized" in x]
     return [x for x in in_files if "sanitized" not in x]
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     """
     Parse command line arguments.
 

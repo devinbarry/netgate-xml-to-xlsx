@@ -13,12 +13,18 @@ from ...errors import UnknownField
 def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
     regexes = (
+        # Not what sure what Advanced is, but found it in haproxy and it is a base64 string.
+        re.compile("(<advanced>).*?(</advanced>)"),
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
         re.compile("(<radius_secret>).*?(</radios_secret>)"),
         re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
         re.compile("(<stats_password>).*?(</stats_password>)"),
         re.compile("(<password>).*?(</password>)"),
         re.compile("(<tls>).*?(</tls>)"),
+        re.compile("(<ssloffloadcert>).*?(</ssloffloadcert>)"),
+        re.compile("(<ha_certificates>).*?(</ha_certificates>)"),
+        re.compile("(<clientcert_ca>).*?(</clientcert_ca>)"),
+        re.compile("(<clientcert_crl>).*?(</clientcert_crl>)"),
     )
     for regex in regexes:
         raw_xml = regex.sub(r"\1SANITIZED\2", raw_xml)
@@ -39,7 +45,7 @@ def adjust_field_value(
 ) -> str | None:
     """Make adjustments based on field_name."""
     if value is None:
-        return None
+        return ""
     assert value is not None
 
     if isinstance(value, dict):
@@ -115,7 +121,7 @@ def load_standard_nodes(
 
 
 def get_element(
-    root_node: OrderedDict, els: list[str] | str, default=""
+    root_node: OrderedDict, els: list[str] | str, default: str | None = ""
 ) -> OrderedDict | str | int | None:
     """
     Iterate down the tree and return path.

@@ -2,9 +2,10 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from collections import OrderedDict
+from typing import Generator
 
 
-def _split_commas(data: str | list, make_int=False) -> list:
+def split_commas(data: str | list, make_int: bool = False) -> list:
     """
     Create list from comma-delimited string (or list).
 
@@ -21,6 +22,10 @@ def _split_commas(data: str | list, make_int=False) -> list:
         list
 
     """
+    if not data:
+        # Don't mess with empty strings.
+        return data
+
     if isinstance(data, str):
         data = data.split(",")
 
@@ -68,10 +73,10 @@ class BasePlugin:
 
         """
         self.display_name = display_name
-        self.field_names = _split_commas(field_names)
-        self.column_widths = _split_commas(column_widths, make_int=True)
+        self.field_names = split_commas(field_names)
+        self.column_widths = split_commas(column_widths, make_int=True)
 
-    def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
+    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
         """
         Run plugin.
 

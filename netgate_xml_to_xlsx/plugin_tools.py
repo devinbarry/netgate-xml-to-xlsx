@@ -5,6 +5,7 @@ import importlib
 import pkgutil
 
 from . import plugins
+from .plugins.base_plugin import BasePlugin
 
 
 def iter_namespace(ns_pkg):
@@ -12,9 +13,9 @@ def iter_namespace(ns_pkg):
     return pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + ".")
 
 
-def discover_plugins():
+def discover_plugins() -> dict[str, BasePlugin]:
     """Discover and initialize plugins."""
-    discovered_plugins = {}
+    discovered_plugins: dict[str, BasePlugin] = {}
     for _, long_name, _ in iter_namespace(plugins):
         if (name := long_name.split(".")[-1]).startswith("plugin_"):
             name = name.replace("plugin_", "", 1)

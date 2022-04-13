@@ -2,6 +2,7 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from collections import OrderedDict
+from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import (
@@ -20,14 +21,14 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name="Interfaces",
+        display_name: str = "Interfaces",
         field_names: str = FIELD_NAMES,
         column_widths: str = WIDTHS,
-    ):
+    ) -> None:
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> tuple[str, list[list]]:
+    def run(self, pfsense: OrderedDict) -> Generator[list[list[str]], None, None]:
         """
         Document all interfaces.
 

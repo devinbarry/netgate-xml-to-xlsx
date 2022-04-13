@@ -7,7 +7,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
 
 
-def sheet_header(sheet: Worksheet, columns: list, column_widths: list[int]):
+def sheet_header(sheet: Worksheet, columns: list, column_widths: list[int]) -> None:
     """Write header row then set the column widths."""
     write_ss_row(sheet, columns, 1, "header")
 
