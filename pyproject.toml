@@ -60,6 +60,8 @@ flake8-pytest = "*"
 pre-commit = "^2.17.0"
 mypy = "^0.941"
 safety = "^1.10.3"
+nox = "^2022.1.7"
+nox-poetry = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -70,6 +72,9 @@ netgate-xml-to-xlsx = "netgate_xml_to_xlsx.main:main"
 
 [tool.black]
 target-version = ["py310",]
+
+[tool.isort]
+profile = "black"
 
 [tool.flakeheaven]
 # See canonical example: https://raw.githubusercontent.com/flakeheaven/flakeheaven/master/pyproject.toml
