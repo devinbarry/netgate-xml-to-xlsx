@@ -2,8 +2,8 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import argparse
-from pathlib import Path
 import sys
+from pathlib import Path
 
 from ._version import __version__
 

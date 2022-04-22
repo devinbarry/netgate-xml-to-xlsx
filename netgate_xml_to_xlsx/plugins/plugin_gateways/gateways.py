@@ -1,14 +1,12 @@
 "Gateways plugin." ""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from collections import OrderedDict
 import sys
+from collections import OrderedDict
 from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import (
-    get_element,
-)
+from ..support.elements import get_element
 
 # Append 'defaultgw4' and 'defaultgw6' before finishing run.
 FIELD_NAMES = "name,descr,interface,gateway,weight,ipprotocol,monitor_disable"

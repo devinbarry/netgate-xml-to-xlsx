@@ -5,10 +5,7 @@ from collections import OrderedDict
 from typing import Generator, cast
 
 from ..base_plugin import BasePlugin, SheetData, split_commas
-from ..support.elements import (
-    get_element,
-    load_standard_nodes,
-)
+from ..support.elements import get_element, load_standard_nodes
 
 
 def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:

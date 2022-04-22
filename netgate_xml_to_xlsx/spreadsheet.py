@@ -3,8 +3,8 @@
 
 import datetime
 
-from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
 
 
 def sheet_header(sheet: Worksheet, columns: list, column_widths: list[int]) -> None:

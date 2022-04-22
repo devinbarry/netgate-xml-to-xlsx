@@ -2,23 +2,20 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import argparse
-from collections import OrderedDict
 import os
+from collections import OrderedDict
 from pathlib import Path
 from typing import cast
 
-from openpyxl import Workbook
-from openpyxl.styles.alignment import Alignment
-from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
 import xmltodict
+from openpyxl import Workbook
+from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
+from openpyxl.styles.alignment import Alignment
 
-from .plugins.base_plugin import BasePlugin
-from .plugins.support.elements import (
-    sanitize_xml,
-)
 from .plugin_tools import discover_plugins
-
-from .spreadsheet import write_ss_row, sheet_header, sheet_footer
+from .plugins.base_plugin import BasePlugin
+from .plugins.support.elements import sanitize_xml
+from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 
 
 class PfSense:

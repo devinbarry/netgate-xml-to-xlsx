@@ -1,11 +1,11 @@
 """Extract elements from XML."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from collections import OrderedDict
 import datetime
 import html
 import ipaddress
 import re
+from collections import OrderedDict
 
 from ...errors import UnknownField
 

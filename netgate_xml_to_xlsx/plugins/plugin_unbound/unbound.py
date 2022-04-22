@@ -5,10 +5,7 @@ from collections import OrderedDict
 from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import (
-    get_element,
-    load_standard_nodes,
-)
+from ..support.elements import get_element, load_standard_nodes
 
 FIELD_NAMES = (
     "enable,active_interface,outgoing_interface,custom_options,custom_options,"

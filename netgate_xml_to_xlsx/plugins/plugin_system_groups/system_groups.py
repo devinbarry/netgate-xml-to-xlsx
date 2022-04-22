@@ -5,9 +5,7 @@ from collections import OrderedDict
 from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import (
-    get_element,
-)
+from ..support.elements import get_element
 
 FIELD_NAMES = "name,description,scope,gid,priv"
 WIDTHS = "40,80,20,20,80"
