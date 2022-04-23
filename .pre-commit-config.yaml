@@ -1,14 +1,14 @@
 repos:
   - repo: local
     hooks:
-    - id: fmt
-      name: fmt
-      language: python
-      types: [python]
-      entry: poetry run black
-
     - id: pyupgrade
       name: pyupgrade
       language: python
       types: [python]
       entry: poetry run pyupgrade
+
+    - id: fmt
+      name: fmt
+      language: python
+      types: [python]
+      entry: poetry run black

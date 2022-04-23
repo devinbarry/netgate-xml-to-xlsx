@@ -1,4 +1,5 @@
 """Nox sessions."""
+# Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import os
 import shlex
@@ -14,9 +15,9 @@ package = "netgate_xml_to_xlsx"
 python_versions = [
     "3.10",
 ]
-nox.options.reuse_existing_virtualenv = True
+# nox.options.reuse_existing_virtualenv = True
 nox.needs_version = ">= 2022.1.7"
-nox.options.sessions = ("flake8",)
+nox.options.sessions = ("build",)
 
 
 try:
@@ -48,14 +49,13 @@ def flake8(session: Session) -> None:
     """
     format(session)
     session.install("pyproject-flake8")
-    session.run("pflake8", package)
+    session.run("pflake8", f"src/{package}")
 
 
 @session(name="flakeheaven", python=python_versions[0])
 def flakeheaven(session: Session) -> None:
     """Aggressive flaking."""
     format(session)
-    session.poetry.installroot()
     session.install(
         "flakeheaven",
         "flake8-aaa",
@@ -76,9 +76,10 @@ def flakeheaven(session: Session) -> None:
         "flake8-pylint",
         "flake8-pytest-style",
         "flake8-pytest",
+        ".",
     )
     session.run("flakeheaven", "plugins")
-    session.run("flakeheaven", "lint", package)
+    session.run("flakeheaven", "lint", f"src/")
 
 
 @session(name="pylint", python=python_versions[0])
@@ -91,15 +92,12 @@ def pylint(session: Session) -> None:
         - see the quality code
         - run other pylint plugins
     """
-    session.poetry.installroot()
     session.install("pylint", "perflint")
     session.run(
-        "poetry",
-        "run",
         "pylint",
         "--rcfile=pylint.rc",
         "--load-plugins=perflint",
-        package,
+        f"src/{package}",
     )
 
 
@@ -107,7 +105,7 @@ def pylint(session: Session) -> None:
 def security(session: Session) -> None:
     """Standard security checks."""
     session.install("bandit", "safety")
-    session.run("bandit", ".")
+    session.run("bandit", "-c=pyproject.toml", "-r", f"src/{package}")
     session.run("safety", "check")
 
 
@@ -126,15 +124,14 @@ def mypy(session: Session) -> None:
     session.run("mypy", "-p", package)
 
 
-@session(name="release", python=python_versions[0])
-def release(session: Session) -> None:
+@session(name="build", python=python_versions[0])
+def build(session: Session) -> None:
     """
-    Ready package for release.
+    Build package for release.
 
-    Work in progress.
+    Only need one build for all supported versions.
     """
-    print("Incomplete release process.")
     flake8(session)
     security(session)
     test(session)
-    bob = set()
+    session.poetry.build_package(distribution_format="wheel")
