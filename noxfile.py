@@ -54,6 +54,7 @@ def flake8(session: Session) -> None:
 def flakeheaven(session: Session) -> None:
     """Aggressive flaking."""
     format(session)
+    session.poetry.installroot()
     session.install(
         "flakeheaven",
         "flake8-aaa",
@@ -76,6 +77,7 @@ def flakeheaven(session: Session) -> None:
         "flake8-pytest",
     )
     session.run("flakeheaven", "lint", package)
+    # session.run("flakeheaven", "plugins")
 
 
 @session(name="security", python=python_versions[0])
@@ -84,6 +86,14 @@ def security(session: Session) -> None:
     session.install("bandit", "safety")
     session.run("bandit", ".")
     session.run("safety", "check")
+
+
+@session(name="test", python=python_versions)
+def test(session: Session) -> None:
+    """Pytest."""
+    session.poetry.installroot()
+    session.install("pytest")
+    session.run("pytest", ".")
 
 
 @session(name="mypy", python=python_versions)
@@ -103,3 +113,4 @@ def release(session: Session) -> None:
     print("Incomplete release process.")
     flake8(session)
     security(session)
+    test(session)
