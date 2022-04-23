@@ -11,7 +11,7 @@ import nox
 
 package = "netgate_xml_to_xlsx"
 python_versions = [
-    "3.9",
+    "3.10",
 ]
 nox.options.reuse_existing_virtualenv = True
 nox.needs_version = ">= 2022.1.7"
@@ -46,17 +46,44 @@ def flake8(session: Session) -> None:
     Format before flaking.
     """
     format(session)
-    # session.notify("format")
     session.install("pyproject-flake8")
     session.run("pflake8", package)
 
 
-@session(name="pylint", python=python_versions)
-def pylint(session: Session) -> None:
-    """Standard pylint. Format before linting."""
+@session(name="flakeheaven", python=python_versions[0])
+def flakeheaven(session: Session) -> None:
+    """Aggressive flaking."""
     format(session)
-    session.install("pylint")
-    session.run("pylint", "--rcfile", "pylint.rc", package)
+    session.install(
+        "flakeheaven",
+        "flake8-aaa",
+        "flake8-2020",
+        "flake8-bandit",
+        "flake8-broken-line",
+        "flake8-bugbear",
+        "flake8-builtins",
+        "flake8-comprehensions",
+        "flake8-docstrings",
+        "flake8-eradicate",
+        "flake8-executable",
+        "flake8-expression-complexity",
+        "flake8-functions",
+        "flake8-logging-format",
+        "flake8-mutable",
+        "flake8-printf-formatting",
+        "flake8-pylint",
+        "flake8-pytest-style",
+        "flake8-pytest",
+    )
+    session.run("flakeheaven", "lint", package)
+
+
+@session(name="security", python=python_versions[0])
+def security(session: Session) -> None:
+    """Standard security checks."""
+    session.install("bandit", "safety")
+    session.run("bandit", ".")
+    session.run("safety", "check")
 
 
 @session(name="mypy", python=python_versions)
@@ -66,9 +93,14 @@ def mypy(session: Session) -> None:
     session.run("mypy", "-p", package)
 
 
-@session(name="security", python=python_versions[0])
-def security(session: Session) -> None:
-    """Standard security checks."""
-    session.install("bandit", "safety")
-    session.run("bandit", ".")
-    session.run("safety", "check")
+@session(name="release", python=python_versions[0])
+def release(session: Session) -> None:
+    """
+    Ready package for release.
+
+    Work in progress.
+    """
+    print("Incomplete release process.")
+    flake8(session)
+    security(session)
+    test(session)

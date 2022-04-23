@@ -13,7 +13,6 @@ from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
 from openpyxl.styles.alignment import Alignment
 
 from .plugin_tools import discover_plugins
-from .plugins.base_plugin import BasePlugin
 from .plugins.support.elements import sanitize_xml
 from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 

@@ -184,8 +184,6 @@ class Plugin(BasePlugin):
 
     def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
-        rows: list[SheetData] = []
-
         haproxy = get_element(pfsense, "installedpackages,haproxy")
         for overview in _haproxy_overview(haproxy):
             yield overview

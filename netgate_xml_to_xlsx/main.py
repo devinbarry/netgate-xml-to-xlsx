@@ -1,8 +1,6 @@
 """Main netgate converstion module."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-import sys
-
 from .parse_args import parse_args
 from .pfsense import PfSense
 
