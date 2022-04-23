@@ -76,6 +76,9 @@ Some additional advantages are:
 * Allows us to have a configuration file that defines what plugins to run, and the order in which to run them.
 
 
+## Tools
+    * nox
+    * tbump: setting version number
 
 ### Using flakeheaven
 The large collection of flakeheaven plugins is a bit overboard while I continue to find the best mixture of plugins that work best for my projects.
