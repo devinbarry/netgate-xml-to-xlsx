@@ -10,6 +10,7 @@ from textwrap import dedent
 import nox
 
 package = "netgate_xml_to_xlsx"
+# When defining multiple versions, put the lowest version first for compatibility.
 python_versions = [
     "3.10",
 ]
@@ -114,3 +115,4 @@ def release(session: Session) -> None:
     flake8(session)
     security(session)
     test(session)
+    bob = set()

@@ -5,4 +5,10 @@ repos:
       name: fmt
       language: python
       types: [python]
-      entry: poetry run  black
+      entry: poetry run black
+
+    - id: pyupgrade
+      name: pyupgrade
+      language: python
+      types: [python]
+      entry: poetry run pyupgrade
