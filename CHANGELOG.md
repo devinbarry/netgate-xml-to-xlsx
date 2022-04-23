@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Released 0.9.7 -- 2022-04-23
+* Refactor following "Hypermodern Python" model.
+* Use nox for automation
+
 ## Released 0.9.6-a1 -- 2022-03-24
 
 * Refactor original script into modules.
