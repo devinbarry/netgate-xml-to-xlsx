@@ -76,6 +76,10 @@ target-version = ["py310",]
 [tool.isort]
 profile = "black"
 
+[tool.flake8]
+exclude = [".git", "dist","tests"]
+max_line_length = 99
+
 [tool.flakeheaven]
 # See canonical example: https://raw.githubusercontent.com/flakeheaven/flakeheaven/master/pyproject.toml
 exclude = [".git", "dist","tests"]
