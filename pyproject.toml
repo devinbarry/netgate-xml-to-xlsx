@@ -90,10 +90,10 @@ flake8-functions = ["+*", "-CFQ004"]
 flake8-logging-format = ["+*"]
 flake8-mutable = ["+*"]
 flake8-printf-formatting = ["+*"]
-flake8-pylint-plugin = ["+*","-PLR0201","-PLR0903"]
+flake8-pylint-plugin = ["+*","-PLR0201", "-PLR0902", "-PLR0903", "-PLR0911"]
 # Add back the test
 flake8-pytest = ["+*"]
 flake8-pytest-style = ["+*", "+**/tests*"]
-pylint = ["+*"]
+pylint = ["+*", "-R0903", "-R0902"]
 
 [tool.flake8-functions]

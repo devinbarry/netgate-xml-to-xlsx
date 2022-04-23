@@ -76,8 +76,8 @@ def flakeheaven(session: Session) -> None:
         "flake8-pytest-style",
         "flake8-pytest",
     )
+    session.run("flakeheaven", "plugins")
     session.run("flakeheaven", "lint", package)
-    # session.run("flakeheaven", "plugins")
 
 
 @session(name="security", python=python_versions[0])
