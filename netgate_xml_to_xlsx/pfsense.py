@@ -43,7 +43,6 @@ class PfSense:
 
     def _get_output_path(self, in_path: Path) -> Path:
         """Generate output path based on args and in_filename."""
-        # out_path = self.args.output_dir / Path(f"{in_path.name}.xlsx")
         out_path = cast(Path, self.args.output_dir) / Path(f"{in_path.name}.xlsx")
         return out_path
 

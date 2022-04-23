@@ -49,12 +49,6 @@ class Plugin(BasePlugin):
             for key in "optimization,hostname,domain,timezone".split(","):
                 rows.append([key, get_element(node, key)])
 
-        # Ugly getting this twice.
-        hostname = get_element(node, "hostname")
-        domain = get_element(node, "domain")
-        # TODO: Change output to be based on filename, not host/domain.
-        self.ss_filename = f"""{hostname}.{domain}.xlsx"""
-
         time_servers = "\n".join(get_element(node, "timeservers").split(" "))
         rows.append(["timeservers", time_servers])
 

@@ -38,7 +38,7 @@ def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
 def _haproxy_backends(
     nodes: OrderedDict | list[OrderedDict],
 ) -> Generator[SheetData, None, None]:
-    """HAProxy backends can have 1 or more items."""
+    """Report HAProxy backends have one or more items."""
     rows = []
     field_names = cast(
         list[str],
@@ -93,7 +93,7 @@ def _haproxy_backends(
 def _haproxy_pools(
     nodes: OrderedDict | list[OrderedDict],
 ) -> Generator[SheetData, None, None]:
-    """HAProxy pools."""
+    """Report HAProxy pools."""
     rows = []
 
     field_names = cast(

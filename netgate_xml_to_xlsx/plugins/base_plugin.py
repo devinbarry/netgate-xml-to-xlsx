@@ -94,4 +94,4 @@ class BasePlugin(ABC):
             List of rows to write to spreadsheet.
 
         """
-        pass
+        raise NotImplementedError

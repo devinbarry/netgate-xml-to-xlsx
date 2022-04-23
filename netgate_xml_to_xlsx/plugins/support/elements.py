@@ -7,7 +7,7 @@ import ipaddress
 import re
 from collections import OrderedDict
 
-from ...errors import UnknownField
+from netgate_xml_to_xlsx.errors import UnknownField
 
 
 def sanitize_xml(raw_xml: str) -> str:
@@ -141,7 +141,7 @@ def get_element(
             if node is None:
                 return default
 
-            if isinstance(node, str) or isinstance(node, list):
+            if isinstance(node, (str, list)):
                 return adjust_field_value(field_name=el, value=node)
         return node
     except KeyError:

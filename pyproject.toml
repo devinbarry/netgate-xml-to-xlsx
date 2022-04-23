@@ -62,6 +62,24 @@ ignore_missing_imports = true
 warn_return_any = true
 disallow_untyped_defs = true
 
+# Haven't yet figured out how to make this work.
+[tool.pylint.'MESSAGES CONTROL']
+    "good-names-rgxs"=[
+    "i",
+    "j",
+    "k",
+    "ex",
+    "Run",
+    "_",
+    "fh",
+    "fn",
+    "el",
+    "dt",
+    "ok",
+    "yy",
+    "mm",
+    "dd"]
+
 [tool.flake8]
 exclude = [".git", "dist","tests"]
 max_line_length = 99
@@ -99,5 +117,5 @@ flake8-pylint-plugin = ["+*","-PLR0201", "-PLR0902", "-PLR0903", "-PLR0911"]
 # Add back the test
 flake8-pytest = ["+*"]
 flake8-pytest-style = ["+*", "+**/tests*"]
-pylint = ["+*", "-R0903", "-R0902"]
+pylint = ["+*", "-R0903", "-R0902", "-R0911"]
 
