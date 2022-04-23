@@ -103,4 +103,3 @@ def release(session: Session) -> None:
     print("Incomplete release process.")
     flake8(session)
     security(session)
-    test(session)
