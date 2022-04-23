@@ -99,7 +99,7 @@ def test(session: Session) -> None:
 @session(name="mypy", python=python_versions)
 def mypy(session: Session) -> None:
     """Type check the module."""
-    session.install("mypy")
+    session.install("mypy", "mypy-extensions")
     session.run("mypy", "-p", package)
 
 

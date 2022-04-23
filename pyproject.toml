@@ -57,6 +57,11 @@ target-version = ["py310",]
 [tool.isort]
 profile = "black"
 
+[tool.mypy]
+ignore_missing_imports = true
+warn_return_any = true
+disallow_untyped_defs = true
+
 [tool.flake8]
 exclude = [".git", "dist","tests"]
 max_line_length = 99
@@ -96,4 +101,3 @@ flake8-pytest = ["+*"]
 flake8-pytest-style = ["+*", "+**/tests*"]
 pylint = ["+*", "-R0903", "-R0902"]
 
-[tool.flake8-functions]
