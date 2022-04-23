@@ -81,6 +81,28 @@ def flakeheaven(session: Session) -> None:
     session.run("flakeheaven", "lint", package)
 
 
+@session(name="pylint", python=python_versions[0])
+def pylint(session: Session) -> None:
+    """
+    Standalone pylint.
+
+    I like to occasionally run pylint by itself to:
+        - get different reports
+        - see the quality code
+        - run other pylint plugins
+    """
+    session.poetry.installroot()
+    session.install("pylint", "perflint")
+    session.run(
+        "poetry",
+        "run",
+        "pylint",
+        "--rcfile=pylint.rc",
+        "--load-plugins=perflint",
+        package,
+    )
+
+
 @session(name="security", python=python_versions[0])
 def security(session: Session) -> None:
     """Standard security checks."""

@@ -65,7 +65,7 @@ disallow_untyped_defs = true
 
 # Haven't yet figured out how to make this work.
 [tool.pylint.'MESSAGES CONTROL']
-    "good-names-rgxs"=[
+good-names=[
     "i",
     "j",
     "k",
