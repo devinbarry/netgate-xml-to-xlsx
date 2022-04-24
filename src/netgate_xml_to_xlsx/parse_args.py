@@ -3,9 +3,8 @@
 
 import argparse
 import sys
+from importlib.metadata import version
 from pathlib import Path
-
-from ._version import __version__
 
 
 def filter_infiles(in_files: list[str], include: bool = True) -> list[str]:
@@ -22,7 +21,6 @@ def parse_args() -> argparse.Namespace:
     Process in_files and out_dir.
     """
     parser = argparse.ArgumentParser("Netgate XML to XLSX")
-
     default = "./output"
     parser.add_argument(
         "--output-dir",
@@ -39,6 +37,8 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Sanitize the input xml files and save as <filename>-sanitized.",
     )
+
+    __version__ = version("netgate_xml_to_xlsx")
     parser.add_argument(
         "--version",
         action="version",
