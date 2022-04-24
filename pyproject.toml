@@ -10,7 +10,8 @@ homepage = "https://gitlab.com/appropriate-solutions-inc/netgate-xml-to-xlsx"
 repository = "https://gitlab.com/appropriate-solutions-inc/netgate-xml-to-xlsx.git"
 include = [
     "LICENSE",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "TODO.md"
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
