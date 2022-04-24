@@ -82,3 +82,9 @@ Some additional advantages are:
 
 ### Using flakeheaven
 The large collection of flakeheaven plugins is a bit overboard while I continue to find the best mixture of plugins that work best for my projects.
+
+### Cookiecutter References
+* [cookiecutter-hypermodern-python](https://github.com/cjolowicz/cookiecutter-hypermodern-python)
+* [cookiecutter-poetry](https://fpgmaas.github.io/cookiecutter-poetry/)
+
+
