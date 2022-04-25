@@ -14,7 +14,6 @@ def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
     regexes = (
         # Not what sure what Advanced is, but found it in haproxy and it is a base64 string.
-        re.compile("(<advanced>).*?(</advanced>)"),
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
         re.compile("(<radius_secret>).*?(</radios_secret>)"),
         re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
