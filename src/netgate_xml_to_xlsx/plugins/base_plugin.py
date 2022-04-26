@@ -63,6 +63,7 @@ class BasePlugin(ABC):
         display_name: str,
         field_names: str,
         column_widths: str | list[int],
+        el_paths_to_sanitize: list[str] | None,
     ) -> None:
         """
         Initialize base plugin.
@@ -74,12 +75,48 @@ class BasePlugin(ABC):
         column_widths:
             Comma-delimited list of sheet column widths.
 
+        el_paths_to_sanitize:
+            List of comma-delimited elements to santitize
         """
         self.display_name: str = display_name
         self.field_names: list[str] = cast(list[str], split_commas(field_names))
         self.column_widths: list[int] = cast(
             list[int], split_commas(column_widths, make_int=True)
         )
+        self.el_paths_to_sanitize = el_paths_to_sanitize
+
+    def sanitize(self, root: OrderedDict | None) -> None:
+        """Sanitize defined paths."""
+        if root is None or self.el_paths_to_sanitize is None:
+            # Nothing to do
+            return
+        assert not root is None
+        assert not self.el_paths_to_sanitize is None
+
+        for el_path in self.el_paths_to_sanitize:
+            el_names = el_path.split(",")
+            if not len(el_names):
+                # empty list
+                return
+            previous_el = None
+
+            # Ignore possibility of first elemen being a list as we know it never is in netgate.
+            current_el = root.get(el_names[0], None)
+
+            # TODO: Deal with lists.
+            for el_name in el_names[1:]:
+                previous_el = current_el
+                current_el = current_el.get(el_name)
+                if current_el is None:
+                    return
+                if isinstance(current_el, OrderedDict):
+                    # Still processing nodes.
+                    continue
+                # else: if we're out of el_names fall through to else.
+            else:
+                # current_el is the element to sanitize
+                if previous_el is not None:
+                    previous_el[el_name] = "SANITIZED"
 
     @abstractmethod
     def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:

@@ -13,7 +13,6 @@ from netgate_xml_to_xlsx.errors import UnknownField
 def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
     regexes = (
-        # Not what sure what Advanced is, but found it in haproxy and it is a base64 string.
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
         re.compile("(<radius_secret>).*?(</radios_secret>)"),
         re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
@@ -127,6 +126,30 @@ def get_element(
 
     Use try/except for missing keys as None is a valid return value.
     """
+    if isinstance(els, str):
+        els = els.split(",")
+
+    if root_node is None:
+        return default
+
+    node = root_node
+    try:
+        for el in els:
+            node = node[el]
+            if node is None:
+                return default
+
+            if isinstance(node, (str, list)):
+                return adjust_field_value(field_name=el, value=node)
+        return node
+    except KeyError:
+        return default
+
+
+def modify_element(
+    root_node: OrderedDict, els: list[str] | str, new_value: str | None
+) -> None:
+    """Modify an element, if it exists."""
     if isinstance(els, str):
         els = els.split(",")
 
