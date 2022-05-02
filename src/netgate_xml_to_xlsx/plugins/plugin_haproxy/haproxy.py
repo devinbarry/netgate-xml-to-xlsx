@@ -25,7 +25,8 @@ def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
     column_widths = "50,80"
 
     rows = load_standard_nodes(nodes=nodes, field_names=field_names)
-    rows = list(zip(field_names, rows[0]))
+    if rows:
+        rows = list(zip(field_names, rows[0]))
 
     yield SheetData(
         sheet_name="HAProxy",
@@ -185,6 +186,9 @@ class Plugin(BasePlugin):
     def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
         haproxy = get_element(pfsense, "installedpackages,haproxy")
+        if not haproxy:
+            # haproxy not an installed package
+            return
         for overview in _haproxy_overview(haproxy):
             yield overview
 
