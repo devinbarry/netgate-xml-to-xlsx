@@ -13,6 +13,7 @@ from netgate_xml_to_xlsx.errors import UnknownField
 def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
     regexes = (
+        re.compile("(<authorizedkeys>).*?(</authorizedkeys>)"),
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
         re.compile("(<clientcert_ca>).*?(</clientcert_ca>)"),
         re.compile("(<clientcert_crl>).*?(</clientcert_crl>)"),
