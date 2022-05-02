@@ -7,8 +7,8 @@ from typing import Generator
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import get_element
 
-FIELD_NAMES = "name,descr,scope,expires,ipsecpk,uid,cert"
-WIDTHS = "40,60,20,20,20,10,60"
+FIELD_NAMES = "name,enabled,descr,scope,expires,ipsecpk,uid,cert"
+WIDTHS = "40,10,60,20,20,20,10,60"
 
 
 class Plugin(BasePlugin):
@@ -44,6 +44,8 @@ class Plugin(BasePlugin):
             row = []
             for key in self.field_names:
                 row.append(get_element(node, key))
+            # The existence of the disabled element indicates user is disabled.
+            row[1] = "No" if "disabled" in node else "Yes"
             rows.append(row)
 
         yield SheetData(
