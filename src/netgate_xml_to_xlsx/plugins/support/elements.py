@@ -14,15 +14,17 @@ def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
     regexes = (
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
-        re.compile("(<radius_secret>).*?(</radios_secret>)"),
-        re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
-        re.compile("(<stats_password>).*?(</stats_password>)"),
-        re.compile("(<password>).*?(</password>)"),
-        re.compile("(<tls>).*?(</tls>)"),
-        re.compile("(<ssloffloadcert>).*?(</ssloffloadcert>)"),
-        re.compile("(<ha_certificates>).*?(</ha_certificates>)"),
         re.compile("(<clientcert_ca>).*?(</clientcert_ca>)"),
         re.compile("(<clientcert_crl>).*?(</clientcert_crl>)"),
+        re.compile("(<crt>).*?(</crt>)"),
+        re.compile("(<ha_certificates>).*?(</ha_certificates>)"),
+        re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
+        re.compile("(<password>).*?(</password>)"),
+        re.compile("(<prv>).*?(</prv>)"),
+        re.compile("(<radius_secret>).*?(</radios_secret>)"),
+        re.compile("(<ssloffloadcert>).*?(</ssloffloadcert>)"),
+        re.compile("(<stats_password>).*?(</stats_password>)"),
+        re.compile("(<tls>).*?(</tls>)"),
     )
     for regex in regexes:
         raw_xml = regex.sub(r"\1SANITIZED\2", raw_xml)
