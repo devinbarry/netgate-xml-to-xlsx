@@ -63,7 +63,7 @@ class BasePlugin(ABC):
         display_name: str,
         field_names: str,
         column_widths: str | list[int],
-        el_paths_to_sanitize: list[str] | None,
+        el_paths_to_sanitize: list[str] | None = None,
     ) -> None:
         """
         Initialize base plugin.
