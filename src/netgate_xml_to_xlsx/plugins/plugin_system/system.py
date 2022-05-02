@@ -37,11 +37,11 @@ class Plugin(BasePlugin):
             rows.append([key, get_element(node, key)])
 
         # Check version number.
-        if (version := int(float(rows[0][1]))) != 21:
+        if (version := int(float(rows[0][1]))) < 21:
             assert version is not None
             print(
                 f"Warning: File uses version {version}.x. "
-                "Script is only tested on version 21 XML formats."
+                "Script is only tested on XML format versions 21+."
             )
 
         node = get_element(pfsense, "system", None)
