@@ -5,10 +5,10 @@ import argparse
 import os
 from pathlib import Path
 from typing import cast
-from xml.dom.minidom import parseString
 
-from dicttoxml2 import dicttoxml
 import xmltodict
+from defusedxml.minidom import parseString
+from dicttoxml2 import dicttoxml
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
 from openpyxl.styles.alignment import Alignment
