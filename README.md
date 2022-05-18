@@ -45,6 +45,8 @@ netgate-xml-to-xlsx --sanitize firewall-config.xml
 netgate-xml-to-xlsx --sanitize dir/*
 ```
 
+The sanitize step alters the XML format and layout as it goes through a binary conversion and back to XML again.
+
 ### Convert to Spreadsheet
 * By default, output is sent to the `./output` directory.
 * Use the `--output-dir` parameter to set a specific output directory.
