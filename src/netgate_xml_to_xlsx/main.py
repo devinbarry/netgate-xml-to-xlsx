@@ -28,7 +28,7 @@ def main() -> None:
         banner(pfsense)
 
         if args.sanitize:
-            pfsense.sanitize()
+            pfsense.sanitize(PLUGINS_TO_RUN)
             continue
 
         # Run plugins in order.

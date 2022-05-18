@@ -40,6 +40,14 @@ colorama = {version = "*", markers = "sys_platform == \"win32\""}
 development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
 
 [[package]]
+name = "dicttoxml2"
+version = "2.0.0"
+description = "Converts a Python dictionary or other native data type into a valid XML string."
+category = "main"
+optional = false
+python-versions = ">=3.7, <4"
+
+[[package]]
 name = "distlib"
 version = "0.3.4"
 description = "Distribution utilities"
@@ -296,7 +304,7 @@ python-versions = ">=3.4"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "80cd1abbc60b7746f456286ed0c21e2ef08c81517c5e60fbe22672edf75bf83c"
+content-hash = "55a67b1a158aff9f037ecada5864aa5ceb90ff589417768fa07cf1c0184ade42"
 
 [metadata.files]
 argcomplete = [
@@ -314,6 +322,10 @@ colorama = [
 colorlog = [
     {file = "colorlog-6.6.0-py2.py3-none-any.whl", hash = "sha256:351c51e866c86c3217f08e4b067a7974a678be78f07f85fc2d55b8babde6d94e"},
     {file = "colorlog-6.6.0.tar.gz", hash = "sha256:344f73204009e4c83c5b6beb00b3c45dc70fcdae3c80db919e0a4171d006fde8"},
+]
+dicttoxml2 = [
+    {file = "dicttoxml2-2.0.0-py3-none-any.whl", hash = "sha256:3f75ddc5cb5c58d03321a580eab8d9630a1fde93e5128e1a57a41e03c6b99449"},
+    {file = "dicttoxml2-2.0.0.tar.gz", hash = "sha256:f3f65bbfc5b10cfe419f886077b853b2d998bfb6a64e54f1850a0abf362b1bf2"},
 ]
 distlib = [
     {file = "distlib-0.3.4-py2.py3-none-any.whl", hash = "sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b"},

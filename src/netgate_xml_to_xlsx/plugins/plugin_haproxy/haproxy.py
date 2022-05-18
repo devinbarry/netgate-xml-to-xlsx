@@ -180,8 +180,10 @@ class Plugin(BasePlugin):
         column_widths: str = "",
     ) -> None:
         """Ignore field_names and column_widths as we create them individually."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, field_names, column_widths, ["pfsense,installedpackages,haproxy,advanced"])
 
+    def sanitize(self, root):
+        super().sanitize(root)
     def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
         haproxy = get_element(pfsense, "installedpackages,haproxy")
