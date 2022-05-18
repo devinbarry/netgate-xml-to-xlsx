@@ -55,6 +55,45 @@ class SheetData:
         self.column_widths = column_widths
 
 
+def _recurse_sanitize(root: OrderedDict | list, el_names: list[str]) -> None:
+        """
+        Walk the el_names path.
+
+        Recurse through lists.
+        Don't expect lists to be in the thousands so recursion is fine.
+        """
+        current_el = root
+        if current_el is None:
+            # Empty terminal or missing node.
+            return
+
+        if isinstance(current_el, list):
+            # Process each element in the list.
+            # Required to handle lists of lists.
+            # Process all of the remaining el_names.
+            for el in current_el:
+                _recurse_sanitize(el, el_names)
+            return
+
+        for offset, el_name in enumerate(el_names, start=1):
+            previous_el = current_el
+            current_el = current_el.get(el_name)
+            if current_el is None:
+                return
+            if isinstance is None:
+                # Empty or missing terminal node.
+                return
+
+            if isinstance(current_el, str):
+                # Terminal node to sanitize
+                previous_el[el_name] = "SANITIZED"
+                return
+
+            if isinstance(current_el, list):
+                for el in current_el:
+                    _recurse_sanitize(el, el_names[offset:])
+                return
+
 class BasePlugin(ABC):
     """Base of all plugins."""
 
@@ -90,33 +129,14 @@ class BasePlugin(ABC):
         if root is None or self.el_paths_to_sanitize is None:
             # Nothing to do
             return
-        assert not root is None
-        assert not self.el_paths_to_sanitize is None
-
+        assert root is not None
+        assert self.el_paths_to_sanitize is not None
         for el_path in self.el_paths_to_sanitize:
             el_names = el_path.split(",")
             if not len(el_names):
                 # empty list
                 return
-            previous_el = None
-
-            # Ignore possibility of first elemen being a list as we know it never is in netgate.
-            current_el = root.get(el_names[0], None)
-
-            # TODO: Deal with lists.
-            for el_name in el_names[1:]:
-                previous_el = current_el
-                current_el = current_el.get(el_name)
-                if current_el is None:
-                    return
-                if isinstance(current_el, OrderedDict):
-                    # Still processing nodes.
-                    continue
-                # else: if we're out of el_names fall through to else.
-            else:
-                # current_el is the element to sanitize
-                if previous_el is not None:
-                    previous_el[el_name] = "SANITIZED"
+            _recurse_sanitize(root, el_names)
 
     @abstractmethod
     def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
