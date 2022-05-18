@@ -1,14 +1,13 @@
 """HAProxy plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from collections import OrderedDict
 from typing import Generator, cast
 
 from ..base_plugin import BasePlugin, SheetData, split_commas
 from ..support.elements import get_element, load_standard_nodes
 
 
-def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
+def _haproxy_overview(nodes: dict) -> Generator[SheetData, None, None]:
     """Top-level haproxy elements.
 
     Return two columns: Name/Value.
@@ -37,7 +36,7 @@ def _haproxy_overview(nodes: OrderedDict) -> Generator[SheetData, None, None]:
 
 
 def _haproxy_backends(
-    nodes: OrderedDict | list[OrderedDict],
+    nodes: dict | list[dict],
 ) -> Generator[SheetData, None, None]:
     """Report HAProxy backends have one or more items."""
     rows = []
@@ -56,7 +55,7 @@ def _haproxy_backends(
         split_commas("20,20,20,25,25,20,20,20,20,40,20,20,20,20,20,80,20,20,20,20,20"),
     )
 
-    if isinstance(nodes, OrderedDict):
+    if isinstance(nodes, dict):
         nodes = [nodes]
 
     for node in nodes:
@@ -92,7 +91,7 @@ def _haproxy_backends(
 
 
 def _haproxy_pools(
-    nodes: OrderedDict | list[OrderedDict],
+    nodes: dict | list[dict],
 ) -> Generator[SheetData, None, None]:
     """Report HAProxy pools."""
     rows = []
@@ -130,7 +129,7 @@ def _haproxy_pools(
         ),
     )
 
-    if isinstance(nodes, OrderedDict):
+    if isinstance(nodes, dict):
         nodes = [nodes]
 
     for node in nodes:
@@ -183,7 +182,7 @@ class Plugin(BasePlugin):
         """Ignore field_names and column_widths as we create them individually."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
+    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
         haproxy = get_element(pfsense, "installedpackages,haproxy")
         if not haproxy:

@@ -3,7 +3,6 @@
 
 import argparse
 import os
-from collections import OrderedDict
 from pathlib import Path
 from typing import cast
 
@@ -29,7 +28,7 @@ class PfSense:
         self.args = args
         self.in_file = (in_path := Path(in_filename))
         self.raw_xml: str = ""
-        self.pfsense: OrderedDict = OrderedDict()
+        self.pfsense: dict = {}
         self.workbook: Workbook = Workbook()
 
         # ss_filename is expected to be overwritten by

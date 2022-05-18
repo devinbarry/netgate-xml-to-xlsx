@@ -2,7 +2,6 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from typing import Generator, cast
 
 
@@ -55,44 +54,45 @@ class SheetData:
         self.column_widths = column_widths
 
 
-def _recurse_sanitize(root: OrderedDict | list, el_names: list[str]) -> None:
-        """
-        Walk the el_names path.
+def _recurse_sanitize(root: dict | list, el_names: list[str]) -> None:
+    """
+    Walk the el_names path.
 
-        Recurse through lists.
-        Don't expect lists to be in the thousands so recursion is fine.
-        """
-        current_el = root
+    Recurse through lists.
+    Don't expect lists to be in the thousands so recursion is fine.
+    """
+    current_el = root
+    if current_el is None:
+        # Empty terminal or missing node.
+        return
+
+    if isinstance(current_el, list):
+        # Process each element in the list.
+        # Required to handle lists of lists.
+        # Process all of the remaining el_names.
+        for el in current_el:
+            _recurse_sanitize(el, el_names)
+        return
+
+    for offset, el_name in enumerate(el_names, start=1):
+        previous_el = current_el
+        current_el = current_el.get(el_name)
         if current_el is None:
-            # Empty terminal or missing node.
+            return
+        if isinstance is None:
+            # Empty or missing terminal node.
+            return
+
+        if isinstance(current_el, str):
+            # Terminal node to sanitize
+            previous_el[el_name] = "SANITIZED"
             return
 
         if isinstance(current_el, list):
-            # Process each element in the list.
-            # Required to handle lists of lists.
-            # Process all of the remaining el_names.
             for el in current_el:
-                _recurse_sanitize(el, el_names)
+                _recurse_sanitize(el, el_names[offset:])
             return
 
-        for offset, el_name in enumerate(el_names, start=1):
-            previous_el = current_el
-            current_el = current_el.get(el_name)
-            if current_el is None:
-                return
-            if isinstance is None:
-                # Empty or missing terminal node.
-                return
-
-            if isinstance(current_el, str):
-                # Terminal node to sanitize
-                previous_el[el_name] = "SANITIZED"
-                return
-
-            if isinstance(current_el, list):
-                for el in current_el:
-                    _recurse_sanitize(el, el_names[offset:])
-                return
 
 class BasePlugin(ABC):
     """Base of all plugins."""
@@ -124,7 +124,7 @@ class BasePlugin(ABC):
         )
         self.el_paths_to_sanitize = el_paths_to_sanitize
 
-    def sanitize(self, root: OrderedDict | None) -> None:
+    def sanitize(self, root: dict | None) -> None:
         """Sanitize defined paths."""
         if root is None or self.el_paths_to_sanitize is None:
             # Nothing to do
@@ -139,7 +139,7 @@ class BasePlugin(ABC):
             _recurse_sanitize(root, el_names)
 
     @abstractmethod
-    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
+    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """
         Run plugin.
 

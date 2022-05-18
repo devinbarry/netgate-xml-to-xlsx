@@ -5,7 +5,6 @@ import datetime
 import html
 import ipaddress
 import re
-from collections import OrderedDict
 
 from netgate_xml_to_xlsx.errors import UnknownField
 
@@ -42,7 +41,7 @@ def unescape(value: str | None) -> str | None:
 
 
 def adjust_field_value(
-    *, field_name: str, value: str | int | OrderedDict | None
+    *, field_name: str, value: str | int | dict | None
 ) -> str | None:
     """Make adjustments based on field_name."""
     if value is None:
@@ -51,7 +50,7 @@ def adjust_field_value(
 
     if isinstance(value, dict):
         return value
-    assert not isinstance(value, OrderedDict)
+    assert not isinstance(value, dict)
 
     if isinstance(value, str):
         value = unescape(value)
@@ -94,7 +93,7 @@ def adjust_field_value(
 
 
 def load_standard_nodes(
-    *, nodes: OrderedDict | list | None, field_names: list[str]
+    *, nodes: dict | list | None, field_names: list[str]
 ) -> list[list]:
     """Load nodes that do not require special handling into rows."""
     rows = []
@@ -103,7 +102,7 @@ def load_standard_nodes(
     assert nodes is not None
 
     # If a single dictionary, put it into a list
-    if isinstance(nodes, OrderedDict):
+    if isinstance(nodes, dict):
         nodes = [nodes]
 
     for node in nodes:
@@ -122,37 +121,13 @@ def load_standard_nodes(
 
 
 def get_element(
-    root_node: OrderedDict, els: list[str] | str, default: str | None = ""
-) -> OrderedDict | str | int | None:
+    root_node: dict, els: list[str] | str, default: str | None = ""
+) -> dict | str | int | None:
     """
     Iterate down the tree and return path.
 
     Use try/except for missing keys as None is a valid return value.
     """
-    if isinstance(els, str):
-        els = els.split(",")
-
-    if root_node is None:
-        return default
-
-    node = root_node
-    try:
-        for el in els:
-            node = node[el]
-            if node is None:
-                return default
-
-            if isinstance(node, (str, list)):
-                return adjust_field_value(field_name=el, value=node)
-        return node
-    except KeyError:
-        return default
-
-
-def modify_element(
-    root_node: OrderedDict, els: list[str] | str, new_value: str | None
-) -> None:
-    """Modify an element, if it exists."""
     if isinstance(els, str):
         els = els.split(",")
 
@@ -190,7 +165,7 @@ def format_privs(privs: list[tuple[str, str | None]] | str | None) -> str | None
     return "\n".join(privs)
 
 
-def updated_or_created(node: OrderedDict) -> str:
+def updated_or_created(node: dict) -> str:
     """Return "updated" or "created" value, or ""."""
     if updated := get_element(node, "updated,time"):
         return updated

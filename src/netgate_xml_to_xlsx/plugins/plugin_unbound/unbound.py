@@ -1,7 +1,6 @@
 """Unbound plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from collections import OrderedDict
 from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
@@ -27,7 +26,7 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
+    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
         node = get_element(pfsense, "unbound")
         rows = load_standard_nodes(nodes=node, field_names=self.field_names)
@@ -53,7 +52,7 @@ class Plugin(BasePlugin):
 
         subrows = []
         for domain_override in domain_overrides:
-            zipped = OrderedDict(zip(domain_overrides_fieldnames, domain_override))
+            zipped = dict(zip(domain_overrides_fieldnames, domain_override))
             subrows.append(
                 "\n".join([f"{key}: {value}" for key, value in zipped.items()])
             )
@@ -62,7 +61,7 @@ class Plugin(BasePlugin):
 
         subrows = []
         for host in hosts:
-            zipped = OrderedDict(zip(hosts_fieldnames, host))
+            zipped = dict(zip(hosts_fieldnames, host))
             subrows.append(
                 "\n".join([f"{key}: {value}" for key, value in zipped.items()])
             )

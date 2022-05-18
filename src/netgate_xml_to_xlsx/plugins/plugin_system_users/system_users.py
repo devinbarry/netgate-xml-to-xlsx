@@ -1,7 +1,6 @@
 """System Users plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from collections import OrderedDict
 from typing import Generator
 
 from ..base_plugin import BasePlugin, SheetData
@@ -23,7 +22,7 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: OrderedDict) -> Generator[SheetData, None, None]:
+    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """
         Sheet with system.user information.
 
@@ -35,7 +34,7 @@ class Plugin(BasePlugin):
         if not nodes:
             return
 
-        if isinstance(nodes, OrderedDict):
+        if isinstance(nodes, dict):
             # Only found one.
             nodes = [nodes]
         nodes.sort(key=lambda x: x["name"].casefold())
