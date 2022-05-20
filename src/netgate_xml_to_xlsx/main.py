@@ -24,7 +24,7 @@ def main() -> None:
     """Driver."""
     args = parse_args()
     in_files = args.in_files
-    config = toml.load("./plugins-to-run.toml")
+    config = toml.load("./plugins.toml")
 
     for in_filename in in_files:
         pfsense = PfSense(args, in_filename)
@@ -35,7 +35,7 @@ def main() -> None:
             continue
 
         # Run plugins in order.
-        for plugin_to_run in config["plugins-to-run"]:
+        for plugin_to_run in config["plugins"]:
             print(f"    {plugin_to_run}")
             pfsense.run(plugin_to_run)
         pfsense.save()
