@@ -35,6 +35,7 @@ xmltodict = "^0.13.0"
 openpyxl = "^3.0.9"
 dicttoxml2 = "^2.0.0"
 defusedxml = "^0.7.1"
+toml = "^0.10.2"
 
 
 [tool.poetry.dev-dependencies]

@@ -1,6 +1,8 @@
 """Main netgate converstion module."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
+import toml
+
 from .parse_args import parse_args
 from .pfsense import PfSense
 
@@ -22,6 +24,7 @@ def main() -> None:
     """Driver."""
     args = parse_args()
     in_files = args.in_files
+    config = toml.load("./plugins-to-run.toml")
 
     for in_filename in in_files:
         pfsense = PfSense(args, in_filename)
@@ -32,7 +35,7 @@ def main() -> None:
             continue
 
         # Run plugins in order.
-        for plugin_to_run in PLUGINS_TO_RUN:
+        for plugin_to_run in config["plugins-to-run"]:
             print(f"    {plugin_to_run}")
             pfsense.run(plugin_to_run)
         pfsense.save()
