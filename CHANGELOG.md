@@ -1,10 +1,14 @@
 # CHANGELOG
 
-## Released 0.9.7 -- 2022-04-23
-* Refactor following "Hypermodern Python" model.
-* Use nox for automation
+## Release 0.9.8 -- TBD
+* Support per-plugin sanitize method (see haproxy plugin for example).
+* Hoist test scripts.
 
-## Released 0.9.6-a1 -- 2022-03-24
+## Release 0.9.7 -- 2022-04-23
+* Refactor following "Hypermodern Python" model.
+* Use nox for automation.
+
+## Release 0.9.6-a1 -- 2022-03-24
 
 * Refactor original script into modules.
 * Convert to plugin architecture.
