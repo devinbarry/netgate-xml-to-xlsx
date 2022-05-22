@@ -8,6 +8,8 @@ import re
 
 from netgate_xml_to_xlsx.errors import UnknownField
 
+from .mytypes import Node
+
 
 def sanitize_xml(raw_xml: str) -> str:
     """Sanitize the xml."""
@@ -38,6 +40,35 @@ def unescape(value: str | None) -> str | None:
     assert value is not None
 
     return html.unescape(value)
+
+
+def xml_findall(parsed_xml: Node, el_path: str) -> list[Node]:
+    """
+    Find all instances of the XML path.
+
+    Args:
+        parsed_xml:
+            Parsed XML node.
+
+        paths:
+            Comma-delimited XML element hierarcy.
+            If "pfsense" is first element, remove it.
+            (etree parses "pfsense" into the "root")
+
+        Returns:
+            List of found Nodes.
+
+    """
+    path = el_path.split(",")
+    if path[0] == "pfsense":
+        if len(path) == 1:
+            return []
+        path = path[1:]
+    selector = "/".join(path)
+    return parsed_xml.findall(selector)
+
+
+# RGAC TODO: Review all of the following.
 
 
 def adjust_field_value(

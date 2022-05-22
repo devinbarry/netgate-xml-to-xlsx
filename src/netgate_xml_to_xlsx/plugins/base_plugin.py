@@ -4,7 +4,8 @@
 from abc import ABC, abstractmethod
 from typing import Generator, cast
 
-import lxml  # nosec
+from .support.elements import xml_findall
+from .support.mytypes import Node
 
 
 def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
@@ -86,26 +87,21 @@ class BasePlugin(ABC):
         )
         self.el_paths_to_sanitize = el_paths_to_sanitize
 
-    def sanitize(self, tree: lxml.etree._Element | None) -> None:
+    def sanitize(self, parsed_xml: Node | None) -> None:
         """
         Sanitize defined paths.
 
         Args:
-            tree: Parsed XML tree.
+            parsed_xml: Parsed XML Node.
 
         """
-        if tree is None or self.el_paths_to_sanitize is None:
+        if parsed_xml is None or self.el_paths_to_sanitize is None:
             # Nothing to do
             return
-        assert tree is not None
+        assert parsed_xml is not None
         assert self.el_paths_to_sanitize is not None
         for el_path in self.el_paths_to_sanitize:
-            path = el_path.split(",")
-            # "pfsense" is root, so take it off if it is the first element
-            if path[0] == "pfsense":
-                path = path[1:]
-            selector = "/".join(path)
-            els = tree.findall(selector)
+            els = xml_findall(parsed_xml, el_path)
             for el in els:
                 if el.text is not None:
                     el.text = "SANITIZED"
