@@ -78,6 +78,9 @@ Some additional advantages are:
 * Allows us to have a configuration file that defines what plugins to run, and the order in which to run them.
 
 
+## Nosec on lxml imports
+The `#nosec` flag is added to the lxml imports as the lxml parsing is not a security concern in this environment.
+
 ## Tools
     * nox
     * tbump: setting version number

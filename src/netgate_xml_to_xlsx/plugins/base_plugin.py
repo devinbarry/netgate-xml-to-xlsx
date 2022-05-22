@@ -4,6 +4,8 @@
 from abc import ABC, abstractmethod
 from typing import Generator, cast
 
+import lxml  # nosec
+
 
 def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
     """
@@ -54,46 +56,6 @@ class SheetData:
         self.column_widths = column_widths
 
 
-def _recurse_sanitize(root: dict | list, el_names: list[str]) -> None:
-    """
-    Walk the el_names path.
-
-    Recurse through lists.
-    Don't expect lists to be in the thousands so recursion is fine.
-    """
-    current_el = root
-    if current_el is None:
-        # Empty terminal or missing node.
-        return
-
-    if isinstance(current_el, list):
-        # Process each element in the list.
-        # Required to handle lists of lists.
-        # Process all of the remaining el_names.
-        for el in current_el:
-            _recurse_sanitize(el, el_names)
-        return
-
-    for offset, el_name in enumerate(el_names, start=1):
-        previous_el = current_el
-        current_el = current_el.get(el_name)
-        if current_el is None:
-            return
-        if isinstance is None:
-            # Empty or missing terminal node.
-            return
-
-        if isinstance(current_el, str):
-            # Terminal node to sanitize
-            previous_el[el_name] = "SANITIZED"
-            return
-
-        if isinstance(current_el, list):
-            for el in current_el:
-                _recurse_sanitize(el, el_names[offset:])
-            return
-
-
 class BasePlugin(ABC):
     """Base of all plugins."""
 
@@ -124,19 +86,29 @@ class BasePlugin(ABC):
         )
         self.el_paths_to_sanitize = el_paths_to_sanitize
 
-    def sanitize(self, root: dict | None) -> None:
-        """Sanitize defined paths."""
-        if root is None or self.el_paths_to_sanitize is None:
+    def sanitize(self, tree: lxml.etree._Element | None) -> None:
+        """
+        Sanitize defined paths.
+
+        Args:
+            tree: Parsed XML tree.
+
+        """
+        if tree is None or self.el_paths_to_sanitize is None:
             # Nothing to do
             return
-        assert root is not None
+        assert tree is not None
         assert self.el_paths_to_sanitize is not None
         for el_path in self.el_paths_to_sanitize:
-            el_names = el_path.split(",")
-            if not len(el_names):
-                # empty list
-                return
-            _recurse_sanitize(root, el_names)
+            path = el_path.split(",")
+            # "pfsense" is root, so take it off if it is the first element
+            if path[0] == "pfsense":
+                path = path[1:]
+            selector = "/".join(path)
+            els = tree.findall(selector)
+            for el in els:
+                if el.text is not None:
+                    el.text = "SANITIZED"
 
     @abstractmethod
     def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
