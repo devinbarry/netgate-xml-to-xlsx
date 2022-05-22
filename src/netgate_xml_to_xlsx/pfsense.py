@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import cast
 
 import xmltodict
-from defusedxml.minidom import parseString
-from dicttoxml2 import dicttoxml
+from lxml import etree  # nosec
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
 from openpyxl.styles.alignment import Alignment
@@ -30,6 +29,7 @@ class PfSense:
         self.args = args
         self.in_file = (in_path := Path(in_filename))
         self.raw_xml: str = ""
+        self.parsed_xml = None  # TBD RGAC!!
         self.pfsense: dict = {}
         self.workbook: Workbook = Workbook()
 
@@ -123,6 +123,9 @@ class PfSense:
 
         The Netgate configuration file XML is well ordered and thus searchable via regex.
 
+        Parse the XML into a tree and call the individual plugin sanitizers.
+        Call the individual plugin sanitizers.
+
         Args:
             plugins_to_run: List of active plugin names.
 
@@ -130,16 +133,14 @@ class PfSense:
         # Run generic sanitize.
         self.raw_xml = sanitize_xml(self.raw_xml)
 
-        # Convert xml to dict for plugin processing.
-        dikt = xmltodict.parse(self.raw_xml)
+        # Parse xml for plugin sanitizing.
+        self.parsed_xml = etree.XML(self.raw_xml)
         for plugin_name in plugins_to_run:
             plugin = self.plugins[plugin_name]
-            plugin.sanitize(dikt)
+            plugin.sanitize(self.parsed_xml)
 
-        # Convert dictionary back to pretty-formatted xml.
-        xml = dicttoxml(dikt)
-        dom = parseString(xml)
-        self.raw_xml = dom.toprettyxml()
+        # Pretty format XML.
+        self.raw_xml = etree.tostring(self.parsed_xml, pretty_print=True).decode("utf8")
 
         # Save sanitized XML
         parts = os.path.splitext(self.in_file)

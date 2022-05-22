@@ -187,9 +187,6 @@ class Plugin(BasePlugin):
             ["pfsense,installedpackages,haproxy,advanced"],
         )
 
-    def sanitize(self, root):
-        super().sanitize(root)
-
     def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
         """Document unbound elements."""
         haproxy = get_element(pfsense, "installedpackages,haproxy")

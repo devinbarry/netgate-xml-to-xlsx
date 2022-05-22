@@ -4,62 +4,36 @@
 from collections import OrderedDict
 
 import pytest
+from lxml import etree
 
 from netgate_xml_to_xlsx.plugins.base_plugin import BasePlugin
 
-base = OrderedDict(
-    {
-        "l1": OrderedDict(
-            {
-                "l1.1": "one.one",
-                "l1.2": "one.two",
-                "L1.3": [],
-            }
-        ),
-        "l2": OrderedDict(
-            {
-                "l2.1": [OrderedDict({"l3": "l_31"}), OrderedDict({"l3": "l_32"})],
-            },
-        ),
-    }
-)
+# IMPORTANT: The lxml parsing converts first element to the 'root'.
+null_element = """\
+<pfsense>
+    <l1>
+        <l1.1/>
+    </l1>
+</pfsense>
+"""
 
-l_1_2 = OrderedDict(
-    {
-        "l1": OrderedDict(
-            {
-                "l1.1": "one.one",
-                "l1.2": "SANITIZED",
-                "L1.3": [],
-            }
-        ),
-        "l2": OrderedDict(
-            {
-                "l2.1": [OrderedDict({"l3": "l_31"}), OrderedDict({"l3": "l_32"})],
-            },
-        ),
-    }
-)
 
-l2_3 = OrderedDict(
-    {
-        "l1": OrderedDict(
-            {
-                "l1.1": "one.one",
-                "l1.2": "one.two",
-                "L1.3": [],
-            }
-        ),
-        "l2": OrderedDict(
-            {
-                "l2.1": [
-                    OrderedDict({"l3": "SANITIZED"}),
-                    OrderedDict({"l3": "SANITIZED"}),
-                ],
-            },
-        ),
-    }
-)
+one_element = """\
+<pfsense>
+    <l1>
+        <l1.1>TARGET</l1.1>
+    </l1>
+</pfsense>
+"""
+
+multi_element = """\
+<pfsense>
+    <l1>
+        <l1.1>TARGET</l1.1>
+        <l1.1>TARGET</l1.1>
+    </l1>
+</pfsense>
+"""
 
 
 class LocalPlugin(BasePlugin):
@@ -77,22 +51,17 @@ class LocalPlugin(BasePlugin):
 
 
 @pytest.mark.parametrize(
-    "name,pfsense,el_paths,expected",
+    "name,xml,el_paths",
     (
-        #   ("none-none", None, ["abc"], None),
-        #   ("base-none-base", base, None, base),
-        #   ("base-empty-base", base, [], base),
-        #   ("base-notfound-base", base, ["abc", "cde"], base),
-        #  ("l1-l2", base, ["l1,l1.2"], l_1_2),
-        ("l2_3", base, ["l2,l2.1,l3"], l2_3),
+        ("null_element", null_element, ["l1,l1.1"]),
+        ("one_element", one_element, ["pfsense,l1,l1.1"]),
+        ("multi_element", multi_element, ["l1,l1.1"]),
     ),
 )
-def test_sanitize_paths(
-    name,
-    pfsense: OrderedDict | None,
-    el_paths: list[str] | None,
-    expected: OrderedDict | None,
-):
+def test_sanitize_paths(name, xml: str, el_paths: list[str] | None):
+    parsed_xml = etree.XML(xml)
+    expected_xml = xml.replace("TARGET", "SANITIZED")
     plugin = LocalPlugin("name", "", "", el_paths)
-    plugin.sanitize(pfsense)
-    assert pfsense == expected
+    plugin.sanitize(parsed_xml)
+    sanitized_xml = etree.tostring(parsed_xml, pretty_print=True).decode("utf8")
+    assert sanitized_xml == expected_xml
