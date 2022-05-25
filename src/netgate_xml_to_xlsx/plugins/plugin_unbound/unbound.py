@@ -3,15 +3,18 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.errors import NodeError
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element, load_standard_nodes
+from ..support.elements import xml_findall, xml_findone
 
 FIELD_NAMES = (
-    "enable,active_interface,outgoing_interface,custom_options,custom_options,"
-    "hideversion,dnssecstripped,port,system_domain_local_zone_type,sslcertref,"
-    "dnssec,tlsport"
+    "enable,hosts,domainoverrides,active_interface,outgoing_interface,"
+    "custom_options,custom_options,hideversion,dnssecstripped,port,"
+    "system_domain_local_zone_type,sslcertref,dnssec,tlsport"
 )
-WIDTHS = "20,20,20,20,20,20,20,20,20,20,20,20,80,80"
+WIDTHS = "10,50,50,20,20,20,20,20,20,20,40,20,20,20"
 
 
 class Plugin(BasePlugin):
@@ -26,50 +29,58 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
-        """Document unbound elements."""
-        node = get_element(pfsense, "unbound")
-        rows = load_standard_nodes(nodes=node, field_names=self.field_names)
+    def adjust_node(self, node: Node) -> str:
+        """Custom node adjustments."""
+        if node is None:
+            return ""
 
-        # Only expect one row returned.
-        assert len(rows) <= 1
+        match node.tag:
+            case "domainoverrides" | "hosts":
+                if node.tag == "domainoverrides":
+                    field_names = "domain,ip,tls_hostname,descr".split(",")
+                else:
+                    # hosts
+                    field_names = "host,domain,ip,aliases,descr".split(",")
 
-        if not rows:
-            # No unbound values. Nothing to output.
+                result = []
+                for field_name in field_names:
+                    child = xml_findone(node, field_name)
+                    if child is None:
+                        value = ""
+                    else:
+                        value = child.text or ""
+                    result.append(f"{field_name}: {value}")
+                return "\n".join(result)
+
+            case "hideidentity" | "hideversion" | "dnssecstripped" | "dnssec" | "tlsport":
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
+        return super().adjust_node(node)
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+        """Document unbound elements.  One row."""
+        rows = []
+
+        node = xml_findone(parsed_xml, "unbound")
+        if node is None:
             return
 
-        # Load multi-element items.
-        domain_overrides_fieldnames = "domain,ip,descr,tls_hostname".split(",")
-        domain_overrides = load_standard_nodes(
-            nodes=get_element(node, "domainoverrides"),
-            field_names=domain_overrides_fieldnames,
-        )
+        row = []
 
-        hosts_fieldnames = "host,domain,ip,descr,aliases".split(",")
-        hosts = load_standard_nodes(
-            nodes=get_element(node, "hosts"), field_names=hosts_fieldnames
-        )
+        for field_name in self.field_names:
+            value = self.adjust_nodes(xml_findall(node, field_name))
 
-        subrows = []
-        for domain_override in domain_overrides:
-            zipped = dict(zip(domain_overrides_fieldnames, domain_override))
-            subrows.append(
-                "\n".join([f"{key}: {value}" for key, value in zipped.items()])
-            )
+            row.append(value)
 
-        rows[0].append("\n\n".join(subrows))
-
-        subrows = []
-        for host in hosts:
-            zipped = dict(zip(hosts_fieldnames, host))
-            subrows.append(
-                "\n".join([f"{key}: {value}" for key, value in zipped.items()])
-            )
-
-        rows[0].append("\n\n".join(subrows))
-
-        # Add the two subrows columns to the field names.
-        self.field_names.extend(("domainoverrides", "hosts"))
+        self.sanity_check_node_row(node, row)
+        rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,

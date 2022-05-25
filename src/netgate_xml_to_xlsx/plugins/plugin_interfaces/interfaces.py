@@ -3,14 +3,20 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.errors import NodeError
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element
+from ..support.elements import xml_findone
 
 FIELD_NAMES = (
-    "name,descr,alias-address,alias-subnet,spoofmac,enable,"
-    "blockpriv,blockbogons,ipaddr,subnet,gateway"
+    "enable,name,if,descr,alias-address,"
+    "alias-subnet,spoofmac,enable,ipaddr,subnet,"
+    "gateway,ipaddrv6,subnetv6,blockpriv,blockbogons,"
+    "media,track6-interface,track6-prefix-id,dhcp6-duid,dhcp6-ia-pd-len,"
+    "dhcp6cvpt"
 )
-WIDTHS = "20,40,20,20,20,20,20,20,20,10,40"
+WIDTHS = "20,40,20,20,20," "20,20,20,20,20," "20,20,20,20,20," "20,20,20,20,20," "20"
 
 
 class Plugin(BasePlugin):
@@ -25,33 +31,49 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
-        """
-        Document all interfaces.
+    def adjust_node(self, node: Node) -> str:
+        """Custom node adjustment."""
+        if node is None:
+            return ""
 
-        TODO: Review blockbogons. Does existence == On?
-        """
+        match node.tag:
+            case "media":
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+        return super().adjust_node(node)
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+        """Document all interfaces."""
         rows = []
 
-        # Prepend 'name' before calling _write_sheet.
-
         # Don't sort interfaces. Want them in the order they are encountered.
-        nodes = get_element(pfsense, "interfaces")
-        if not nodes:
+        interfaces_node = xml_findone(parsed_xml, "interfaces")
+        if interfaces_node is None:
             return
 
-        # Don't put nodes in a list as we want a single element
+        children = interfaces_node.getchildren()
+        if not len(children):
+            return
 
-        # Remove 'name' from field_names as we're adding it manually.
-        # Put it back before exiting.
-        del self.field_names[0]
+        for node in children:
+            row = []  # name
 
-        for name, node in nodes.items():
-            row = [name]
             for field_name in self.field_names:
-                row.append(get_element(node, field_name))
+                if field_name == "name":
+                    row.append(node.tag)
+                    continue
+                value = self.adjust_node(xml_findone(node, field_name))
+
+                row.append(value)
+
+            self.sanity_check_node_row(node, row)
             rows.append(row)
-        self.field_names.insert(0, "name")
 
         yield SheetData(
             sheet_name=self.display_name,

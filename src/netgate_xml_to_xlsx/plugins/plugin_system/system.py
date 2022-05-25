@@ -3,11 +3,26 @@
 
 from typing import Generator
 
-from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element
+from netgate_xml_to_xlsx.errors import NodeError
+from netgate_xml_to_xlsx.mytypes import Node
 
-FIELD_NAMES = "name,value"
-WIDTHS = "80,80"
+from ..base_plugin import BasePlugin, SheetData
+from ..support.elements import nice_address_sort, unescape, xml_findall, xml_findone
+
+FIELD_NAMES = (
+    "aliasesresolveinterval,already_run_config_upgrade,authserver,bogons,crypto_hardware,"
+    "dhcpbackup,disablebeep,disablechecksumoffloading,disablechecksumoffloading,disablelargereceiveoffloading,"  # NOQA
+    "disablenatreflection,disablesegmentationoffloading,dns1host,dns2host,dnsserver,"
+    "do_not_send_uniqueid,domain,firmware,gitsync,hn_altq_enable,"
+    "hostname,ipv6dontcreatelocaldns,language,lastchange,logsbackup,"
+    "maximumfrags,maximumstates,maximumtableentries,nextgid,nextuid,"
+    "optimization,pkg_repo_conf_path,powerd_ac_mode,powerd_battery_mode,powerd_normal_mode,"
+    "primaryconsole,reflectiontimeout,rrdbackup,scrubrnid,serialspeed,"
+    "ssh,sshguard_blocktime,sshguard_detection_time,sshguard_threshold,sshguard_whitelist,"
+    "timeservers,timezone,use_mfs_tmp_size,use_mfs_var_size,version,"
+    "webgui"
+)
+WIDTHS = "80,100"
 
 
 class Plugin(BasePlugin):
@@ -22,7 +37,108 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def adjust_nodes(self, nodes: list[Node]) -> str:
+        """Custom node adjustments."""
+        if nodes is None or len(nodes) == 0:
+            return ""
+
+        result = []
+        for node in nodes:
+            match node.tag:
+                case "authserver":
+                    field_names = (
+                        "name,type,host,radius_protocol,radius_nasip_attribute,"
+                        "radius_secret,radius_timeout,radius_auth_port,refid".split(",")
+                    )
+                    for field_name in field_names:
+                        # Only the fields that appear.
+                        # Prep for other types of authentication.
+                        value = self.adjust_node(xml_findone(node, field_name))
+                        if value:
+                            result.append(f"{field_name}: {value}")
+
+                case "firmware" | "gitsync":
+                    # Need examples.
+                    return "WIP"
+
+                case "bogons":
+                    result.append(self.adjust_node(xml_findone(node, "interval")))
+
+                case "dnsserver":
+                    result.append(unescape(node.text))
+
+                case "ssh":
+                    result.append(self.adjust_node(xml_findone(node, "enabled")))
+
+                case "timeservers":
+                    time_servers = node.text or ""
+                    result.append(nice_address_sort(time_servers))
+
+                case "version":
+                    if version := int(float(node.text)) < 21:
+                        print(
+                            f"Warning: File uses version {version}.x. "
+                            "Script is only tested on XML format versions 21+."
+                        )
+                    result.append(node.text)
+
+                case "webgui":
+                    field_names = (
+                        "althostnames,auth_refresh_time,authmode,"
+                        "dashboardavailablewidgetspanel,dashboardcolumns,"
+                        "interfacessort,loginautocomplete,logincss,loginshowhost,"
+                        "max_procs,noantilockout,port,protocol,ssl-certref,"
+                        "statusmonitoringsettingspanel,systemlogsfilterpanel,"
+                        "systemlogsmanagelogpanel,webguicss,webguifixedmenu,"
+                        "webguihostnamemenu"
+                    ).split(",")
+
+                    for field_name in field_names:
+                        # Only the fields that appear.
+                        # Prep for other types of authentication.
+                        value = self.adjust_node(xml_findone(node, field_name))
+                        if value:
+                            result.append(f"{field_name}: {value}")
+        result.sort()
+
+        if len(result):
+            # Remove possible trailing space.
+            if result[-1] == "":
+                result = result[:-1]
+            return "\n".join(result)
+
+        return super().adjust_nodes(nodes)
+
+    def adjust_node(self, node: Node) -> str:
+        """Custom node adjustment."""
+        if node is None:
+            return ""
+
+        # TODO: Multi-line case statement that black doesn't undo.
+        match node.tag:
+            case "loginshowhost" | "noantilockout" | "interfacessort" | "dashboardavailablewidgetspanel":  # NOQA
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
+            case "systemlogsfilterpanel" | "systemlogsmanagelogpanel" | "statusmonitoringsettingspanel":  # NOQA
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
+        return super().adjust_node(node)
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
         System-level information.
 
@@ -30,34 +146,27 @@ class Plugin(BasePlugin):
         """
         rows = []
 
-        # Version and change information.
-        node = pfsense
+        top_level = {}
+        # Version and change information is at top level.
         for key in "version,lastchange".split(","):
-            rows.append([key, get_element(node, key)])
+            top_level[key] = self.adjust_node(xml_findone(parsed_xml, key))
 
-        # Check version number.
-        if (version := int(float(rows[0][1]))) < 21:
-            assert version is not None
-            print(
-                f"Warning: File uses version {version}.x. "
-                "Script is only tested on XML format versions 21+."
-            )
+        system_node = xml_findone(parsed_xml, "system")
+        if system_node is None:
+            return
 
-        node = get_element(pfsense, "system", None)
-        if node is not None:
-            for key in "optimization,hostname,domain,timezone".split(","):
-                rows.append([key, get_element(node, key)])
+        for key in self.field_names:
+            if key in top_level:
+                rows.append([key, top_level[key]])
+                continue
 
-        time_servers = "\n".join(get_element(node, "timeservers").split(" "))
-        rows.append(["timeservers", time_servers])
-
-        rows.append(["bogons", get_element(node, "bogons,interval")])
-        rows.append(["ssh", get_element(node, "ssh,enabled")])
-        rows.append(["dnsserver", "\n".join(get_element(node, "dnsserver"))])
+            row = [key, self.adjust_nodes(xml_findall(system_node, key))]
+            self.sanity_check_node_row(system_node, row)
+            rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row="name,value".split(","),
             data_rows=rows,
             column_widths=self.column_widths,
         )

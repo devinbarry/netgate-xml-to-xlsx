@@ -3,21 +3,21 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import (
-    get_element,
-    rules_destination,
-    rules_source,
-    rules_username_time,
-    updated_or_created,
-)
+from ..support.elements import xml_findall, xml_findone
 
 FIELD_NAMES = (
-    "id,tracker,type,interface,ipprotocol,tag,tagged,max,max_src_nodes,"
-    "max_src-conn,max-src-states,statetimeout,statetype,os,source,destination,"
-    "log,descr,created,updated"
+    "disabled,interface,type,ipprotocol,protocol,"
+    "source,destination,tag,tagged,max,"
+    "max_src_nodes,max_src-conn,max-src-states,statetimeout,statetype,"
+    "os,log,descr,created,updated,"
+    "id,tracker,uuid"
 )
-WIDTHS = "10,20,10,15,15,10,10,10,20,20,20,20,20,10,50,50,40,80,85,85"
+WIDTHS = (
+    "15,15,15,20,40," "50,50,20,20,20," "20,20,20,20,20," "10,10,85,80,80," "10,20,20"
+)
 
 
 class Plugin(BasePlugin):
@@ -25,47 +25,44 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "Rules",
+        display_name: str = "Filter Rules",
         field_names: str = FIELD_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
-        """Create the rules sheet."""
+    def _updated_or_created(self, node: Node) -> str:
+        """Return "updated" or "created" value, or ""."""
+        if updated := self.adjust_node(xml_findone(node, "updated,time")):
+            return updated
+        return self.adjust_node(xml_findone(node, "created,time"))
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+        """
+        Create the rules sheet.
+
+        Many elements have children that need to be processed.
+        """
         rows = []
 
-        source_index = self.field_names.index("source")
-        destination_index = self.field_names.index("destination")
-        created_index = self.field_names.index("created")
-        updated_index = self.field_names.index("updated")
-
-        nodes = get_element(pfsense, "filter,rule")
-        if not nodes:
-            return
-
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
+        rule_nodes = xml_findall(parsed_xml, "filter,rule")
 
         # Sort rules so that latest changes are at the top.
-        nodes.sort(
-            key=updated_or_created,
+        rule_nodes.sort(
+            key=self._updated_or_created,
             reverse=True,
         )
 
-        for node in nodes:
+        for node in rule_nodes:
             row = []
+
             for field_name in self.field_names:
-                row.append(get_element(node, field_name))
-            row = ["" if x is None else x for x in row]
+                value = self.adjust_node(xml_findone(node, field_name))
 
-            row[source_index] = rules_source(row, source_index)
-            row[destination_index] = rules_destination(row, destination_index)
-            row[created_index] = rules_username_time(row, created_index)
-            row[updated_index] = rules_username_time(row, updated_index)
+                row.append(value)
 
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(

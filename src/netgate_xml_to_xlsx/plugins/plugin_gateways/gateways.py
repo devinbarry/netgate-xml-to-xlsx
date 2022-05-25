@@ -1,15 +1,18 @@
 """Gateways plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-import sys
 from typing import Generator
 
-from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element
+from netgate_xml_to_xlsx.mytypes import Node
 
-# Append 'defaultgw4' and 'defaultgw6' before finishing run.
-FIELD_NAMES = "name,descr,interface,gateway,weight,ipprotocol,monitor_disable"
-WIDTHS = "20,40,20,20,10,30,30,20,20"
+from ..base_plugin import BasePlugin, SheetData
+from ..support.elements import xml_findall, xml_findone
+
+FIELD_NAMES = (
+    "name,interface,gateway,defaultgw4,defaultgw6,weight,ipprotocol,monitor_disable,"
+    "action_disable,descr"
+)
+WIDTHS = "40,20,20,20,30," "10,20,20,20,80"
 
 
 class Plugin(BasePlugin):
@@ -23,48 +26,72 @@ class Plugin(BasePlugin):
     ) -> None:
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
+        self.default_gateways = {"defaultgw4": None, "defaultgw6": None}
+        self.gateway_name = None
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def adjust_node(self, node: Node) -> str:
+        """Custom node adjustments."""
+        if node is None:
+            return ""
+
+        match node.tag:
+            case "name":
+                # Remember gateway name so we can use later for defaults.
+                # name must come before defaultgwX in the fieldname list.
+                self.gateway_name = node.text
+
+            case "action_disable" | "monitor_disable":
+                # Existence indicates yes.
+                return "YES"
+
+        return super().adjust_node(node)
+
+    def is_default_gw(self, ipvx: str) -> str:
+        """
+        Return YES if ipvx is for a default gateway, else "".
+
+        Args:
+            ipvx: ipv4 or ipv6
+
+        Return:
+            YES or "".
+
+        """
+        default = self.default_gateways[ipvx]
+        if self.gateway_name and default == self.gateway_name:
+            return "YES"
+        return ""
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather data for Gateways."""
         rows = []
 
-        # Load default IPV4 and IPV6 gateways.
-        # Don't want "None" for default gateway.
-        default_gw4 = get_element(pfsense, "gateways,defaultgw4")
-        default_gw6 = get_element(pfsense, "gateways,defaultgw6")
-
-        # Which column has the gateway name.
-        gw_name_col = 0
-
-        # Don't sort nodes for now. Leave in order found.
-        nodes = get_element(pfsense, "gateways,gateway_item")
-        if not nodes:
+        gateways_node = xml_findone(parsed_xml, "gateways")
+        if gateways_node is None:
             return
 
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
+        # Load default IPV4 and IPV6 gateways.
+        self.default_gateways["defaultgw4"] = self.adjust_node(
+            xml_findone(gateways_node, "defaultgw4")
+        )
+        self.default_gateways["defaultgw6"] = self.adjust_node(
+            xml_findone(gateways_node, "defaultgw6")
+        )
 
-        for node in nodes:
+        gateway_item_nodes = xml_findall(gateways_node, "gateway_item")
+        for node in gateway_item_nodes:
             row = []
+
             for field_name in self.field_names:
-                try:
-                    row.append(get_element(node, field_name))
-                except AttributeError as err:
-                    print(err)
-                    sys.exit(-1)
+                value = self.adjust_node(xml_findone(node, field_name))
 
-            if default_gw4 == row[gw_name_col]:
-                row.append("YES")
-            else:
-                row.append(None)
-            if default_gw6 == row[gw_name_col]:
-                row.append("YES")
-            else:
-                row.append(None)
+                if field_name in ("defaultgw4", "defaultgw6"):
+                    value = self.is_default_gw(field_name)
+
+                row.append(value)
+
+            self.sanity_check_node_row(node, row)
             rows.append(row)
-
-        self.field_names.extend(["defaultgw4", "defaultgw6"])
 
         yield SheetData(
             sheet_name=self.display_name,

@@ -3,11 +3,17 @@
 
 from typing import Generator
 
-from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element
+from netgate_xml_to_xlsx.mytypes import Node
 
-FIELD_NAMES = "name,enabled,descr,scope,expires,ipsecpk,uid,cert"
-WIDTHS = "40,10,60,20,20,20,10,60"
+from ..base_plugin import BasePlugin, SheetData
+from ..support.elements import xml_findall, xml_node_exists
+
+FIELD_NAMES = (
+    "disabled,name,groupname,scope,expires,"
+    "descr,ipsecpk,uid,cert,bcrypt-hash,"
+    "authorizedkeys,ipsecpsk"
+)
+WIDTHS = "12,40,40,20,20," "60,20,10,20,20," "20,20"
 
 
 class Plugin(BasePlugin):
@@ -22,7 +28,7 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
         Sheet with system.user information.
 
@@ -30,21 +36,23 @@ class Plugin(BasePlugin):
         (at least to me at the moment).
         """
         rows = []
-        nodes = get_element(pfsense, "system,user")
-        if not nodes:
+
+        system_user_nodes = xml_findall(parsed_xml, "system,user")
+        if not system_user_nodes:
             return
 
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
-        nodes.sort(key=lambda x: x["name"].casefold())
+        system_user_nodes.sort(key=lambda x: x.text.casefold())
 
-        for node in nodes:
+        for node in system_user_nodes:
             row = []
-            for key in self.field_names:
-                row.append(get_element(node, key))
+            for field_name in self.field_names:
+                values = [self.adjust_node(x) for x in xml_findall(node, field_name)]
+                values.sort()
+
+                row.append("\n".join(values))
+
             # The existence of the disabled element indicates user is disabled.
-            row[1] = "No" if "disabled" in node else "Yes"
+            row[1] = "Yes" if xml_node_exists(node, "disabled") else "Yes"
             rows.append(row)
 
         yield SheetData(

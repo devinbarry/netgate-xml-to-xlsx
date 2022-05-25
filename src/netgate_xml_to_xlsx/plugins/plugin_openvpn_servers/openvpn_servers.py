@@ -3,8 +3,10 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element, load_standard_nodes
+from ..support.elements import xml_findall, xml_findone
 
 FIELD_NAMES = (
     "vpnid,disable,mode,protocol,dev_mode,interface,ipaddr,local_port,"
@@ -40,19 +42,24 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Document all OpenVPN servers."""
         rows = []
 
-        # Don't sort OpenVPN Servers. Want them in the order they are encountered.
-        nodes = get_element(pfsense, "openvpn,openvpn-server")
-        if not nodes:
+        openvpn_server_nodes = xml_findall(parsed_xml, "openvpn,openvpn-server")
+        if not len(openvpn_server_nodes):
             return
 
-        if isinstance(nodes, dict):
-            nodes = [nodes]
+        for node in openvpn_server_nodes:
+            row = []
 
-        rows.extend(load_standard_nodes(nodes=nodes, field_names=self.field_names))
+            for field_name in self.field_names:
+                value = self.adjust_node(xml_findone(node, field_name))
+
+                row.append(value)
+
+            self.sanity_check_node_row(node, row)
+            rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,

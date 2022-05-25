@@ -6,11 +6,12 @@ import os
 from pathlib import Path
 from typing import cast
 
-import xmltodict
 from lxml import etree  # nosec
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
 from openpyxl.styles.alignment import Alignment
+
+from netgate_xml_to_xlsx.mytypes import Node
 
 from .plugin_tools import discover_plugins
 from .plugins.support.elements import sanitize_xml
@@ -29,8 +30,7 @@ class PfSense:
         self.args = args
         self.in_file = (in_path := Path(in_filename))
         self.raw_xml: str = ""
-        self.parsed_xml = None  # TBD RGAC!!
-        self.pfsense: dict = {}
+        self.parsed_xml: Node = None
         self.workbook: Workbook = Workbook()
 
         # ss_filename is expected to be overwritten by
@@ -97,8 +97,7 @@ class PfSense:
         Return pfsense keys.
         """
         self.raw_xml = self.in_file.read_text(encoding="utf-8")
-        data = xmltodict.parse(self.raw_xml)
-        self.pfsense = data["pfsense"]
+        self.parsed_xml = etree.XML(self.raw_xml)
 
     def _write_sheet(
         self,
@@ -135,6 +134,7 @@ class PfSense:
 
         # Parse xml for plugin sanitizing.
         self.parsed_xml = etree.XML(self.raw_xml)
+
         for plugin_name in plugins_to_run:
             plugin = self.plugins[plugin_name]
             plugin.sanitize(self.parsed_xml)
@@ -163,7 +163,7 @@ class PfSense:
         Continue iterating if it is None.
         """
         plugin = self.plugins[plugin_name]
-        for sheet_data in plugin.run(self.pfsense):
+        for sheet_data in plugin.run(self.parsed_xml):
             if sheet_data is None or not sheet_data.data_rows:
                 continue
 

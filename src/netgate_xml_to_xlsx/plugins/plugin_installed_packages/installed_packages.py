@@ -3,14 +3,25 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element, load_standard_nodes
+from ..support.elements import unescape, xml_findall, xml_findone
 
 FIELD_NAMES = (
-    "name,internal_name,descr,version,configuration_file,include_file,"
-    "website,pkginfolink,filter_rule_function"
+    "name,internal_name,version,descr,plugins,"
+    "noembedded,logging,website,pkginfolink,filter_rule_function,"
+    "configuration_file,include_file"
 )
-WIDTHS = "40,40,50,20,50,50,80,80,50"
+WIDTHS = "40,40,20,80,40," "20,40,80,80,80," "80,80"
+
+
+def name_sort(node: Node) -> str:
+    """Extract element name for sorting."""
+    if node is None:
+        return ""
+    value = unescape(xml_findone(node, "name").text).casefold()
+    return value
 
 
 class Plugin(BasePlugin):
@@ -25,20 +36,49 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
-        """Gather data for Installed Packages. Sort by name."""
+    def adjust_node(self, node: Node) -> str:
+        """Local node customizations."""
+        if node is None:
+            return ""
+
+        match node.tag:
+            case "logging":
+                return "WIP"  # TODO: logsocket, facilityname, logfilename
+
+            case "plugins":
+                # Get 'item'.
+                children = node.getchildren()
+                plugins = []
+                for child in children:
+                    assert child.tag == "item"
+                    plugins.append(self.adjust_node(xml_findone(child, "type")))
+                plugins.sort()
+                return "\n".join(plugins)
+
+        return super().adjust_node(node)
+
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+        """Document installed packages. Sort by name."""
         rows = []
 
-        nodes = get_element(pfsense, "installedpackages,package")
-        if not nodes:
-            return
+        package_nodes = xml_findall(parsed_xml, "installedpackages,package")
 
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
-        nodes.sort(key=lambda x: x["name"].casefold())
+        package_nodes.sort(
+            key=name_sort,
+            # key=lambda x: x.name.casefold(),
+            reverse=False,
+        )
 
-        rows = load_standard_nodes(nodes=nodes, field_names=self.field_names)
+        for node in package_nodes:
+            row = []
+
+            for field_name in self.field_names:
+                value = self.adjust_node(xml_findone(node, field_name))
+
+                row.append(value)
+
+            self.sanity_check_node_row(node, row)
+            rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,

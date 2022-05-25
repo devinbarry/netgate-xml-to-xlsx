@@ -3,8 +3,10 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element
+from ..support.elements import xml_findall
 
 FIELD_NAMES = "name,description,scope,gid,priv"
 WIDTHS = "40,80,20,20,80"
@@ -22,7 +24,7 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
         Sheet with system.group information.
 
@@ -30,20 +32,19 @@ class Plugin(BasePlugin):
         Display privileges alpha sorted.
         """
         rows = []
-        nodes = get_element(pfsense, "system,group")
-        if not nodes:
+        system_group_nodes = xml_findall(parsed_xml, "system,group")
+        if not system_group_nodes:
             return
 
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
+        system_group_nodes.sort(key=lambda x: x.text.casefold())
 
-        nodes.sort(key=lambda x: x["name"].casefold())
-
-        for node in nodes:
+        for node in system_group_nodes:
             row = []
-            for key in self.field_names:
-                row.append(get_element(node, key))
+            for field_name in self.field_names:
+                values = [self.adjust_node(x) for x in xml_findall(node, field_name)]
+                values.sort()
+
+                row.append("\n".join(values))
             rows.append(row)
 
         yield SheetData(

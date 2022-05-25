@@ -3,8 +3,10 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.mytypes import Node
+
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import get_element, load_standard_nodes
+from ..support.elements import xml_findall
 
 FIELD_NAMES = "name,type,address,url,updatefreq,descr,detail"
 WIDTHS = "40,40,40,80,20,80,80"
@@ -22,20 +24,25 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
 
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Aliases sheet."""
         rows = []
 
-        nodes = get_element(pfsense, "aliases,alias")
-        if not nodes:
+        alias_nodes = xml_findall(parsed_xml, "aliases,alias")
+        if not alias_nodes:
             return
 
-        if isinstance(nodes, dict):
-            # Only found one.
-            nodes = [nodes]
-        nodes.sort(key=lambda x: x["name"].casefold())
+        alias_nodes.sort(key=lambda x: x.text.casefold())
 
-        rows.extend(load_standard_nodes(nodes=nodes, field_names=self.field_names))
+        for node in alias_nodes:
+            row = []
+            for field_name in self.field_names:
+                values = [self.adjust_node(x) for x in xml_findall(node, field_name)]
+                values.sort()
+
+                row.append("\n".join(values))
+
+            rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,

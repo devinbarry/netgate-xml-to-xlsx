@@ -1,11 +1,16 @@
 """Base plugin class."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
+import datetime
 from abc import ABC, abstractmethod
 from typing import Generator, cast
 
-from .support.elements import xml_findall
-from .support.mytypes import Node
+import lxml  # nosec
+
+from netgate_xml_to_xlsx.errors import NodeError
+from netgate_xml_to_xlsx.mytypes import Node
+
+from .support.elements import nice_address_sort, unescape, xml_findall
 
 
 def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
@@ -37,6 +42,57 @@ def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
     # Yes, we know it is a list[str]...
     # Without cast mypy thinks we're returning list[Any].
     return cast(list[int | str], data)
+
+
+def _destination_source(node: Node) -> str:
+    """Format destination and source addresses/ports."""
+    any_address: bool = False
+    address: str = ""
+    port: str = ""
+
+    for child in node.getchildren():
+        match child.tag:
+            case "any":
+                any_address = True
+            case "address" | "network":
+                address = unescape(child.text)
+            case "port":
+                port = unescape(child.text)
+            case _:
+                raise NodeError(f"Unknown tag {child.tag} in node {node.tag}.")
+
+    result = []
+    if any_address:
+        if port:
+            result.append(f"any:{port}")
+        else:
+            result.append("any")
+    else:
+        if address and port:
+            result.append(f"{address}:{port}")
+        else:
+            # Ignore port without address as I don't think that is allowed.
+            result.append(address)
+    return "\n".join(result)
+
+
+def _created_updated(node: Node) -> str:
+    """Format created/updated user and date/time."""
+    result = []
+    for child in node.getchildren():
+        match child.tag:
+            case "username":
+                result.append(child.text)
+            case "time":
+                date_time = datetime.datetime.fromtimestamp(int(child.text)).strftime(
+                    "%Y-%m-%d %H-%M-%S"
+                )
+                result.append(date_time)
+            case _:
+
+                raise NodeError(f"Unknown tag {child.tag} in node {node.tag}.")
+
+    return "\n".join(result)
 
 
 class SheetData:
@@ -106,14 +162,134 @@ class BasePlugin(ABC):
                 if el.text is not None:
                     el.text = "SANITIZED"
 
+    def adjust_node(self, node: Node) -> str | Node:
+        """
+        Adjust a node based children and tag name.
+
+        Args:
+            node: XML node to check
+
+        Returns:
+            Processed node data or original node if no processing done.
+
+        """
+        if node is None:
+            return ""
+
+        children = node.getchildren()
+        if not children:
+            # Terminal node. Defaults to returning text.
+            match node.tag:
+                case "address":
+                    if node.text is None:
+                        return ""
+                    return nice_address_sort(node.text)
+
+                case "data_ciphers" | "local_network" | "local_networkv6" | "remote_network" | "remote_networkv6":  # NOQA
+                    if node.text is None:
+                        return ""
+                    values = [x.strip() for x in node.text.split(",")]
+                    values.sort()
+                    return "\n".join(values)
+
+                case "descr":
+                    if node.text is None:
+                        return ""
+                    value = unescape(node.text)
+                    value = value.replace("<br />", "\n")
+                    lines = [x.strip() for x in value.split("\n")]
+                    return "\n".join(lines)
+
+                # May be specific only to our environment. Details divided by ||
+                case "detail":
+                    if node.text is None:
+                        return ""
+                    value = unescape(node.text)
+                    value = value.replace("||", "\n")
+                    lines = [x.strip() for x in value.split("\n")]
+                    return "\n".join(lines)
+
+                case "disable" | "disabled" | "enable" | "blockpriv" | "blockbogons":
+                    # Existence of tag indicates 'yes'.
+                    # Sanity check there is no text.
+                    if node.text:
+                        raise NodeError(
+                            f"Node {node.tag} has unexpected text: {node.text}."
+                        )
+
+                    return "YES"
+
+                case _:
+                    return node.text or ""
+
+        # Process
+        match node.tag:
+            case "destination" | "source":
+                return _destination_source(node)
+
+            case "created" | "updated":
+                return _created_updated(node)
+
+        # Not processed.
+        return node
+
+    def adjust_nodes(self, nodes: list[Node]) -> str:
+        """
+        Adjust multiple nodes into one.
+
+        All nodes have the same tag.
+        # TODO: Always process for 'nodes' as we'll compress the information
+        # for single instances.
+        """
+        if nodes is None:
+            return ""
+
+        num_nodes = len(nodes)
+        if num_nodes == 0:
+            return ""
+        assert num_nodes != 0
+
+        result = []
+        for node in nodes:
+            result.append(self.adjust_node(node))
+            result.append("")
+
+        if len(result) > 1:
+            # Have results. Remove the trailing space.
+            result = result[:-1]
+            self.sanity_check_node_row(node.getparent(), result)
+
+        return "\n".join(result)
+
+    def sanity_check_node_row(self, node: Node, row: list) -> None:
+        """
+        Ensure no row items are an XML node.
+
+        Args:
+            node: Node being processed so we can grab the tag.
+            row: List items ready to write to spreadsheet
+
+        Raises:
+            NodeError
+
+        """
+        errors = []
+        bad_items = [x for x in row if isinstance(x, lxml.etree._Element)]
+        if not bad_items:
+            return
+
+        for item in bad_items:
+            errors.append(f"Unprocessed {node.tag}:{item.tag}")
+        raise NodeError("\n".join(errors))
+
     @abstractmethod
-    def run(self, pfsense: dict) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
         Run plugin.
 
         Args:
             pfsense:
-                Root of the XML configuration file parsed to dictionary.
+                Root of the parsed XML file.
 
         Returns:
             List of rows to write to spreadsheet.

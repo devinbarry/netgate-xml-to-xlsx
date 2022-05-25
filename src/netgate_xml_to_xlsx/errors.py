@@ -6,9 +6,5 @@ class ScriptError(Exception):
     """Generic script error."""
 
 
-class UnknownField(ScriptError):
-    """Parsing something new."""
-
-
-class MissingField(ScriptError):
-    """Expected field not found."""
+class NodeError(ScriptError):
+    """Something wrong with finding/processing a node."""

@@ -6,8 +6,8 @@ plugins = [
     "rules",
     "interfaces",
     "gateways",
-    "openvpn_servers",
-    "installed_packages",
     "unbound",
+    "installed_packages",
     "haproxy",
+    "openvpn_servers",
 ]

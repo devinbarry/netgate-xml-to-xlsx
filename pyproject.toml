@@ -45,6 +45,7 @@ nox-poetry = "^1."
 pyupgrade = "^2.32.0"
 pyflakes = "^2.4.0"
 pydocstyle = "^6.1.1"
+types-toml = "^0.10.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
