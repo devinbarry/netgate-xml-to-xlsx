@@ -34,7 +34,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "Filters",
+        display_name: str = "Filter Rules",
         field_names: str = FIELD_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
