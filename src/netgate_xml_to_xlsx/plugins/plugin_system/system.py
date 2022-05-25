@@ -59,7 +59,7 @@ class Plugin(BasePlugin):
 
                 case "firmware" | "gitsync":
                     # Need examples.
-                    return "WIP"
+                    return self.wip(node)
 
                 case "bogons":
                     result.append(self.adjust_node(xml_findone(node, "interval")))

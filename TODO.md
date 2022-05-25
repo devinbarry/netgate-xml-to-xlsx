@@ -2,19 +2,20 @@
 
 * Add load() method to plugins so they can load anciliary files.
 * Base tabs:
-  * ca
-  * hasync
-  * ifgroups
-  * ipsec
-  * menu
+  * cron
+  * dhcpd
+  * diag
+  * dnshaper
   * nat
-  * notifications
-  * ntpd
-  * service
-  * servicewatchdog
-  * sshdata
-  * sysctl
-  * virtualip
+  * ppps
+  * proxyarp
+  * rrd
+  * shaper
+  * snmpd
+  * staticroutes
+  * syslog
+  * widgets
+  * wol
 
 * Packages tabs:
   * freeradius
@@ -22,9 +23,12 @@
   * freeradiuseapconf
   * freeradiusinterfaces
   * lightsquid
+  * menu
   * pfblockerng
   * pfblockernglistsv4
   * pfblockerngtopspammers
+  * service
+  * servicewatchdog
   * squid
   * squidantivirus
   * squidauth

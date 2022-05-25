@@ -43,7 +43,7 @@ class Plugin(BasePlugin):
 
         match node.tag:
             case "logging":
-                return "WIP"  # TODO: logsocket, facilityname, logfilename
+                return self.wip(node)
 
             case "plugins":
                 # Get 'item'.

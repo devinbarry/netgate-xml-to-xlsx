@@ -81,6 +81,11 @@ Some additional advantages are:
 ## Nosec on lxml imports
 The `#nosec` flag is added to the lxml imports as the lxml parsing is not a security concern in this environment.
 
+## asserts
+Asserts are used throughout to:
+1. provide mypy guidance
+1. check for unexpected data as we're working from XML samples and not a specification.
+
 ## Tools
     * nox
     * tbump: setting version number

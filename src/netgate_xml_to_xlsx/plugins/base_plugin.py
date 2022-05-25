@@ -282,6 +282,18 @@ class BasePlugin(ABC):
             errors.append(f"Unprocessed {node.tag}:{item.tag}")
         raise NodeError("\n".join(errors))
 
+    def extract_node_elements(self, node: Node) -> dict[str, str]:
+        """Create dictionary of node children's tag:value."""
+        data = {}
+        for child in node.getchildren():
+            data[child.tag] = self.adjust_node(child)
+        return data
+
+    def wip(self, node: Node) -> str:
+        """Output a WIP warning."""
+        print(f"WIP: {self.display_name}/{node.tag}.")
+        return "WIP"
+
     @abstractmethod
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
