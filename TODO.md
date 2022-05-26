@@ -2,20 +2,15 @@
 
 * Add load() method to plugins so they can load anciliary files.
 * Base tabs:
-  * cron
   * dhcpd
+  * dhcpd6
   * diag
   * dnshaper
   * nat
   * ppps
   * proxyarp
-  * rrd
   * shaper
   * snmpd
-  * staticroutes
-  * syslog
-  * widgets
-  * wol
 
 * Packages tabs:
   * freeradius
