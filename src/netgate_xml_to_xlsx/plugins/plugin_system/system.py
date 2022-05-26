@@ -143,6 +143,8 @@ class Plugin(BasePlugin):
         System-level information.
 
         Only showing interesting information (at least to me at the moment).
+        TODO: Needs custom report_unknown_node_elements.
+
         """
         rows = []
 

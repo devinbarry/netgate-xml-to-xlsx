@@ -33,12 +33,13 @@ class Plugin(BasePlugin):
         if cron_nodes is None:
             return
 
-        for cron_node in cron_nodes:
+        for node in cron_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                row.append(self.adjust_node(xml_findone(cron_node, field_name)))
+                row.append(self.adjust_node(xml_findone(node, field_name)))
 
-            self.sanity_check_node_row(cron_node, row)
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(

@@ -109,6 +109,10 @@ class Plugin(BasePlugin):
         if node is None or not self.should_process(node):
             return rows
 
+        # Check for top-level elements plus the different phases and client.
+        l_fieldnames = self.field_names[:]
+        l_fieldnames.extend("phase1,phase2,client".split(","))
+        self.report_unknown_node_elements(node, l_fieldnames)
         row = []
 
         for field_name in self.field_names:
@@ -136,11 +140,12 @@ class Plugin(BasePlugin):
 
         phase1_nodes = xml_findall(node_in, "phase1")
 
-        for phase1_node in phase1_nodes:
+        for node in phase1_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                row.append(self.adjust_node(xml_findone(phase1_node, field_name)))
-            self.sanity_check_node_row(phase1_node, row)
+                row.append(self.adjust_node(xml_findone(node, field_name)))
+            self.sanity_check_node_row(node, row)
             rows.append(row)
         return rows
 
@@ -150,18 +155,18 @@ class Plugin(BasePlugin):
 
         phase2_nodes = xml_findall(node_in, "phase2")
 
-        for phase2_node in phase2_nodes:
+        for node in phase2_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                row.append(self.adjust_nodes(xml_findall(phase2_node, field_name)))
-            self.sanity_check_node_row(phase2_node, row)
+                row.append(self.adjust_nodes(xml_findall(node, field_name)))
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         return rows
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Document unbound elements.  One row."""
-
         node = xml_findone(parsed_xml, "ipsec")
         if node is None:
             return

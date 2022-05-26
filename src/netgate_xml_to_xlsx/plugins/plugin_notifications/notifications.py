@@ -66,11 +66,12 @@ class Plugin(BasePlugin):
         """Gather ntpd information."""
         rows = []
 
-        notifications_node = xml_findone(parsed_xml, "notifications")
-        if notifications_node is None:
+        node = xml_findone(parsed_xml, "notifications")
+        if node is None:
             return
 
-        children = notifications_node.getchildren()
+        self.report_unknown_node_elements(node)
+        children = node.getchildren()
         if len(children) == 0:
             return
 
@@ -81,7 +82,7 @@ class Plugin(BasePlugin):
             value = self.adjust_node(child)
             row.append(value)
 
-        self.sanity_check_node_row(notifications_node, row)
+        self.sanity_check_node_row(node, row)
         rows.append(row)
 
         yield SheetData(

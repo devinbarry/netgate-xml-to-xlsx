@@ -34,6 +34,7 @@ class Plugin(BasePlugin):
         if node is None:
             return
 
+        self.report_unknown_node_elements(node)
         row = []
         children = node.getchildren()
         if len(children) > 0:

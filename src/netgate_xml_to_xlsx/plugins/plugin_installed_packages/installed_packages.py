@@ -70,6 +70,7 @@ class Plugin(BasePlugin):
         )
 
         for node in package_nodes:
+            self.report_unknown_node_elements(node)
             row = []
 
             for field_name in self.field_names:

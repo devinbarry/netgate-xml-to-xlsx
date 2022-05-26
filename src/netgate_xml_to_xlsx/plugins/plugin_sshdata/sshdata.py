@@ -32,13 +32,14 @@ class Plugin(BasePlugin):
         if sshdata_nodes is None:
             return
 
-        for sshdata_node in sshdata_nodes:
+        for node in sshdata_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                value = self.adjust_node(xml_findone(sshdata_node, field_name))
+                value = self.adjust_node(xml_findone(node, field_name))
                 row.append(value)
 
-            self.sanity_check_node_row(sshdata_node, row)
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(

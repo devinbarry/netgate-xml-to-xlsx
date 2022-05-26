@@ -129,6 +129,7 @@ class Plugin(BasePlugin):
         header_row: list[str] = "name,value".split(",")
         column_widths: list[int] = split_commas("50,80")
 
+        self.report_unknown_node_elements(node, field_names)
         row = []
 
         for field_name in field_names:
@@ -164,6 +165,7 @@ class Plugin(BasePlugin):
         rows = []
 
         for node in nodes:
+            self.report_unknown_node_elements(node, field_names)
             row = []
 
             for field_name in field_names:
@@ -216,6 +218,7 @@ class Plugin(BasePlugin):
         rows = []
 
         for node in nodes:
+            self.report_unknown_node_elements(node, field_names)
             row = []
 
             for field_name in field_names:

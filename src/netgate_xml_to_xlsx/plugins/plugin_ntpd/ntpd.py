@@ -50,17 +50,18 @@ class Plugin(BasePlugin):
         """Gather ntpd information."""
         rows = []
 
-        ntpd_node = xml_findone(parsed_xml, "ntpd")
-        if ntpd_node is None:
+        node = xml_findone(parsed_xml, "ntpd")
+        if node is None:
             return
 
+        self.report_unknown_node_elements(node)
         row = []
 
         for field_name in self.field_names:
-            value = self.adjust_node(xml_findone(ntpd_node, field_name))
+            value = self.adjust_node(xml_findone(node, field_name))
             row.append(value)
 
-        self.sanity_check_node_row(ntpd_node, row)
+        self.sanity_check_node_row(node, row)
         rows.append(row)
 
         yield SheetData(

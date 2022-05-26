@@ -35,6 +35,7 @@ class Plugin(BasePlugin):
         alias_nodes.sort(key=lambda x: x.text.casefold())
 
         for node in alias_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
                 values = [self.adjust_node(x) for x in xml_findall(node, field_name)]

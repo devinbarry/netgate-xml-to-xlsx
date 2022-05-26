@@ -62,7 +62,8 @@ class Plugin(BasePlugin):
             return
 
         for node in children:
-            row = []  # name
+            self.report_unknown_node_elements(node)
+            row = []
 
             for field_name in self.field_names:
                 if field_name == "name":

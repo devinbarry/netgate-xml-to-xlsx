@@ -35,6 +35,7 @@ class Plugin(BasePlugin):
             return
 
         for node in ca_nodes:
+            self.report_unknown_node_elements(node)
             row = []
 
             for field_name in self.field_names:

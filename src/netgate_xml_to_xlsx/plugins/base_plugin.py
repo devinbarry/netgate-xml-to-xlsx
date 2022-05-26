@@ -289,6 +289,33 @@ class BasePlugin(ABC):
             data[child.tag] = self.adjust_node(child)
         return data
 
+    def report_unknown_node_elements(
+        self, node: Node, field_names: list[str] | None = None
+    ) -> None:
+        """
+        Report if any unknown node elements are present.
+
+        Report if any of the node's children's tags are not found in the fieldnames list.
+
+        """
+        if node is None:
+            return
+
+        unknowns = []
+        if field_names is None:
+            field_names = self.field_names
+        fn_set = set(field_names)
+
+        for child in node.getchildren():
+            if child.tag not in fn_set:
+                unknowns.append(child.tag)
+
+        if unknowns:
+            parent = node.getparent()
+            print(
+                f"""Node {parent.tag}/{node.tag} has unknown children: {", ".join(unknowns)}."""
+            )
+
     def wip(self, node: Node) -> str:
         """Output a WIP warning."""
         print(f"WIP: {self.display_name}/{node.tag}.")

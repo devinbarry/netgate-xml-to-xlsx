@@ -80,6 +80,7 @@ class Plugin(BasePlugin):
 
         gateway_item_nodes = xml_findall(gateways_node, "gateway_item")
         for node in gateway_item_nodes:
+            self.report_unknown_node_elements(node)
             row = []
 
             for field_name in self.field_names:

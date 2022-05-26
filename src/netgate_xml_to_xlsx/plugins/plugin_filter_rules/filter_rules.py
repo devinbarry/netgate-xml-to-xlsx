@@ -68,13 +68,14 @@ class Plugin(BasePlugin):
         if rule_nodes is None:
             return
 
-        for rule_node in rule_nodes:
+        for node in rule_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                value = self.adjust_node(xml_findone(rule_node, field_name))
+                value = self.adjust_node(xml_findone(node, field_name))
                 row.append(value)
 
-            self.sanity_check_node_row(rule_node, row)
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(

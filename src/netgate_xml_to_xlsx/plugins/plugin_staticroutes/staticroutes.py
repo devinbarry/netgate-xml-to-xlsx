@@ -33,12 +33,13 @@ class Plugin(BasePlugin):
         if routes_nodes is None:
             return
 
-        for routes_node in routes_nodes:
+        for node in routes_nodes:
+            self.report_unknown_node_elements(node)
             row = []
             for field_name in self.field_names:
-                row.append(self.adjust_node(xml_findone(routes_node, field_name)))
+                row.append(self.adjust_node(xml_findone(node, field_name)))
 
-            self.sanity_check_node_row(routes_node, row)
+            self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(
