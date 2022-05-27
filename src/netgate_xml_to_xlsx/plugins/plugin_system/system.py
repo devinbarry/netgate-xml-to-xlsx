@@ -17,7 +17,7 @@ FIELD_NAMES = (
     "hostname,ipv6dontcreatelocaldns,language,lastchange,logsbackup,"
     "maximumfrags,maximumstates,maximumtableentries,nextgid,nextuid,"
     "optimization,pkg_repo_conf_path,powerd_ac_mode,powerd_battery_mode,powerd_normal_mode,"
-    "primaryconsole,reflectiontimeout,rrdbackup,scrubrnid,serialspeed,"
+    "primaryconsole,reflectiontimeout,revision,rrdbackup,scrubrnid,serialspeed,"
     "ssh,sshguard_blocktime,sshguard_detection_time,sshguard_threshold,sshguard_whitelist,"
     "timeservers,timezone,use_mfs_tmp_size,use_mfs_var_size,version,"
     "webgui"

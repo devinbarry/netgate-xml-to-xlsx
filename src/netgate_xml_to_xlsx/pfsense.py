@@ -91,6 +91,28 @@ class PfSense:
         self.workbook.add_named_style(normal)
         self.workbook.add_named_style(footer)
 
+    def _sanity_check_root_node(self) -> None:
+        """Check for unknown root elements."""
+        expected_nodes = set(
+            (
+                "version,lastchange,revision,aliases,ca,"
+                "cert,cron,dhcpd,dhcpdv6,diag,"
+                "dnshaper,filter,gateways,hasync,ifgroups,"
+                "installedpackages,interfaces,ipsec,nat,notifications,"
+                "ntpd,openvpn,ovpnserver,ppps,proxyarp,"
+                "rrd,shaper,snmpd,sshdata,staticroutes,"
+                "switches,sysctl,syslog,system_groups,system_users,"
+                "system,unbound,virtualip,vlans,widgets,"
+                "wizardtemp,wol"
+            ).split(",")
+        )
+        unknown = []
+        for child in self.parsed_xml:
+            if child.tag not in expected_nodes:
+                unknown.append(child.tag)
+        if len(unknown):
+            print(f"""Unknown root node(s): {",".join(unknown)}""")
+
     def _load(self) -> None:
         """Load and parse Netgate xml firewall configuration.
 
@@ -98,6 +120,7 @@ class PfSense:
         """
         self.raw_xml = self.in_file.read_text(encoding="utf-8")
         self.parsed_xml = etree.XML(self.raw_xml)
+        self._sanity_check_root_node()
 
     def _write_sheet(
         self,

@@ -1,16 +1,8 @@
 # TODO
 
-* Add load() method to plugins so they can load anciliary files.
 * Base tabs:
-  * dhcpd
-  * dhcpd6
-  * diag
-  * dnshaper
   * nat
-  * ppps
-  * proxyarp
-  * shaper
-  * snmpd
+  * ovpnserver
 
 * Packages tabs:
   * freeradius
