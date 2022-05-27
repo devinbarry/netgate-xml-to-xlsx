@@ -1,9 +1,5 @@
 # TODO
 
-* Base tabs:
-  * nat
-  * ovpnserver
-
 * Packages tabs:
   * freeradius
   * freeradiusclients

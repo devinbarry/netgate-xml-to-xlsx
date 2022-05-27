@@ -10,7 +10,7 @@ import lxml  # nosec
 from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
-from .support.elements import nice_address_sort, unescape, xml_findall
+from .support.elements import nice_address_sort, unescape, xml_findall, xml_findone
 
 
 def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
@@ -296,8 +296,21 @@ class BasePlugin(ABC):
         path.reverse()
         return "/".join(path)
 
+    def load_cell(self, node, node_names) -> str:
+        """Load node elements into a single cell."""
+        if node is None:
+            return ""
+
+        cell = []
+        self.report_unknown_node_elements(node, node_names)
+        for node_name in node_names:
+            cell.append(
+                f"{node_name}: {self.adjust_node(xml_findone(node, node_name))}"
+            )
+        return "\n".join(cell)
+
     def report_unknown_node_elements(
-        self, node: Node, field_names: list[str] | None = None
+        self, node: Node, node_names: list[str] | None = None
     ) -> None:
         """
         Report if any unknown node elements are present.
@@ -309,9 +322,9 @@ class BasePlugin(ABC):
             return
 
         unknowns = []
-        if field_names is None:
-            field_names = self.field_names
-        fn_set = set(field_names)
+        if node_names is None:
+            node_names = self.field_names
+        fn_set = set(node_names)
 
         for child in node.getchildren():
             if child.tag not in fn_set:
