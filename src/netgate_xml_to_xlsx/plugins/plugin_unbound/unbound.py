@@ -9,7 +9,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "enable,hosts,domainoverrides,active_interface,outgoing_interface,"
     "custom_options,custom_options,hideversion,dnssecstripped,port,"
     "system_domain_local_zone_type,sslcertref,dnssec,tlsport,hideidentity,"
@@ -24,11 +24,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Unbound",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """Custom node adjustments."""
@@ -38,19 +38,19 @@ class Plugin(BasePlugin):
         match node.tag:
             case "domainoverrides" | "hosts":
                 if node.tag == "domainoverrides":
-                    field_names = "domain,ip,tls_hostname,descr".split(",")
+                    node_names = "domain,ip,tls_hostname,descr".split(",")
                 else:
                     # hosts
-                    field_names = "host,domain,ip,aliases,descr".split(",")
+                    node_names = "host,domain,ip,aliases,descr".split(",")
 
                 result = []
-                for field_name in field_names:
-                    child = xml_findone(node, field_name)
+                for node_name in node_names:
+                    child = xml_findone(node, node_name)
                     if child is None:
                         value = ""
                     else:
                         value = child.text or ""
-                    result.append(f"{field_name}: {value}")
+                    result.append(f"{node_name}: {value}")
                 return "\n".join(result)
 
             case "hideidentity" | "hideversion" | "dnssecstripped" | "dnssec" | "tlsport" | "forwarding":  # NOQA
@@ -76,8 +76,8 @@ class Plugin(BasePlugin):
         self.report_unknown_node_elements(node)
         row = []
 
-        for field_name in self.field_names:
-            value = self.adjust_nodes(xml_findall(node, field_name))
+        for node_name in self.node_names:
+            value = self.adjust_nodes(xml_findall(node, node_name))
 
             row.append(value)
 
@@ -86,7 +86,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

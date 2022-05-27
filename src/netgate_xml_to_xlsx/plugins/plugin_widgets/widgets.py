@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import unescape, xml_findone
 
-FIELD_NAMES = "sequence,period,traffic_graphs"
+NODE_NAMES = "sequence,period,traffic_graphs"
 WIDTHS = "40,10,80"
 
 
@@ -18,11 +18,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Widgets",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustements."""
@@ -36,14 +36,14 @@ class Plugin(BasePlugin):
                 return "\n".join(sequences)
 
             case "traffic_graphs":
-                field_names = (
+                node_names = (
                     "refreshinterval,invert,backgroundupdate,smoothfactor,size,filter"
                 ).split(",")
-                self.report_unknown_node_elements(node, field_names)
+                self.report_unknown_node_elements(node, node_names)
                 cell = []
-                for field_name in field_names:
+                for node_name in node_names:
                     cell.append(
-                        f"{field_name}: {self.adjust_node(xml_findone(node, field_name))}"
+                        f"{node_name}: {self.adjust_node(xml_findone(node, node_name))}"
                     )
                 return "\n".join(cell)
 
@@ -60,8 +60,8 @@ class Plugin(BasePlugin):
         self.report_unknown_node_elements(node)
         row = []
 
-        for field_name in self.field_names:
-            value = self.adjust_node(xml_findone(node, field_name))
+        for node_name in self.node_names:
+            value = self.adjust_node(xml_findone(node, node_name))
             row.append(value)
 
         self.sanity_check_node_row(node, row)
@@ -69,7 +69,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

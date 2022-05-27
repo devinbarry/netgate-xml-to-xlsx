@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "name,interface,gateway,defaultgw4,defaultgw6,weight,ipprotocol,monitor_disable,"
     "action_disable,descr"
 )
@@ -21,11 +21,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Gateways",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
         self.default_gateways = {"defaultgw4": None, "defaultgw6": None}
         self.gateway_name = None
 
@@ -37,7 +37,7 @@ class Plugin(BasePlugin):
         match node.tag:
             case "name":
                 # Remember gateway name so we can use later for defaults.
-                # name must come before defaultgwX in the fieldname list.
+                # name must come before defaultgwX in the nodename list.
                 self.gateway_name = node.text
 
             case "action_disable" | "monitor_disable":
@@ -83,11 +83,11 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node)
             row = []
 
-            for field_name in self.field_names:
-                value = self.adjust_node(xml_findone(node, field_name))
+            for node_name in self.node_names:
+                value = self.adjust_node(xml_findone(node, node_name))
 
-                if field_name in ("defaultgw4", "defaultgw6"):
-                    value = self.is_default_gw(field_name)
+                if node_name in ("defaultgw4", "defaultgw6"):
+                    value = self.is_default_gw(node_name)
 
                 row.append(value)
 
@@ -96,7 +96,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

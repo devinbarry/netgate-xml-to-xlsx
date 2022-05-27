@@ -9,7 +9,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "name,enable,range,ddnsclientupdates,ddnsdomain,"
     "ddnsdomainkey,ddnsdomainkeyalgorithm,ddnsdomainkeyname,ddnsdomainprimary,defaultleasetime,"
     "dhcpleaseinlocaltime,domain,domainsearchlist,failover_peerip,filename,"
@@ -33,11 +33,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "DHCPD",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -54,12 +54,12 @@ class Plugin(BasePlugin):
                 return "YES"
 
             case "range":
-                field_names = "from,to".split(",")
-                self.report_unknown_node_elements(node, field_names)
+                node_names = "from,to".split(",")
+                self.report_unknown_node_elements(node, node_names)
                 cell = []
-                for field_name in field_names:
+                for node_name in node_names:
                     cell.append(
-                        f"{field_name}: {self.adjust_node(xml_findone(node, field_name))}"
+                        f"{node_name}: {self.adjust_node(xml_findone(node, node_name))}"
                     )
                 return "\n".join(cell)
 
@@ -76,11 +76,11 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node)
             row = []
 
-            for field_name in self.field_names:
-                if field_name == "name":
+            for node_name in self.node_names:
+                if node_name == "name":
                     row.append(node.tag)
                     continue
-                row.append(self.adjust_node(xml_findone(node, field_name)))
+                row.append(self.adjust_node(xml_findone(node, node_name)))
 
             self.sanity_check_node_row(node, row)
             rows.append(row)
@@ -88,7 +88,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

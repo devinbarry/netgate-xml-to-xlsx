@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall
 
-FIELD_NAMES = "name,type,address,url,aliasurl,updatefreq,descr,detail"
+NODE_NAMES = "name,type,address,url,aliasurl,updatefreq,descr,detail"
 WIDTHS = "40,40,40,80,80,20,80,80"
 
 
@@ -18,11 +18,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Aliases",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Aliases sheet."""
@@ -37,8 +37,8 @@ class Plugin(BasePlugin):
         for node in alias_nodes:
             self.report_unknown_node_elements(node)
             row = []
-            for field_name in self.field_names:
-                values = [self.adjust_node(x) for x in xml_findall(node, field_name)]
+            for node_name in self.node_names:
+                values = [self.adjust_node(x) for x in xml_findall(node, node_name)]
                 values.sort()
 
                 row.append("\n".join(values))
@@ -47,7 +47,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

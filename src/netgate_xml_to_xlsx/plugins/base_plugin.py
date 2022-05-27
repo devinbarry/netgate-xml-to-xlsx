@@ -119,15 +119,15 @@ class BasePlugin(ABC):
     def __init__(
         self,
         display_name: str,
-        field_names: str,
+        node_names: str,
         column_widths: str | list[int],
         el_paths_to_sanitize: list[str] | None = None,
     ) -> None:
         """
         Initialize base plugin.
 
-        field_names:
-            Comma-delimited list of fields to obtain.
+        node_names:
+            Comma-delimited list of nodes to obtain.
             Also used for the sheet's header row.
 
         column_widths:
@@ -137,7 +137,7 @@ class BasePlugin(ABC):
             List of comma-delimited elements to santitize
         """
         self.display_name: str = display_name
-        self.field_names: list[str] = cast(list[str], split_commas(field_names))
+        self.node_names: list[str] = cast(list[str], split_commas(node_names))
         self.column_widths: list[int] = cast(
             list[int], split_commas(column_widths, make_int=True)
         )
@@ -315,7 +315,7 @@ class BasePlugin(ABC):
         """
         Report if any unknown node elements are present.
 
-        Report if any of the node's children's tags are not found in the fieldnames list.
+        Report if any of the node's children's tags are not found in the nodenames list.
 
         """
         if node is None:
@@ -323,7 +323,7 @@ class BasePlugin(ABC):
 
         unknowns = []
         if node_names is None:
-            node_names = self.field_names
+            node_names = self.node_names
         fn_set = set(node_names)
 
         for child in node.getchildren():

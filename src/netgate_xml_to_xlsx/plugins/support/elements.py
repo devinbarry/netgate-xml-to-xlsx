@@ -69,7 +69,7 @@ def nice_address_sort(data: str, delimiter: str = " ") -> str:
     """
     Sort addresses that may consist of domains and IPv4/v6 addresses.
 
-    Not all 'address' fields are proper IPs and domains.
+    Not all 'address' nodes are proper IPs and domains.
     some are ports.
 
     Deals with values such as 0.hostname.domain.

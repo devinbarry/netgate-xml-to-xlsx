@@ -24,13 +24,13 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "HAProxy",
-        field_names: str = "",
+        node_names: str = "",
         column_widths: str = "",
     ) -> None:
-        """Ignore field_names and column_widths as we create them individually."""
+        """Ignore node_names and column_widths as we create them individually."""
         super().__init__(
             display_name,
-            field_names,
+            node_names,
             column_widths,
             ["pfsense,installedpackages,haproxy,advanced"],
         )
@@ -100,9 +100,9 @@ class Plugin(BasePlugin):
                     address = self.adjust_node(xml_findone(server_node, "address"))
                     port = self.adjust_node(xml_findone(server_node, "port"))
                     row.append(f"domain/port: {address}:{port}")
-                    for field_name in "ssl,checkssl,id,_index".split(","):
-                        value = self.adjust_node(xml_findone(server_node, field_name))
-                        row.append(f"{field_name}: {value}")
+                    for node_name in "ssl,checkssl,id,_index".split(","):
+                        value = self.adjust_node(xml_findone(server_node, node_name))
+                        row.append(f"{node_name}: {value}")
                     row.append("")
                     rows.append("\n".join(row))
 
@@ -114,10 +114,10 @@ class Plugin(BasePlugin):
         """
         Top-level haproxy elements.
 
-        Display two columns (field, value).
+        Display two columns (node, value).
 
         """
-        field_names: list[str] = (
+        node_names: list[str] = (
             "enable,configversion,nbproc,nbthread,maxconn,carpdev,"
             "logfacility,loglevel,log-send-hostname,remotesyslog,"
             "localstats_refreshtime,localstats_sticktable_refreshtime"
@@ -129,18 +129,18 @@ class Plugin(BasePlugin):
         header_row: list[str] = "name,value".split(",")
         column_widths: list[int] = split_commas("50,80")
 
-        all_field_names = field_names[:]
-        all_field_names.extend("ha_backends,ha_pools".split(","))
-        self.report_unknown_node_elements(node, all_field_names)
+        all_node_names = node_names[:]
+        all_node_names.extend("ha_backends,ha_pools".split(","))
+        self.report_unknown_node_elements(node, all_node_names)
         row = []
 
-        for field_name in field_names:
-            value = self.adjust_node(xml_findone(node, field_name))
+        for node_name in node_names:
+            value = self.adjust_node(xml_findone(node, node_name))
 
             row.append(value)
 
         self.sanity_check_node_row(node, row)
-        rows = list(zip(field_names, row))
+        rows = list(zip(node_names, row))
 
         yield SheetData(
             sheet_name="HAProxy",
@@ -151,7 +151,7 @@ class Plugin(BasePlugin):
 
     def _backends(self, nodes: list[Node]) -> Generator[SheetData, None, None]:
         """HAProxy backends have one or more items."""
-        field_names: list[str] = split_commas(
+        node_names: list[str] = split_commas(
             "name,status,type,primary_frontend,backend_serverpool,"  # 5
             "dontlognull,log-detailed,socket-stats,a_extaddr,ha_certificates,"  # 10
             "clientcert_ca,clientcert_crl,a_actionitems,a_errorfiles,dcertadv,"  # 15
@@ -167,11 +167,11 @@ class Plugin(BasePlugin):
         rows = []
 
         for node in nodes:
-            self.report_unknown_node_elements(node, field_names)
+            self.report_unknown_node_elements(node, node_names)
             row = []
 
-            for field_name in field_names:
-                value = self.adjust_node(xml_findone(node, field_name))
+            for node_name in node_names:
+                value = self.adjust_node(xml_findone(node, node_name))
 
                 row.append(value)
 
@@ -180,7 +180,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name="HAProxy Backends",
-            header_row=field_names,
+            header_row=node_names,
             data_rows=rows,
             column_widths=column_widths,
         )
@@ -189,7 +189,7 @@ class Plugin(BasePlugin):
         """Report HAProxy pools."""
         rows = []
 
-        field_names: list[str] = split_commas(
+        node_names: list[str] = split_commas(
             "name,id,ha_servers,check_type,checkinter,log-health-checks,httpcheck_method,"
             "balance,balance_urilen,balance_uridepth,balance_uriwhole,"
             "a_acl,a_actionitems,errorfiles,advanced,advanced_backend,"
@@ -220,18 +220,18 @@ class Plugin(BasePlugin):
         rows = []
 
         for node in nodes:
-            self.report_unknown_node_elements(node, field_names)
+            self.report_unknown_node_elements(node, node_names)
             row = []
 
-            for field_name in field_names:
-                value = self.adjust_node(xml_findone(node, field_name))
+            for node_name in node_names:
+                value = self.adjust_node(xml_findone(node, node_name))
                 row.append(value)
             self.sanity_check_node_row(node, row)
             rows.append(row)
 
         yield SheetData(
             sheet_name="HAProxy Pools",
-            header_row=field_names,
+            header_row=node_names,
             data_rows=rows,
             column_widths=column_widths,
         )

@@ -9,7 +9,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "enable,name,if,descr,alias-address,"
     "alias-subnet,spoofmac,enable,ipaddr,subnet,"
     "gateway,ipaddrv6,subnetv6,blockpriv,blockbogons,"
@@ -25,11 +25,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Interfaces",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """Custom node adjustment."""
@@ -65,11 +65,11 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node)
             row = []
 
-            for field_name in self.field_names:
-                if field_name == "name":
+            for node_name in self.node_names:
+                if node_name == "name":
                     row.append(node.tag)
                     continue
-                value = self.adjust_node(xml_findone(node, field_name))
+                value = self.adjust_node(xml_findone(node, node_name))
 
                 row.append(value)
 
@@ -78,7 +78,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

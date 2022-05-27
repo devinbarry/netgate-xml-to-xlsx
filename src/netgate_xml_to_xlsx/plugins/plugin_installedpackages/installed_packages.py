@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import unescape, xml_findall, xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "name,internal_name,version,descr,plugins,"
     "noembedded,logging,website,pkginfolink,filter_rule_function,"
     "configurationfile,include_file,text,tabs,"
@@ -32,11 +32,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "Installed Packages",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """Local node customizations."""
@@ -68,15 +68,15 @@ class Plugin(BasePlugin):
                 return "\n".join(plugins)
 
             case "tabs":
-                field_names = "name,active,tabgroup,url,text".split(",")
+                node_names = "name,active,tabgroup,url,text".split(",")
                 tab_nodes = xml_findall(node, "tab")
                 cells = []
                 for tab_node in tab_nodes:
-                    self.report_unknown_node_elements(tab_node, field_names)
+                    self.report_unknown_node_elements(tab_node, node_names)
                     cell = []
-                    for field_name in field_names:
+                    for node_name in node_names:
                         cell.append(
-                            f"{field_name}: {self.adjust_node(xml_findone(tab_node, field_name))}"
+                            f"{node_name}: {self.adjust_node(xml_findone(tab_node, node_name))}"
                         )
                     cell.append("")
                     cells.append("\n".join(cell))
@@ -102,8 +102,8 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node)
             row = []
 
-            for field_name in self.field_names:
-                value = self.adjust_node(xml_findone(node, field_name))
+            for node_name in self.node_names:
+                value = self.adjust_node(xml_findone(node, node_name))
 
                 row.append(value)
 
@@ -112,7 +112,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

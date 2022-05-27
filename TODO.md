@@ -1,5 +1,7 @@
 # TODO
 
+* Use `load_cell` when loading individual cells with multiple nodes.
+
 * Packages tabs:
   * freeradius
   * freeradiusclients

@@ -11,7 +11,7 @@ from ..support.elements import xml_findone
 
 # No named top-level nodes.
 # Using top-level tags.
-FIELD_NAMES = "name,details"
+NODE_NAMES = "name,details"
 WIDTHS = "60,100"
 
 
@@ -21,11 +21,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "OpenVPN Server",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_node(self, node: Node) -> str:
         """
@@ -81,7 +81,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

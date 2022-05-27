@@ -15,7 +15,7 @@ RULE_NAMES = (
     "updated,created"
 )
 
-FIELD_NAMES = "direction,mode," + RULE_NAMES
+NODE_NAMES = "direction,mode," + RULE_NAMES
 WIDTHS = "20,20,60,20,20,40,20,30,30,20,40,20,20,20,60,30,60,60"
 
 
@@ -25,11 +25,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "NAT",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
         self.local_data = {}
 
     def adjust_node(self, node: Node) -> str:
@@ -59,12 +59,12 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node, rule_names)
             row = []
 
-            for field_name in self.field_names:
-                if field_name in ("direction", "mode"):
-                    row.append(self.local_data[field_name])
+            for node_name in self.node_names:
+                if node_name in ("direction", "mode"):
+                    row.append(self.local_data[node_name])
                     continue
 
-                value = self.adjust_node(xml_findone(node, field_name))
+                value = self.adjust_node(xml_findone(node, node_name))
 
                 row.append(value)
 
@@ -83,12 +83,12 @@ class Plugin(BasePlugin):
             self.report_unknown_node_elements(node, rule_names)
             row = []
 
-            for field_name in self.field_names:
-                if field_name in ("direction", "mode"):
-                    row.append(self.local_data[field_name])
+            for node_name in self.node_names:
+                if node_name in ("direction", "mode"):
+                    row.append(self.local_data[node_name])
                     continue
 
-                value = self.adjust_node(xml_findone(node, field_name))
+                value = self.adjust_node(xml_findone(node, node_name))
 
                 row.append(value)
 
@@ -99,7 +99,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.field_names,
+            header_row=self.node_names,
             data_rows=rows,
             column_widths=self.column_widths,
         )

@@ -9,7 +9,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import nice_address_sort, unescape, xml_findall, xml_findone
 
-FIELD_NAMES = (
+NODE_NAMES = (
     "aliasesresolveinterval,already_run_config_upgrade,authserver,bogons,crypto_hardware,"
     "dhcpbackup,disablebeep,disablechecksumoffloading,disablechecksumoffloading,disablelargereceiveoffloading,"  # NOQA
     "disablenatreflection,disablesegmentationoffloading,dns1host,dns2host,dnsserver,"
@@ -31,11 +31,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "System",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def adjust_nodes(self, nodes: list[Node]) -> str:
         """Custom node adjustments."""
@@ -46,16 +46,16 @@ class Plugin(BasePlugin):
         for node in nodes:
             match node.tag:
                 case "authserver":
-                    field_names = (
+                    node_names = (
                         "name,type,host,radius_protocol,radius_nasip_attribute,"
                         "radius_secret,radius_timeout,radius_auth_port,refid".split(",")
                     )
-                    for field_name in field_names:
-                        # Only the fields that appear.
+                    for node_name in node_names:
+                        # Only the nodes that appear.
                         # Prep for other types of authentication.
-                        value = self.adjust_node(xml_findone(node, field_name))
+                        value = self.adjust_node(xml_findone(node, node_name))
                         if value:
-                            result.append(f"{field_name}: {value}")
+                            result.append(f"{node_name}: {value}")
 
                 case "firmware" | "gitsync":
                     # Need examples.
@@ -83,7 +83,7 @@ class Plugin(BasePlugin):
                     result.append(node.text)
 
                 case "webgui":
-                    field_names = (
+                    node_names = (
                         "althostnames,auth_refresh_time,authmode,"
                         "dashboardavailablewidgetspanel,dashboardcolumns,"
                         "interfacessort,loginautocomplete,logincss,loginshowhost,"
@@ -93,12 +93,12 @@ class Plugin(BasePlugin):
                         "webguihostnamemenu"
                     ).split(",")
 
-                    for field_name in field_names:
-                        # Only the fields that appear.
+                    for node_name in node_names:
+                        # Only the nodes that appear.
                         # Prep for other types of authentication.
-                        value = self.adjust_node(xml_findone(node, field_name))
+                        value = self.adjust_node(xml_findone(node, node_name))
                         if value:
-                            result.append(f"{field_name}: {value}")
+                            result.append(f"{node_name}: {value}")
         result.sort()
 
         if len(result):
@@ -157,7 +157,7 @@ class Plugin(BasePlugin):
         if system_node is None:
             return
 
-        for key in self.field_names:
+        for key in self.node_names:
             if key in top_level:
                 rows.append([key, top_level[key]])
                 continue

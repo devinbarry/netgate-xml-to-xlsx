@@ -13,7 +13,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-FIELD_NAMES = ""
+NODE_NAMES = ""
 WIDTHS = ""
 
 
@@ -23,11 +23,11 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "proxyarp",
-        field_names: str = FIELD_NAMES,
+        node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, field_names, column_widths)
+        super().__init__(display_name, node_names, column_widths)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""
