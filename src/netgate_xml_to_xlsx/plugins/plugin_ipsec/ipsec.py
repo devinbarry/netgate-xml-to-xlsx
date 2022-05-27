@@ -101,7 +101,7 @@ class Plugin(BasePlugin):
                 return self.load_cell(node, node_names)
 
             case "localid":
-                node_names = "type".split(",")
+                node_names = "type,address,netbits".split(",")
                 return self.load_cell(node, node_names)
 
             case "logging":
@@ -158,8 +158,11 @@ class Plugin(BasePlugin):
 
     def gather_client(self, node_in: Node) -> list[str]:
         """Not implemented, but check if there's data."""
-        if self.should_process(node_in):
-            print("WARNING: IPSEC child data found and not processed.")
+        client_node = xml_findone(node_in,"client")
+        if client_node is None:
+            return
+        if self.should_process(client_node):
+            print(f"WARNING: {self.node_ancesters(client_node)} is unimplemented.")
 
         return []
 
@@ -176,6 +179,8 @@ class Plugin(BasePlugin):
                 row.append(self.adjust_node(xml_findone(node, node_name)))
             self.sanity_check_node_row(node, row)
             rows.append(row)
+
+        rows.sort()
         return rows
 
     def gather_phase2s(self, node_in: Node) -> list[str]:
@@ -192,6 +197,7 @@ class Plugin(BasePlugin):
             self.sanity_check_node_row(node, row)
             rows.append(row)
 
+        rows.sort()
         return rows
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:

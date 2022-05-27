@@ -16,7 +16,7 @@ NODE_NAMES = (
     # package-specific information
     "ha_backends,ha_pools,config"
 )
-WIDTHS = "40,40,20,80,40,20,40,80,80,80,80,80,80,60,60,60,60"
+WIDTHS = "40,40,20,80,40,20,80,80,80,80,80,80,80,60,60,60,60"
 
 
 def name_sort(node: Node) -> str:
@@ -56,7 +56,8 @@ class Plugin(BasePlugin):
                 return "YES"
 
             case "logging":
-                return self.wip(node)
+                node_names = "facilityname,logfilename,logsocket".split(",")
+                return self.load_cell(node, node_names)
 
             case "plugins":
                 # Get 'item'.
