@@ -19,23 +19,25 @@ PHASE1_FIELDNAMES = (
     "dpd_delay,dpd_maxfail,encryption,ikeid,iketype,"
     "interface,lifetime,mobike,myid_data,myid_type,"
     "nat_traversal,peerid_data,peerid_type,pre-shared-key,private-key,"
-    "protocol,remote-gateway"
+    "protocol,remote-gateway,mode,rekey_time,reauth_time,"
+    "rand_time,pkcs11certref,pkcs11pin"
 )
 PHASE1_WIDTHS = (
     "40,30,10,10,20,"  # 5
     "20,20,20,10,10,"  # 10
     "30,10,10,20,20,"  # 15
     "20,20,20,20,20,"  # 20
-    "20,30"
+    "20,40,10,20,20,"  # 25
+    "20,40,40"
 )
 
 PHASE2_FIELDNAMES = (
     "descr,encryption-algorithm-option,hash-algorithm-option,ikeid,lifetime,"
     "localid,mode,pfsgroup,pinghost,protocol,"
-    "remoteid,reqid,uniqid"
+    "rekey_time,rand_time,remoteid,reqid,uniqid"
 )
 
-PHASE2_WIDTHS = "40,40,30,20,20,20,20,20,20,20,20,20,30"
+PHASE2_WIDTHS = "40,40,30,20,20,20,20,20,20,20,20,40,40,20,30"
 
 
 class Plugin(BasePlugin):

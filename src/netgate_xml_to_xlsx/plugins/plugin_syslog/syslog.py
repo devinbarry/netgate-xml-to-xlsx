@@ -10,10 +10,12 @@ from ..support.elements import xml_findone
 
 FIELD_NAMES = (
     "enable,logall,filterdescriptions,ipproto,nentries,"
-    "remoteserver,remoteserver2,remoteserver3,reverse,sourceip"
+    "remoteserver,remoteserver2,remoteserver3,reverse,sourceip,"
+    "format,rotatecount,nologdefaultblock,nologbogons,nologprivatenets,"
+    "logcompressiontype"
 )
 
-WIDTHS = "20,20,20,20,20,60,60,60,20,20"
+WIDTHS = "30,20,20,20,20,60,60,60,20,20,20,20,40,40,40,40"
 
 
 class Plugin(BasePlugin):
@@ -34,7 +36,7 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
-            case "logall":
+            case "logall" | "nologdefaultblock" | "nologbogons" | "nologprivatenets":
                 # Existence of tag indicates 'yes'.
                 # Sanity check there is no text.
                 if node.text:

@@ -14,9 +14,9 @@ FIELD_NAMES = (
     "alias-subnet,spoofmac,enable,ipaddr,subnet,"
     "gateway,ipaddrv6,subnetv6,blockpriv,blockbogons,"
     "media,track6-interface,track6-prefix-id,dhcp6-duid,dhcp6-ia-pd-len,"
-    "dhcp6cvpt"
+    "dhcp6cvpt,mediaopt,adv_dhcp6_prefix_selected_interface"
 )
-WIDTHS = "20,40,20,20,20," "20,20,20,20,20," "20,20,20,20,20," "20,20,20,20,20," "20"
+WIDTHS = "20,40,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,60"
 
 
 class Plugin(BasePlugin):

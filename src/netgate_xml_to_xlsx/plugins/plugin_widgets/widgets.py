@@ -8,8 +8,8 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import unescape, xml_findone
 
-FIELD_NAMES = "sequence,period"
-WIDTHS = "40,10"
+FIELD_NAMES = "sequence,period,traffic_graphs"
+WIDTHS = "40,10,80"
 
 
 class Plugin(BasePlugin):
@@ -34,6 +34,18 @@ class Plugin(BasePlugin):
                 sequence = unescape(node.text)
                 sequences = sequence.split(",")
                 return "\n".join(sequences)
+
+            case "traffic_graphs":
+                field_names = (
+                    "refreshinterval,invert,backgroundupdate,smoothfactor,size,filter"
+                ).split(",")
+                self.report_unknown_node_elements(node, field_names)
+                cell = []
+                for field_name in field_names:
+                    cell.append(
+                        f"{field_name}: {self.adjust_node(xml_findone(node, field_name))}"
+                    )
+                return "\n".join(cell)
 
         return super().adjust_node(node)
 

@@ -11,9 +11,9 @@ from ..support.elements import xml_findall, xml_node_exists
 FIELD_NAMES = (
     "disabled,name,groupname,scope,expires,"
     "descr,ipsecpk,uid,cert,bcrypt-hash,"
-    "authorizedkeys,ipsecpsk"
+    "authorizedkeys,ipsecpsk,priv,dashboardcolumns,webguicss"
 )
-WIDTHS = "12,40,40,20,20," "60,20,10,20,20," "20,20"
+WIDTHS = "12,40,40,20,20,60,20,10,20,20,20,20,40,40,60"
 
 
 class Plugin(BasePlugin):

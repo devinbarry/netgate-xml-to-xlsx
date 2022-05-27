@@ -12,8 +12,8 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-FIELD_NAMES = "type,settings"
-WIDTHS = "20,100"
+FIELD_NAMES = "type,smtp,settings"
+WIDTHS = "20,40,100"
 
 
 class Plugin(BasePlugin):
@@ -57,8 +57,6 @@ class Plugin(BasePlugin):
                         f"Node {node.tag} has unexpected text: {node.text}."
                     )
                 return "YES"
-            case _:
-                print("Unknown Notifications type.")
 
         return super().adjust_node(node)
 

@@ -18,7 +18,10 @@ FIELD_NAMES = (
     "username_as_common_name,exit_notify,sndrcvbuf,netbios_enable,netbios_ntype,"
     "netbios_scope,create_gw,verbosity_level,ncp_enable,ping_method,keepalive_interval,"
     "keepalive_timeout,ping_seconds,ping_push,ping_action,ping_action_seconds,"
-    "ping_action_push,inactive_seconds,data_ciphers,data_ciphers_fallback"
+    "ping_action_push,inactive_seconds,data_ciphers,data_ciphers_fallback,"
+    "authmode,tls,tls_type,tlsauth_keydir,caref,certref,crlref,dh_length,"
+    "ocspurl,ecdh_curve,dns_server1,cert_depth,strictusercn,allow_compression,"
+    "dns_server2,dns_server3,dns_server4"
 )
 WIDTHS = (
     "20,20,20,20,20,30,20,20,30,20,"  # 10
@@ -26,7 +29,8 @@ WIDTHS = (
     "20,20,20,30,20,20,20,20,40,40,"  # 30
     "40,40,40,50,20,20,20,20,20,20,"  # 40
     "20,20,20,30,30,20,20,20,30,30,"  # 50
-    "20,20,50"
+    "20,20,20,20,20,40,40,40,20,20,"  # 60
+    "20,20,20,20,20,20,40,20,20,20"
 )
 
 
@@ -41,6 +45,24 @@ class Plugin(BasePlugin):
     ) -> None:
         """Initialize."""
         super().__init__(display_name, field_names, column_widths)
+
+    def adjust_node(self, node: Node) -> str:
+        """Local node adjustments."""
+        if node is None:
+            return ""
+
+        match node.tag:
+            case "stricusercn":
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
+        return super().adjust_node(node)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Document all OpenVPN servers."""

@@ -16,16 +16,16 @@ FIELD_NAMES = (
     "interface,direction,type,protocol,ipprotocol,"
     "quick,icmptype,statetype,statetimeout,floating,"
     "max,max-src-conn,max-src-nodes,max-src-states,os,"
-    "tag,tagged,tracker,id,created,"
-    "updated"
+    "allowopts,associated-rule-id,log,nopfsync,tag,"
+    "tagged,tracker,id,created,updated"
 )
 WIDTHS = (
     "20,20,80,60,60,"
     "20,20,20,20,20,"
     "20,20,20,20,20,"
     "20,20,20,20,20,"
-    "20,20,20,20,30,"
-    "30"
+    "20,40,20,20,20,"
+    "20,20,20,30,30"
 )
 
 
@@ -57,6 +57,16 @@ class Plugin(BasePlugin):
                 address = data["network"] if "network" in data else data["address"]
                 port = f""":{data["port"]}""" if "port" in data else ""
                 return f"{address}{port}"
+
+            case "allowopts" | "log" | "nopfsync" | "tagged":
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
 
         return super().adjust_node(node)
 

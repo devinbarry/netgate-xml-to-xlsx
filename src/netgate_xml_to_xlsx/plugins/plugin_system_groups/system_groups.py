@@ -8,8 +8,8 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall
 
-FIELD_NAMES = "name,description,scope,gid,priv"
-WIDTHS = "40,80,20,20,80"
+FIELD_NAMES = "name,description,scope,gid,priv,member"
+WIDTHS = "40,80,20,20,80,40"
 
 
 class Plugin(BasePlugin):

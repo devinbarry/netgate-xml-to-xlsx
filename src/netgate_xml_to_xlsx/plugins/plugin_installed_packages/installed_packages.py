@@ -11,9 +11,11 @@ from ..support.elements import unescape, xml_findall, xml_findone
 FIELD_NAMES = (
     "name,internal_name,version,descr,plugins,"
     "noembedded,logging,website,pkginfolink,filter_rule_function,"
-    "configuration_file,include_file"
+    "configurationfile,include_file,text,tabs,"
+    # package-specific information
+    "ha_backends,ha_pools,config"
 )
-WIDTHS = "40,40,20,80,40," "20,40,80,80,80," "80,80"
+WIDTHS = "40,40,20,80,40,20,40,80,80,80,80,80,80,60,60,60,60"
 
 
 def name_sort(node: Node) -> str:
@@ -42,6 +44,16 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
+            case "active":
+                # Existence of tag indicates 'yes'.
+                # Sanity check there is no text.
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
             case "logging":
                 return self.wip(node)
 
@@ -54,6 +66,23 @@ class Plugin(BasePlugin):
                     plugins.append(self.adjust_node(xml_findone(child, "type")))
                 plugins.sort()
                 return "\n".join(plugins)
+
+            case "tabs":
+                field_names = "name,active,tabgroup,url,text".split(",")
+                tab_nodes = xml_findall(node, "tab")
+                cells = []
+                for tab_node in tab_nodes:
+                    self.report_unknown_node_elements(tab_node, field_names)
+                    cell = []
+                    for field_name in field_names:
+                        cell.append(
+                            f"{field_name}: {self.adjust_node(xml_findone(tab_node, field_name))}"
+                        )
+                    cell.append("")
+                    cells.append("\n".join(cell))
+                if len(cells) > 0 and cells[-1] == "":
+                    cells = cells[:-1]
+                return "\n".join(cells)
 
         return super().adjust_node(node)
 

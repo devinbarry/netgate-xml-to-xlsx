@@ -9,9 +9,10 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 FIELD_NAMES = (
-    "pfsyncenabled,pfsyncenabled,pfsyncinterface,synchronizetoip,username,password"
+    "pfsyncenabled,pfsyncenabled,pfsyncinterface,pfsyncpeerip,synchronizetoip,"
+    "username,password"
 )
-WIDTHS = "20,20,40,40,40,40"
+WIDTHS = "20,20,40,40,40,40,40,40"
 
 
 class Plugin(BasePlugin):

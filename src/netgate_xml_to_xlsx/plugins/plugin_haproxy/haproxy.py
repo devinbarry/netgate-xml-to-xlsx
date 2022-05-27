@@ -124,12 +124,14 @@ class Plugin(BasePlugin):
             ",dns_resolvers,resolver_retries,resolver_timeoutretry,resolver_holdvalid,"
             "hard_stop_after,ssldefaultdhparam,"
             "email_mailers,email_level,email_myhostname,email_from,email_to,"
-            "files,advanced"
+            "config,files,advanced"
         ).split(",")
         header_row: list[str] = "name,value".split(",")
         column_widths: list[int] = split_commas("50,80")
 
-        self.report_unknown_node_elements(node, field_names)
+        all_field_names = field_names[:]
+        all_field_names.extend("ha_backends,ha_pools".split(","))
+        self.report_unknown_node_elements(node, all_field_names)
         row = []
 
         for field_name in field_names:
@@ -151,15 +153,15 @@ class Plugin(BasePlugin):
         """HAProxy backends have one or more items."""
         field_names: list[str] = split_commas(
             "name,status,type,primary_frontend,backend_serverpool,"  # 5
-            "dontlognull,log-detailed,socket-stats,a_extaddr,ha_certificate,"  # 10
+            "dontlognull,log-detailed,socket-stats,a_extaddr,ha_certificates,"  # 10
             "clientcert_ca,clientcert_crl,a_actionitems,a_errorfiles,dcertadv,"  # 15
-            "ssloffloadcert,advanced,ha_acls,httpclose"  # 19
+            "ssloffloadcert,forwardfor,advanced,ha_acls,httpclose"  # 19
         )
         column_widths: list[int] = split_commas(
             "25,20,20,25,25,"  # 5
             "20,20,20,30,20,"  # 10
             "20,20,20,20,50,"  # 15
-            "20,20,20,20"  # 19
+            "20,40,20,20,20"  # 19
         )
 
         rows = []
@@ -203,7 +205,7 @@ class Plugin(BasePlugin):
             "persist_cookie_postonly,persist_cookie_httponly,persist_cookie_secure,"
             "haproxy_cookie_maxidle,haproxy_cookie_maxlife,haproxy_cookie_domains,"
             "haproxy_cookie_dynamic_cookie_key,strict_transport_security,"
-            "cookie_attribute_secure,email_level,email_to"
+            "cookie_attribute_secure,email_level,email_to,agent_inter"
         )
 
         column_widths: list[int] = split_commas(
@@ -212,7 +214,7 @@ class Plugin(BasePlugin):
             "25,25,20,25,20,20,20,25,20,20,"
             "25,30,25,30,25,40,25,25,30,25,"
             "30,30,30,30,30,30,30,30,30,30,"
-            "30,30,30,30,30,30,30,20,20"
+            "30,30,30,30,30,30,30,20,20,30"
         )
 
         rows = []

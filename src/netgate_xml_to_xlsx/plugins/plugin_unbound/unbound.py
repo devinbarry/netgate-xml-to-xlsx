@@ -12,9 +12,10 @@ from ..support.elements import xml_findall, xml_findone
 FIELD_NAMES = (
     "enable,hosts,domainoverrides,active_interface,outgoing_interface,"
     "custom_options,custom_options,hideversion,dnssecstripped,port,"
-    "system_domain_local_zone_type,sslcertref,dnssec,tlsport"
+    "system_domain_local_zone_type,sslcertref,dnssec,tlsport,hideidentity,"
+    "forwarding"
 )
-WIDTHS = "10,50,50,20,20,20,20,20,20,20,40,20,20,20"
+WIDTHS = "10,50,50,20,20,20,20,20,20,20,40,20,20,20,20,20"
 
 
 class Plugin(BasePlugin):
@@ -52,7 +53,7 @@ class Plugin(BasePlugin):
                     result.append(f"{field_name}: {value}")
                 return "\n".join(result)
 
-            case "hideidentity" | "hideversion" | "dnssecstripped" | "dnssec" | "tlsport":
+            case "hideidentity" | "hideversion" | "dnssecstripped" | "dnssec" | "tlsport" | "forwarding":  # NOQA
                 # Existence of tag indicates 'yes'.
                 # Sanity check there is no text.
                 if node.text:

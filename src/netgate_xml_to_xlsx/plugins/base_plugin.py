@@ -209,9 +209,7 @@ class BasePlugin(ABC):
                     lines = [x.strip() for x in value.split("\n")]
                     return "\n".join(lines)
 
-                case "disable" | "disabled" | "enable" | "blockpriv" | "blockbogons":
-                    # Existence of tag indicates 'yes'.
-                    # Sanity check there is no text.
+                case "disable" | "disabled" | "enable" | "blockpriv" | "blockbogons":  # NOQA
                     if node.text:
                         raise NodeError(
                             f"Node {node.tag} has unexpected text: {node.text}."
@@ -289,6 +287,15 @@ class BasePlugin(ABC):
             data[child.tag] = self.adjust_node(child)
         return data
 
+    def node_ancesters(self, node: Node) -> str:
+        """Walk up through node parents."""
+        path = []
+        path.append(node.tag)
+        while (node := node.getparent()) is not None:
+            path.append(node.tag)
+        path.reverse()
+        return "/".join(path)
+
     def report_unknown_node_elements(
         self, node: Node, field_names: list[str] | None = None
     ) -> None:
@@ -311,10 +318,8 @@ class BasePlugin(ABC):
                 unknowns.append(child.tag)
 
         if unknowns:
-            parent = node.getparent()
-            print(
-                f"""Node {parent.tag}/{node.tag} has unknown children: {", ".join(unknowns)}."""
-            )
+            path = self.node_ancesters(node)
+            print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}.""")
 
     def wip(self, node: Node) -> str:
         """Output a WIP warning."""
