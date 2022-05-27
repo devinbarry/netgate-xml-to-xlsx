@@ -158,7 +158,7 @@ class Plugin(BasePlugin):
 
     def gather_client(self, node_in: Node) -> list[str]:
         """Not implemented, but check if there's data."""
-        client_node = xml_findone(node_in,"client")
+        client_node = xml_findone(node_in, "client")
         if client_node is None:
             return
         if self.should_process(client_node):

@@ -62,9 +62,11 @@ class Plugin(BasePlugin):
 
             case "staticmap":
                 node_names = (
-                    "descr,cid,ddnsdomain,ddnsdomainkey,ddnsdomainkeyalgorithm,ddnsdomainkeyname,"
-                    "ddnsdomainprimary,ddnsdomainsecondary,defaultleasetime,domain,domainsearchlist,filename,"
-                    "filename32,filename32arm,filename64,filename64arm,gateway,hostname,ipaddr,ldap,mac,"
+                    "descr,cid,ddnsdomain,ddnsdomainkey,ddnsdomainkeyalgorithm,"
+                    "ddnsdomainkeyname,ddnsdomainprimary,ddnsdomainsecondary,"
+                    "defaultleasetime,domain,domainsearchlist,"
+                    "filename,filename32,filename32arm,filename64,filename64arm,"
+                    "gateway,hostname,ipaddr,ldap,mac,"
                     "maxleasetime,nextserver,numberoptions,rootpath,tftp"
                 )
                 return self.load_cell(node, node_names.split(","))
