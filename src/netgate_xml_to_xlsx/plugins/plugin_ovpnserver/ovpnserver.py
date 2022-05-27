@@ -41,18 +41,26 @@ class Plugin(BasePlugin):
                 node_names = "type".split(",")
                 return self.load_cell(node, node_names)
 
-            case "step6" | "step9":
+            case "step6":
                 node_names = (
                     "authcertca,certca,city,country,email,"
                     "keylength,lifetime,organization,state,uselist"
                 ).split(",")
                 return self.load_cell(node, node_names)
 
+            case "step9":
+                node_names = (
+                    "authcertca,certca,authcertname,certname,city,country,email,"
+                    "keylength,lifetime,organization,state,uselist"
+                ).split(",")
+                return self.load_cell(node, node_names)
+
             case "step10":
                 node_names = (
-                    "descr,crypto,dhkey,digest,dynip,"
-                    "engine,gentlskey,interface,localnet,localport,"
-                    "nbttype,protocol,tlsauth,topology,tunnelnet"
+                    "descr,crypto,concurrentcon,dhkey,digest,"
+                    "dns1,dns2,dns3,dynip,engine,"
+                    "gentlskey,interface,localnet,localport,nbttype,"
+                    "protocol,tlsauth,topology,tunnelnet"
                 ).split(",")
                 return self.load_cell(node, node_names)
 

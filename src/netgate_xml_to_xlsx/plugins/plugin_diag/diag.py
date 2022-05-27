@@ -19,7 +19,7 @@ WIDTHS = "20,20"
 
 
 class Plugin(BasePlugin):
-    """Gather diag information."""
+    """Gather information."""
 
     def __init__(
         self,
@@ -31,15 +31,15 @@ class Plugin(BasePlugin):
         super().__init__(display_name, node_names, column_widths)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
-        """Gather diag information."""
+        """Gather information."""
         rows = []
         diag_node = xml_findone(parsed_xml, "diag")
         if diag_node is None:
             return
 
-        self.report_unknown_node_elements(diag_node, "ipv6nat")
+        self.report_unknown_node_elements(diag_node, "ipv6nat".split(","))
         for node in diag_node.getchildren():
-            self.report_unknown_node_elements(node)
+            self.report_unknown_node_elements(node, "ipaddr".split(","))
             row = []
 
             for node_name in self.node_names:

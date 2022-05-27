@@ -148,4 +148,12 @@ def xml_findall(in_node: Node, el_path: str) -> list[Node]:
             return []
         path = path[1:]
     selector = "/".join(path)
-    return in_node.findall(selector)
+
+    try:
+        nodes = in_node.findall(selector)
+    except SyntaxError as err:
+        raise NodeError(
+            f"{in_node.getparent()}/{in_node.tag}. Selector: ({selector}). {err}."
+        )
+
+    return nodes

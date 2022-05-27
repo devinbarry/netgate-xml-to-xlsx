@@ -9,8 +9,8 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 RULE_NAMES = (
-    "descr,interface,protocol,"  # 5
-    "source,sourceport,source_hash_key,destination,dstport,target,"
+    "descr,interface,protocol,ipprotocol,source,"
+    "sourceport,source_hash_key,destination,dstport,target,"
     "targetip,targetip_subnet,local-port,associated-rule-id,poolopts,"
     "updated,created"
 )

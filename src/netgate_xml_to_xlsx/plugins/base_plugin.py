@@ -233,7 +233,7 @@ class BasePlugin(ABC):
 
     def adjust_nodes(self, nodes: list[Node]) -> str:
         """
-        Adjust multiple nodes into one.
+        Adjust multiple nodes into cell.
 
         All nodes have the same tag.
         # TODO: Always process for 'nodes' as we'll compress the information
@@ -245,19 +245,18 @@ class BasePlugin(ABC):
         num_nodes = len(nodes)
         if num_nodes == 0:
             return ""
-        assert num_nodes != 0
 
-        result = []
+        cell = []
         for node in nodes:
-            result.append(self.adjust_node(node))
-            result.append("")
+            cell.append(self.adjust_node(node))
+            cell.append("")
 
-        if len(result) > 1:
-            # Have results. Remove the trailing space.
-            result = result[:-1]
-            self.sanity_check_node_row(node.getparent(), result)
+        #  Remove the trailing space.
+        if len(cell) > 1 and cell[-1] == "":
+            cell = cell[:-1]
+            self.sanity_check_node_row(node.getparent(), cell)
 
-        return "\n".join(result)
+        return "\n".join(cell)
 
     def sanity_check_node_row(self, node: Node, row: list) -> None:
         """
@@ -277,8 +276,8 @@ class BasePlugin(ABC):
             return
 
         for item in bad_items:
-            errors.append(f"Unprocessed {node.tag}:{item.tag}")
-        raise NodeError("\n".join(errors))
+            errors.append(f"Unprocessed {self.node_ancesters(node)}:{item.tag}")
+            print("\n".join(errors))
 
     def extract_node_elements(self, node: Node) -> dict[str, str]:
         """Create dictionary of node children's tag:value."""
@@ -332,7 +331,8 @@ class BasePlugin(ABC):
 
         if unknowns:
             path = self.node_ancesters(node)
-            print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}.""")
+            unknowns.sort()
+            print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}""")
 
     def wip(self, node: Node) -> str:
         """Output a WIP warning."""
