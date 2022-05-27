@@ -24,7 +24,7 @@ PHASE1_NODENAMES = (
 )
 PHASE1_WIDTHS = (
     "40,30,10,10,20,"  # 5
-    "20,20,20,10,10,"  # 10
+    "20,20,60,10,10,"  # 10
     "30,10,10,20,20,"  # 15
     "20,20,20,20,20,"  # 20
     "20,40,10,20,20,"  # 25
@@ -72,11 +72,37 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
-            case "encryption" | "localid" | "remoteid" | "encryption-algorithm-option":
-                return self.wip(node)
+            case "encryption":
+                cell = []
+                node_names = (
+                    "encryption-algorithm,hash-algorithm,dhgroup,prf-algorithm".split(
+                        ","
+                    )
+                )
+                item_nodes = xml_findall(node, "item")
+
+                if item_nodes is None:
+                    return ""
+
+                for item_node in item_nodes:
+                    cell.append(self.load_cell(item_node, node_names))
+                    cell.append("")
+
+                if len(cell) > 0 and cell[-1] == "":
+                    cell = cell[:-1]
+                return "\n".join(cell)
+
+            case "encryption-algorithm":
+                node_names = "name,keylen".split(",")
+                return self.load_cell(node, node_names)
 
             case "encryption-algorithm-option":
-                return self.wip(node)
+                node_names = "name,keylen".split(",")
+                return self.load_cell(node, node_names)
+
+            case "localid":
+                node_names = "type".split(",")
+                return self.load_cell(node, node_names)
 
             case "logging":
                 cell = []
@@ -86,15 +112,16 @@ class Plugin(BasePlugin):
                 cell.sort()
                 return "\n".join(cell)
 
+            case "remoteid":
+                node_names = "type,address,netbits".split(",")
+                return self.load_cell(node, node_names)
+
             case "vtimaps":
                 cell = []
                 node_names = "reqid,index,ifnum".split(",")
                 item_nodes = xml_findall(node, "item")
                 for item_node in item_nodes:
-                    for node_name in node_names:
-                        cell.append(
-                            f"{node_name}: {self.adjust_node(xml_findone(item_node, node_name))}"
-                        )
+                    cell.append(self.load_cell(item_node, node_names))
                     cell.append("")
 
                 if len(cell) and cell[-1] == "":

@@ -57,15 +57,19 @@ class Plugin(BasePlugin):
                         if value:
                             result.append(f"{node_name}: {value}")
 
-                case "firmware" | "gitsync":
-                    # Need examples.
-                    return self.wip(node)
+                case "firmware":
+                    node_names = "disablecheck".split(",")
+                    result.append(self.load_cell(node, node_names))
 
                 case "bogons":
                     result.append(self.adjust_node(xml_findone(node, "interval")))
 
                 case "dnsserver":
                     result.append(unescape(node.text))
+
+                case "gitsync":
+                    node_names = "repositoryurl,branch".split(",")
+                    result.append(self.load_cell(node, node_names))
 
                 case "ssh":
                     result.append(self.adjust_node(xml_findone(node, "enabled")))

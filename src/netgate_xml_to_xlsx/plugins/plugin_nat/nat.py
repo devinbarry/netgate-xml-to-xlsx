@@ -9,14 +9,14 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 RULE_NAMES = (
-    "descr,interface,protocol,ipprotocol,source,"
+    "descr,disabled,interface,protocol,ipprotocol,source,"
     "sourceport,source_hash_key,destination,dstport,target,"
     "targetip,targetip_subnet,local-port,associated-rule-id,poolopts,"
     "updated,created"
 )
 
 NODE_NAMES = "direction,mode," + RULE_NAMES
-WIDTHS = "20,20,60,20,20,40,20,30,30,20,40,20,20,20,60,30,60,60"
+WIDTHS = "20,20,20,60,20,20,40,20,30,30,20,40,20,20,20,60,30,60,60"
 
 
 class Plugin(BasePlugin):

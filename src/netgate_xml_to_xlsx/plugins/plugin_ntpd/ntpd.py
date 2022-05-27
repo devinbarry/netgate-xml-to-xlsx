@@ -6,7 +6,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findone
+from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = "gps,orphan,statsgraph,interface,restrictions,ispool"
 WIDTHS = "20,20,20,20,20,40"
@@ -30,19 +30,39 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
+            case "acl_network":
+                if node.text:
+                    raise NodeError(
+                        f"Node {node.tag} has unexpected text: {node.text}."
+                    )
+
+                return "YES"
+
             case "gps":
-                return self.wip(node)
+                field_names = "type".split(",")
+                return self.load_cell(node, field_names)
 
             case "interface":
                 # Order is important? Don't sort.
-                return "\n".join(node.text.split(","))
+                result = node.text.split(",")
+                result.sort()
+                return "\n".join(result)
 
             case "ispool":
                 # Order is important. Don't sort.
                 return "\n".join(node.text.split(" "))
 
             case "restrictions":
-                return self.wip(node)
+                node_names = "acl_network,mask".split(",")
+                row_nodes = xml_findall(node, "row")
+                cell = []
+                for row_node in row_nodes:
+                    cell.append(self.load_cell(row_node, node_names))
+                    cell.append("")
+                if len(cell) > 0 and cell[-1] == "":
+                    cell = cell[:-1]
+
+                return "\n".join(cell)
 
         return super().adjust_node(node)
 
