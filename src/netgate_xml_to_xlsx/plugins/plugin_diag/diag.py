@@ -9,11 +9,10 @@ Generate it, but you'll have columns with empty rows.
 
 from typing import Generator
 
-from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall, xml_findone
+from ..support.elements import xml_findone
 
 NODE_NAMES = "name,ipv6nat"
 WIDTHS = "20,20"

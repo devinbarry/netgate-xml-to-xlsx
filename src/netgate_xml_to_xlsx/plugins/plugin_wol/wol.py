@@ -6,7 +6,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import unescape, xml_findone
+from ..support.elements import xml_findone
 
 NODE_NAMES = ""
 WIDTHS = ""
@@ -35,7 +35,7 @@ class Plugin(BasePlugin):
             return
 
         self.report_unknown_node_elements(node)
-        row = []
+
         children = node.getchildren()
         if len(children) > 0:
             self.wip(node)

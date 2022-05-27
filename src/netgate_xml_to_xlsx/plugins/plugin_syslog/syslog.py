@@ -3,6 +3,7 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
@@ -32,7 +33,7 @@ class Plugin(BasePlugin):
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
-        if node == None:
+        if node is None:
             return ""
 
         match node.tag:

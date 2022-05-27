@@ -3,6 +3,7 @@
 
 from typing import Generator
 
+from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData

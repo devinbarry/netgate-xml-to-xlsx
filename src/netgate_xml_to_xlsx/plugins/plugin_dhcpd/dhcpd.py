@@ -7,7 +7,7 @@ from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall, xml_findone
+from ..support.elements import xml_findone
 
 NODE_NAMES = (
     "name,enable,range,ddnsclientupdates,ddnsdomain,"
