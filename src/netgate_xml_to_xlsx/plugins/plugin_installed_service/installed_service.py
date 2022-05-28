@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-NODE_NAMES = "name,description,rcfile,executable"
+NODE_NAMES = "name,description,rcfile,executable,starts_on_sync"
 WIDTHS = "40,80,60,60"
 
 
@@ -23,6 +23,16 @@ class Plugin(BasePlugin):
     ) -> None:
         """Initialize."""
         super().__init__(display_name, node_names, column_widths)
+
+    def adjust_node(self, node: Node) -> str:
+        if node is None:
+            return ""
+
+        match node.tag:
+            case "starts_on_sync":
+                return self.yes(node)
+
+        return super().adjust_node(node)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""
