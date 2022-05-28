@@ -41,6 +41,6 @@ plugins = [
     "wol",
 
     # Installed packages, in alphabetical order.
-    "haproxy",
+    "installed_haproxy",
 
 ]
