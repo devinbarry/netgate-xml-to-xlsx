@@ -6,7 +6,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall, xml_findone
+from ..support.elements import xml_findone
 
 NODE_NAMES = (
     "autorule_suffix,credits,database_cc,enable_agg,enable_cb,"

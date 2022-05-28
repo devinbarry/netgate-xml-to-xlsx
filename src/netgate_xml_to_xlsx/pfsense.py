@@ -14,7 +14,6 @@ from openpyxl.styles.alignment import Alignment
 from netgate_xml_to_xlsx.mytypes import Node
 
 from .plugin_tools import discover_plugins
-from .plugins.base_plugin import BasePlugin
 from .plugins.support.elements import sanitize_xml
 from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 

@@ -26,8 +26,6 @@ class Plugin(BasePlugin):
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""
-        rows = []
-
         node = xml_findone(parsed_xml, "installedpackages/vpn_openvpn_export")
         if node is None:
             return
