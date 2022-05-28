@@ -1,5 +1,6 @@
 plugins = [
     # Standard, in alphabetical order.
+    "installedpackages_list",
     "aliases",
     "ca",
     "cert",
