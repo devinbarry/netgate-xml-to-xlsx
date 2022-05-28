@@ -53,9 +53,9 @@ class Plugin(BasePlugin):
         rows = []
 
         radius_node = xml_findone(parsed_xml, "installedpackages,freeradius")
-        if not radius_node:
+        if radius_node is None:
             return
-        self.report_unknown_node_elements(radius_node, "config")
+        self.report_unknown_node_elements(radius_node, "config".split("<"))
 
         node = xml_findone(radius_node, "config")
         self.report_unknown_node_elements(node)
