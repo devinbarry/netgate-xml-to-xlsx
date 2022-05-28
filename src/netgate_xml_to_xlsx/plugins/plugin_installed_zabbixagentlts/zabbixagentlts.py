@@ -45,7 +45,7 @@ class Plugin(BasePlugin):
         if zabbix_node is None:
             return
 
-        self.report_unknown_node_elements(zabbix_node, "config")
+        self.report_unknown_node_elements(zabbix_node, "config".split(","))
 
         node = xml_findone(zabbix_node, "config")
         self.report_unknown_node_elements(node)
