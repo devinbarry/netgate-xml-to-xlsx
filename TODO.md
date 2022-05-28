@@ -3,9 +3,6 @@
 * Use `load_cell` when loading individual cells with multiple nodes.
 
 * Packages tabs:
-  * pfblockerng
-  * pfblockernglistsv4
-  * pfblockerngtopspammers
   * squid
   * squidantivirus
   * squidauth

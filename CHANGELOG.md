@@ -6,6 +6,7 @@
   * FreeRADIUS components
   * lightsquid
   * menu
+  * pf components
   * service
   * servicewatchdog
   * zabbixagentlts
