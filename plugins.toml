@@ -1,6 +1,6 @@
 plugins = [
     # Standard, in alphabetical order.
-    "installedpackages_list",
+    "installed_vpn_openvpn_export",
     "aliases",
     "ca",
     "cert",
@@ -13,6 +13,7 @@ plugins = [
     "gateways",
     "hasync",
     "ifgroups",
+    "installedpackages_list",
     "installedpackages",
     "interfaces",
     "ipsec",

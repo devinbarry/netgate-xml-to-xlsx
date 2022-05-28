@@ -310,12 +310,19 @@ class BasePlugin(ABC):
 
     def report_unknown_node_elements(
         self, node: Node, node_names: list[str] | None = None
-    ) -> None:
+    ) -> bool:
         """
         Report if any unknown node elements are present.
 
         Report if any of the node's children's tags are not found in the nodenames list.
 
+        Args:
+            node: Node to examine
+
+            node_names: List of expected node names.
+
+        Returns:
+            True if unknown node names found.
         """
         if node is None:
             return
@@ -333,6 +340,8 @@ class BasePlugin(ABC):
             path = self.node_ancesters(node)
             unknowns.sort()
             print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}""")
+            return True
+        return False
 
     def wip(self, node: Node) -> str:
         """Output a WIP warning."""
