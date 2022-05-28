@@ -157,6 +157,7 @@ class BasePlugin(ABC):
         assert parsed_xml is not None
         assert self.el_paths_to_sanitize is not None
         for el_path in self.el_paths_to_sanitize:
+            import pdb;pdb.set_trace()
             els = xml_findall(parsed_xml, el_path)
             for el in els:
                 if el.text is not None:

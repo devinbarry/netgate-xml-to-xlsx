@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Release 0.9.9 -- ??
+* Name installed package plugins as `plugin_installed_xxx`.
+* Installed packages:
+  * menu
+  * service
+  * servicewatchdog
+  * zabbixagentlts
+* Added Zabbix custom sanitization
+
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
 * Complete first pass of all base XML elements.

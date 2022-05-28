@@ -42,5 +42,9 @@ plugins = [
 
     # Installed packages, in alphabetical order.
     "installed_haproxy",
+    "installed_menu",
+    "installed_service",
+    "installed_servicewatchdog",
+    "installed_zabbixagentlts",
 
 ]

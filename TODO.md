@@ -8,12 +8,9 @@
   * freeradiuseapconf
   * freeradiusinterfaces
   * lightsquid
-  * menu
   * pfblockerng
   * pfblockernglistsv4
   * pfblockerngtopspammers
-  * service
-  * servicewatchdog
   * squid
   * squidantivirus
   * squidauth
@@ -32,8 +29,6 @@
   * squidtraffic
   * squidusers
   * suricata
-  * zabbixagentlts
-
 
 
 
