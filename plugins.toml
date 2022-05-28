@@ -58,4 +58,7 @@ plugins = [
     "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",
 
+    # Reports.
+    "report_unknown_installedpackages",
+
 ]

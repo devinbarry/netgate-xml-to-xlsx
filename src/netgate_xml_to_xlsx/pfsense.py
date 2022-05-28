@@ -14,6 +14,7 @@ from openpyxl.styles.alignment import Alignment
 from netgate_xml_to_xlsx.mytypes import Node
 
 from .plugin_tools import discover_plugins
+from .plugins.base_plugin import BasePlugin
 from .plugins.support.elements import sanitize_xml
 from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 
@@ -186,16 +187,28 @@ class PfSense:
         Continue iterating if it is None.
         """
         plugin = self.plugins[plugin_name]
-        for sheet_data in plugin.run(self.parsed_xml):
-            if sheet_data is None or not sheet_data.data_rows:
-                continue
+        if plugin_name.startswith("report"):
+            for sheet_data in plugin.run(self.parsed_xml, self.plugins):
+                if sheet_data is None or not sheet_data.data_rows:
+                    continue
 
-            self._write_sheet(
-                sheet_name=sheet_data.sheet_name,
-                header_row=sheet_data.header_row,
-                column_widths=sheet_data.column_widths,
-                rows=sheet_data.data_rows,
-            )
+                self._write_sheet(
+                    sheet_name=sheet_data.sheet_name,
+                    header_row=sheet_data.header_row,
+                    column_widths=sheet_data.column_widths,
+                    rows=sheet_data.data_rows,
+                )
+        else:
+            for sheet_data in plugin.run(self.parsed_xml):
+                if sheet_data is None or not sheet_data.data_rows:
+                    continue
+
+                self._write_sheet(
+                    sheet_name=sheet_data.sheet_name,
+                    header_row=sheet_data.header_row,
+                    column_widths=sheet_data.column_widths,
+                    rows=sheet_data.data_rows,
+                )
 
     def save(self) -> None:
         """Delete empty first sheet and then save Workbook."""

@@ -126,15 +126,17 @@ class BasePlugin(ABC):
         """
         Initialize base plugin.
 
-        node_names:
-            Comma-delimited list of nodes to obtain.
-            Also used for the sheet's header row.
+        Args:
+            node_names:
+                Comma-delimited list of nodes to obtain.
+                Also used for the sheet's header row.
 
-        column_widths:
-            Comma-delimited list of sheet column widths.
+            column_widths:
+                Comma-delimited list of sheet column widths.
 
-        el_paths_to_sanitize:
-            List of comma-delimited elements to santitize
+            el_paths_to_sanitize:
+                List of comma-delimited elements to santitize
+
         """
         self.display_name: str = display_name
         self.node_names: list[str] = cast(list[str], split_commas(node_names))
@@ -363,13 +365,20 @@ class BasePlugin(ABC):
         return "WIP"
 
     @abstractmethod
-    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+    def run(
+        self, parsed_xml: Node, installed_plugins: dict | None
+    ) -> Generator[SheetData, None, None]:
         """
         Run plugin.
 
         Args:
             pfsense:
                 Root of the parsed XML file.
+
+            plugins_list:
+                List of loaded plugins.
+                Only used by reports.
+                TODO: Use 'Self' type when available.
 
         Returns:
             List of rows to write to spreadsheet.

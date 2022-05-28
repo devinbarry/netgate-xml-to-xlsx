@@ -10,7 +10,9 @@
   * service
   * servicewatchdog
   * zabbixagentlts
-* Added Zabbix custom sanitization
+* Added Zabbix custom sanitization.
+* Reports
+  * Unknown packages.
 
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
