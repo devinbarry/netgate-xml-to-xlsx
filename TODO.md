@@ -3,10 +3,6 @@
 * Use `load_cell` when loading individual cells with multiple nodes.
 
 * Packages tabs:
-  * freeradius
-  * freeradiusclients
-  * freeradiuseapconf
-  * freeradiusinterfaces
   * pfblockerng
   * pfblockernglistsv4
   * pfblockerngtopspammers
@@ -28,7 +24,6 @@
   * squidtraffic
   * squidusers
   * suricata
-  * `vpn_openvpn_export`c
 
 
 

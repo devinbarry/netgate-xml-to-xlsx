@@ -210,12 +210,7 @@ class BasePlugin(ABC):
                     return "\n".join(lines)
 
                 case "disable" | "disabled" | "enable" | "blockpriv" | "blockbogons":  # NOQA
-                    if node.text:
-                        raise NodeError(
-                            f"Node {node.tag} has unexpected text: {node.text}."
-                        )
-
-                    return "YES"
+                    return self.yes(node)
 
                 case _:
                     return node.text or ""
@@ -276,7 +271,7 @@ class BasePlugin(ABC):
             return
 
         for item in bad_items:
-            errors.append(f"Unprocessed {self.node_ancesters(node)}:{item.tag}")
+            errors.append(f"Unprocessed {self.node_path(node)}:{item.tag}")
             print("\n".join(errors))
 
     def extract_node_elements(self, node: Node) -> dict[str, str]:
@@ -286,7 +281,7 @@ class BasePlugin(ABC):
             data[child.tag] = self.adjust_node(child)
         return data
 
-    def node_ancesters(self, node: Node) -> str:
+    def node_path(self, node: Node) -> str:
         """Walk up through node parents."""
         path = []
         path.append(node.tag)
@@ -307,6 +302,25 @@ class BasePlugin(ABC):
                 f"{node_name}: {self.adjust_node(xml_findone(node, node_name))}"
             )
         return "\n".join(cell)
+
+    def yes(self, node: Node) -> str:
+        """
+        Return YES because the node exists.
+
+        Report warning if node has text or children as that is unexpected.
+
+        """
+        if node.text:
+            print(f"Node {self.node_path(node)} has unexpected text: {node.text}.")
+
+        children = node.getchildren()
+        if len(children) > 0:
+            tags = [x.tag for x in children]
+            tags.sort()
+            tagline = ",".join(tags)
+            print(f"Node {self.node_path(node)} has unexpected children: {tagline}.")
+
+        return "YES"
 
     def report_unknown_node_elements(
         self, node: Node, node_names: list[str] | None = None
@@ -337,7 +351,7 @@ class BasePlugin(ABC):
                 unknowns.append(child.tag)
 
         if unknowns:
-            path = self.node_ancesters(node)
+            path = self.node_path(node)
             unknowns.sort()
             print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}""")
             return True

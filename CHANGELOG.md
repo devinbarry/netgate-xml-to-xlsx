@@ -3,6 +3,7 @@
 ## Release 0.9.9 -- ??
 * Name installed package plugins as `plugin_installed_xxx`.
 * Installed packages:
+  * FreeRADIUS components
   * lightsquid
   * menu
   * service

@@ -1,6 +1,5 @@
 plugins = [
     # Standard, in alphabetical order.
-    "installed_vpn_openvpn_export",
     "aliases",
     "ca",
     "cert",
@@ -43,11 +42,16 @@ plugins = [
     "wol",
 
     # Installed packages, in alphabetical order.
+    "installed_freeradius",
+    "installed_freeradiuseapconf",
+    "installed_freeradiusclients",
+    "installed_freeradiusinterfaces",
     "installed_haproxy",
     "installed_lightsquid",
     "installed_menu",
     "installed_service",
     "installed_servicewatchdog",
+    "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",
 
 ]

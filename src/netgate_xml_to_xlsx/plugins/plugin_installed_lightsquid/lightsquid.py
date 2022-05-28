@@ -35,8 +35,7 @@ class Plugin(BasePlugin):
         lightsquid_node = xml_findone(parsed_xml, "installedpackages,lightsquid")
         if lightsquid_node is None:
             return
-
-        self.report_unknown_node_elements(lightsquid_node, "config")
+        self.report_unknown_node_elements(lightsquid_node, "config".split(","))
 
         node = xml_findone(lightsquid_node, "config")
         self.report_unknown_node_elements(node)
