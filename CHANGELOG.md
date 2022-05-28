@@ -1,8 +1,11 @@
 # CHANGELOG
 
-## Release 0.9.8 -- TBD
+## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
+* Complete first pass of all base XML elements.
+* HAProxy.
 * Hoist test scripts.
+
 
 ## Release 0.9.7 -- 2022-04-23
 * Refactor following "Hypermodern Python" model.
