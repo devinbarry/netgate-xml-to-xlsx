@@ -42,6 +42,7 @@ plugins = [
 
     # Installed packages, in alphabetical order.
     "installed_haproxy",
+    "installed_lightsquid",
     "installed_menu",
     "installed_service",
     "installed_servicewatchdog",

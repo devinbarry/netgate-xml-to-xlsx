@@ -7,7 +7,6 @@
   * freeradiusclients
   * freeradiuseapconf
   * freeradiusinterfaces
-  * lightsquid
   * pfblockerng
   * pfblockernglistsv4
   * pfblockerngtopspammers
