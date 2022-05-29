@@ -3,7 +3,6 @@
 
 from typing import Generator
 
-from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
@@ -38,14 +37,7 @@ class Plugin(BasePlugin):
 
         match node.tag:
             case "logall" | "nologdefaultblock" | "nologbogons" | "nologprivatenets":
-                # Existence of tag indicates 'yes'.
-                # Sanity check there is no text.
-                if node.text:
-                    raise NodeError(
-                        f"Node {node.tag} has unexpected text: {node.text}."
-                    )
-
-                return "YES"
+                self.yes(node)
 
         return super().adjust_node(node)
 

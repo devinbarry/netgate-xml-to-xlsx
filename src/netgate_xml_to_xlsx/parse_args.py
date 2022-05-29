@@ -32,10 +32,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "in_files", nargs="+", help="One or more Netgate .xml files to process."
     )
+
     parser.add_argument(
         "--sanitize",
         action="store_true",
         help="Sanitize the input xml files and save as <filename>-sanitized.",
+    )
+
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Additional logging."
+    )
+
+    parser.add_argument("--debug", action="store_true", help="Debug logging.")
+
+    default = "./logs"
+    parser.add_argument(
+        "--log-dir",
+        type=str,
+        default=default,
+        help=f"Log directory. Default: {default}.",
     )
 
     __version__ = version("netgate_xml_to_xlsx")

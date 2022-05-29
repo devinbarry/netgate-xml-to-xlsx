@@ -2,12 +2,12 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import datetime
+import logging
 from abc import ABC, abstractmethod
 from typing import Generator, cast
 
 import lxml  # nosec
 
-from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from .support.elements import nice_address_sort, unescape, xml_findall, xml_findone
@@ -42,57 +42,6 @@ def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
     # Yes, we know it is a list[str]...
     # Without cast mypy thinks we're returning list[Any].
     return cast(list[int | str], data)
-
-
-def _destination_source(node: Node) -> str:
-    """Format destination and source addresses/ports."""
-    any_address: bool = False
-    address: str = ""
-    port: str = ""
-
-    for child in node.getchildren():
-        match child.tag:
-            case "any":
-                any_address = True
-            case "address" | "network":
-                address = unescape(child.text)
-            case "port":
-                port = unescape(child.text)
-            case _:
-                raise NodeError(f"Unknown tag {child.tag} in node {node.tag}.")
-
-    result = []
-    if any_address:
-        if port:
-            result.append(f"any:{port}")
-        else:
-            result.append("any")
-    else:
-        if address and port:
-            result.append(f"{address}:{port}")
-        else:
-            # Ignore port without address as I don't think that is allowed.
-            result.append(address)
-    return "\n".join(result)
-
-
-def _created_updated(node: Node) -> str:
-    """Format created/updated user and date/time."""
-    result = []
-    for child in node.getchildren():
-        match child.tag:
-            case "username":
-                result.append(child.text)
-            case "time":
-                date_time = datetime.datetime.fromtimestamp(int(child.text)).strftime(
-                    "%Y-%m-%d %H-%M-%S"
-                )
-                result.append(date_time)
-            case _:
-
-                raise NodeError(f"Unknown tag {child.tag} in node {node.tag}.")
-
-    return "\n".join(result)
 
 
 class SheetData:
@@ -144,6 +93,7 @@ class BasePlugin(ABC):
             list[int], split_commas(column_widths, make_int=True)
         )
         self.el_paths_to_sanitize = el_paths_to_sanitize
+        self.logger = logging.getLogger()
 
     def sanitize(self, parsed_xml: Node | None) -> None:
         """
@@ -163,6 +113,56 @@ class BasePlugin(ABC):
             for el in els:
                 if el.text is not None:
                     el.text = "SANITIZED"
+
+    def created_updated(self, node: Node) -> str:
+        """Format created/updated user and date/time."""
+        result = []
+        for child in node.getchildren():
+            match child.tag:
+                case "username":
+                    result.append(child.text)
+                case "time":
+                    date_time = datetime.datetime.fromtimestamp(
+                        int(child.text)
+                    ).strftime("%Y-%m-%d %H-%M-%S")
+                    result.append(date_time)
+                case _:
+                    self.loggger.warning(f"Unknown tag: {self.node_path(node)}")
+                    return self.wip(node)
+
+        return "\n".join(result)
+
+    def destination_source(self, node: Node) -> str:
+        """Format destination and source addresses/ports."""
+        any_address: bool = False
+        address: str = ""
+        port: str = ""
+
+        for child in node.getchildren():
+            match child.tag:
+                case "any":
+                    any_address = True
+                case "address" | "network":
+                    address = unescape(child.text)
+                case "port":
+                    port = unescape(child.text)
+                case _:
+                    self.logger.warning(f"Unknown tag: {self.node_path(node)}")
+                    return self.wip(node)
+
+        result = []
+        if any_address:
+            if port:
+                result.append(f"any:{port}")
+            else:
+                result.append("any")
+        else:
+            if address and port:
+                result.append(f"{address}:{port}")
+            else:
+                # Ignore port without address as I don't think that is allowed.
+                result.append(address)
+        return "\n".join(result)
 
     def adjust_node(self, node: Node) -> str | Node:
         """
@@ -220,10 +220,10 @@ class BasePlugin(ABC):
         # Process
         match node.tag:
             case "destination" | "source":
-                return _destination_source(node)
+                return self.destination_source(node)
 
             case "created" | "updated":
-                return _created_updated(node)
+                return self.created_updated(node)
 
         # Not processed.
         return node
@@ -263,9 +263,6 @@ class BasePlugin(ABC):
             node: Node being processed so we can grab the tag.
             row: List items ready to write to spreadsheet
 
-        Raises:
-            NodeError
-
         """
         errors = []
         bad_items = [x for x in row if isinstance(x, lxml.etree._Element)]
@@ -274,7 +271,7 @@ class BasePlugin(ABC):
 
         for item in bad_items:
             errors.append(f"Unprocessed {self.node_path(node)}:{item.tag}")
-            print("\n".join(errors))
+            self.logger.warning("\n".join(errors))
 
     def extract_node_elements(self, node: Node) -> dict[str, str]:
         """Create dictionary of node children's tag:value."""
@@ -313,14 +310,20 @@ class BasePlugin(ABC):
 
         """
         if node.text:
-            print(f"Node {self.node_path(node)} has unexpected text: {node.text}.")
+            self.logger.warning(
+                f"Node {self.node_path(node)} has unexpected text: {node.text}."
+            )
+            return self.wip(node)
 
         children = node.getchildren()
         if len(children) > 0:
             tags = [x.tag for x in children]
             tags.sort()
             tagline = ",".join(tags)
-            print(f"Node {self.node_path(node)} has unexpected children: {tagline}.")
+            self.logger.warning(
+                f"Node {self.node_path(node)} has unexpected children: {tagline}."
+            )
+            return self.wip(node)
 
         return "YES"
 
@@ -355,13 +358,15 @@ class BasePlugin(ABC):
         if unknowns:
             path = self.node_path(node)
             unknowns.sort()
-            print(f"""Node {path} has unknown child node(s): {", ".join(unknowns)}""")
+            self.logger.warning(
+                f"""Node {path} has unknown child node(s): {", ".join(unknowns)}"""
+            )
             return True
         return False
 
     def wip(self, node: Node) -> str:
         """Output a WIP warning."""
-        print(f"WIP: {self.display_name}/{node.tag}.")
+        self.logger.warning(f"WIP: {self.display_name}/{node.tag}.")
         return "WIP"
 
     @abstractmethod

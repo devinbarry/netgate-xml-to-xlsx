@@ -162,7 +162,9 @@ class Plugin(BasePlugin):
         if client_node is None:
             return
         if self.should_process(client_node):
-            print(f"WARNING: {self.node_path(client_node)} is unimplemented.")
+            self.logger.warning(
+                f"WARNING: {self.node_path(client_node)} is unimplemented."
+            )
 
         return []
 

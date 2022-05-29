@@ -3,7 +3,6 @@
 
 from typing import Generator
 
-from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
@@ -49,12 +48,7 @@ class Plugin(BasePlugin):
 
         match node.tag:
             case "mac_allow" | "mac_deny":
-                if node.text:
-                    raise NodeError(
-                        f"Node {node.tag} has unexpected text: {node.text}."
-                    )
-
-                return "YES"
+                return self.yes(node)
 
             case "range":
                 node_names = "from,to".split(",")

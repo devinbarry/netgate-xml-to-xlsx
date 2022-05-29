@@ -2,6 +2,7 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import argparse
+import logging
 import os
 from pathlib import Path
 from typing import cast
@@ -39,7 +40,7 @@ class PfSense:
         self.default_alignment = Alignment(wrap_text=True, vertical="top")
 
         self.plugins = discover_plugins()
-
+        self.logger = logging.getLogger()
         self._load()
 
     def _get_output_path(self, in_path: Path) -> Path:
@@ -111,7 +112,7 @@ class PfSense:
             if child.tag not in expected_nodes:
                 unknown.append(child.tag)
         if len(unknown):
-            print(f"""Unknown root node(s): {",".join(unknown)}""")
+            self.logger.warning(f"""Unknown root node(s): {",".join(unknown)}""")
 
     def _load(self) -> None:
         """Load and parse Netgate xml firewall configuration.
@@ -172,11 +173,11 @@ class PfSense:
         else:
             out_path = Path(f"{parts[0]}-sanitized{parts[1]}")
         out_path.write_text(f"{self.raw_xml}", encoding="utf-8")
-        print(f"Sanitized file written: {out_path}.")
+        self.logger.info(f"Sanitized file written: {out_path}.")
 
         # Delete the unsanitized file.
         self.in_file.unlink()
-        print(f"Deleted original file: {self.in_file}.")
+        self.logger.info(f"Deleted original file: {self.in_file}.")
 
     def run(self, plugin_name: str) -> None:
         """

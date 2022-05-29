@@ -4,7 +4,6 @@
 from textwrap import indent
 from typing import Generator
 
-from netgate_xml_to_xlsx.errors import NodeError
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData, split_commas
@@ -83,7 +82,11 @@ class Plugin(BasePlugin):
                     return ""
                 els = value.split(" ")
                 if len(els) != 4:
-                    raise NodeError(f"Unexpected tag value for {node.tag}: dcertadv")
+                    self.logger.warning(
+                        f"Unexpected value for {self.node_path}: {value}."
+                    )
+                    return self.wip(node)
+
                 result.append(f"{els[0]}: {els[1]}")
                 result.append("ciphers:")
                 result.append(indent("\n".join(els[3].split(":")), " " * 4))

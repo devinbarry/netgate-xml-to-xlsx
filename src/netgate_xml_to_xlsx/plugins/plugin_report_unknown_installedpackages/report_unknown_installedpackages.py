@@ -36,7 +36,7 @@ class Plugin(BasePlugin):
         rows = []
         node = xml_findone(parsed_xml, "installedpackages")
         if node is None:
-            print("No packages are installed.")
+            self.logger.warning("No packages are installed.")
             yield None
 
         child_tags = set([x.tag for x in node.getchildren()])
