@@ -1,6 +1,5 @@
 plugins = [
     # Standard, in alphabetical order.
-    "installed_suricata_rule",
     "aliases",
     "ca",
     "cert",
@@ -56,7 +55,8 @@ plugins = [
     "installed_pfblockerngtopspammers",
     "installed_service",
     "installed_servicewatchdog",
-    "installed_suricata_config",
+    "installed_suricata",
+    "installed_suricata_rule",
     "installed_suricata_sid_mgmt_lists",
     "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",

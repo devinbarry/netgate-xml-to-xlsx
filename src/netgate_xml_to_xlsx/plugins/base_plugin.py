@@ -375,6 +375,11 @@ class BasePlugin(ABC):
         self.logger.warning(f"WIP: {self.display_name}/{node.tag}.")
         return "WIP"
 
+    def rotate_rows(self, rows: list[list[str]]) -> list[list[str]]:
+        """Rotate horizontal headers and rows into vertical columns."""
+        vertical_rows = list(zip(self.node_names, *rows))
+        return vertical_rows
+
     @abstractmethod
     def run(
         self, parsed_xml: Node, installed_plugins: dict | None

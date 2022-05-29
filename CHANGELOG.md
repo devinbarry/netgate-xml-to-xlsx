@@ -10,8 +10,10 @@
   * pf components
   * service
   * servicewatchdog
+  * Suricata components
   * vpn\_openvpn\_export
   * zabbixagentlts
+
 * Added Zabbix custom sanitization.
 * Added pf custom sanitization.
 * Reports

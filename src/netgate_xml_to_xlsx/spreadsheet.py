@@ -7,9 +7,17 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
 
-def sheet_header(sheet: Worksheet, columns: list, column_widths: list[int]) -> None:
-    """Write header row then set the column widths."""
-    write_ss_row(sheet, columns, 1, "header")
+def sheet_header(
+    sheet: Worksheet, columns: list | None, column_widths: list[int]
+) -> None:
+    """
+    Write header row (if it is available) then set the column widths.
+
+    Spreadsheets that rotate the data vertically may not have a header row.
+
+    """
+    if columns is not None:
+        write_ss_row(sheet, columns, 1, "header")
 
     for column_number, width in enumerate(column_widths, start=1):
         column_letter = get_column_letter(column_number)

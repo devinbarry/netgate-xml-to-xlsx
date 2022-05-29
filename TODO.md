@@ -22,7 +22,6 @@
   * squidreverseuri
   * squidtraffic
   * squidusers
-  * suricata
 
 
 

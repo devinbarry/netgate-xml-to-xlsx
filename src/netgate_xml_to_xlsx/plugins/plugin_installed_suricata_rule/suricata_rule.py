@@ -1,6 +1,7 @@
 """Suricata Rule plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
+from base64 import b64decode
 from typing import Generator
 
 from netgate_xml_to_xlsx.mytypes import Node
@@ -9,23 +10,23 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = (
-    "enable,interface,descr,alertsystemlog,alertsystemlog_facility,"
+    "interface,descr,enable,alertsystemlog,alertsystemlog_facility,"
     "alertsystemlog_priority,append_http_log,append_stats_log,asn1_max_frames,autoflowbitrules,"
     "autofp_scheduler,block_drops_only,blockoffenders,blockoffendersip,blockoffenderskill,"
     "dcerpc_parser,delayed_detect,detect_eng_profile,dhcp_parser,dns_global_memcap,"
     "dns_parser_tcp,dns_parser_tcp_ports,dns_parser_udp,dns_parser_udp_ports,dns_request_flood_limit,"  # NOQA
     "dns_state_memcap,enable_async_sessions,enable_eve_log,enable_file_store,enable_http_log,"
     "enable_iprep,enable_midstream_sessions,enable_pcap_log,enable_stats_collection,enable_stats_log,"  # NOQA
-    "enable_telegraf_stats,"
-    "enable_tls_log,enable_tls_store,eve_log_alerts,eve_log_alerts_http,eve_log_alerts_metadata,"
+    "enable_telegraf_stats,enable_tls_log,enable_tls_store,enable_verbose_logging,eve_log_alerts,"
+    "eve_log_alerts_http,eve_log_alerts_metadata,"
     "eve_log_alerts_packet,eve_log_alerts_payload,eve_log_alerts_xff,eve_log_alerts_xff_deployment,eve_log_alerts_xff_header,"  # NOQA
-    "eve_log_alerts_xff_mode,eve_log_anomaly,eve_log_anomaly_packethdr,eve_log_anomaly_type_applayer,"
+    "eve_log_alerts_xff_mode,eve_log_anomaly,eve_log_anomaly_packethdr,eve_log_anomaly_type_applayer,"  # NOQA
     "eve_log_anomaly_type_decode,eve_log_anomaly_type_stream,"
     "eve_log_dhcp,eve_log_dhcp_extended,eve_log_dns,eve_log_drop,"
     "eve_log_files,eve_log_files_hash,eve_log_files_magic,eve_log_flow,eve_log_ftp,"
     "eve_log_http,eve_log_http_extended,eve_log_http_extended_headers,eve_log_http2,eve_log_ikev2,"
-    "eve_log_krb5,eve_log_netflow,eve_log_nfs,eve_log_rdp,eve_log_rfb,eve_log_sip,eve_log_smb,"
-    "eve_log_smtp,eve_log_smtp_extended,eve_log_smtp_extended_fields,eve_log_snmp,eve_log_ssh,eve_log_stats,"
+    "eve_log_krb5,eve_log_mqtt,eve_log_netflow,eve_log_nfs,eve_log_rdp,eve_log_rfb,eve_log_sip,eve_log_smb,"  # NOQA
+    "eve_log_smtp,eve_log_smtp_extended,eve_log_smtp_extended_fields,eve_log_snmp,eve_log_ssh,eve_log_stats,"  # NOQA
     "eve_log_stats_deltas,eve_log_stats_threads,eve_log_stats_totals,eve_log_tftp,eve_log_tls,"
     "eve_log_tls_extended_fields,"
     "eve_log_tls_extended,eve_output_type,eve_redis_key,eve_redis_mode,eve_redis_port,"
@@ -51,7 +52,7 @@ NODE_NAMES = (
 )
 
 
-WIDTHS = ""
+WIDTHS = "60"
 
 
 class Plugin(BasePlugin):
@@ -80,6 +81,14 @@ class Plugin(BasePlugin):
                 # Override base.
                 return node.text
 
+            case "eve_log_http_extended_headers" | "eve_log_smtp_extended_fields":
+                els = [x.strip() for x in node.text.split(",")]
+                els.sort(key=str.casefold)
+                return "\n".join(els)
+
+            case "file_store_logdir":
+                return b64decode(node.text)
+
             case "host_os_policy" | "libhtp_policy":
                 if node.tag == "host_os_policy":
                     node_names = "name,bind_to,policy".split(",")
@@ -96,6 +105,11 @@ class Plugin(BasePlugin):
                 if len(cell) > 0 and cell[-1] == "":
                     cell = cell[:-1]
                 return "\n".join(cell)
+
+            case "rule_sid_off" | "rulesets":
+                els = [x.strip() for x in node.text.split("||")]
+                els.sort(key=str.casefold)
+                return "\n".join(els)
 
         return super().adjust_node(node)
 
@@ -120,9 +134,17 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
+        rows.sort(key=lambda x: " ".join(x[0:1]).casefold())
+        vertical_rows = self.rotate_rows(rows)
+
+        col_widths = [60]
+        col_widths.extend([40 for x in range(len(vertical_rows[0]) - 1)])
+        header_row = ["name"]
+        header_row.extend(["data" for x in range(len(vertical_rows[0]) - 1)])
+
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.node_names,
-            data_rows=rows,
-            column_widths=self.column_widths,
+            header_row=header_row,
+            data_rows=vertical_rows,
+            column_widths=col_widths,
         )
