@@ -46,7 +46,7 @@ class Plugin(BasePlugin):
                 values.sort()
 
                 row.append("\n".join(values))
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

@@ -83,8 +83,7 @@ class Plugin(BasePlugin):
             row.append(child.tag)  # name
             row.append(self.adjust_node(child))
 
-            self.sanity_check_node_row(child, row)
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

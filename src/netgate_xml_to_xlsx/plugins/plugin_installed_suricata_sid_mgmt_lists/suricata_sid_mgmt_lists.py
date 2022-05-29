@@ -13,7 +13,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall,xml_findone
+from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = "name,modtime,content"
 
@@ -47,10 +47,17 @@ class Plugin(BasePlugin):
                 if value == "":
                     return ""
 
-                return datetime.datetime.fromtimestamp(
-                    int(value)
-                ).strftime("%Y-%m-%d %H-%M-%S")
+                match node.tag:
+                    case "enable":
+                        # Override base one as Suricata stores the value.
+                        return node.value
 
+                    case "libhtp_policy" | "host_os_policy":
+                        return self.wip(node)
+
+                return datetime.datetime.fromtimestamp(int(value)).strftime(
+                    "%Y-%m-%d %H-%M-%S"
+                )
 
             case "content":
                 return b64decode(node.text)
@@ -75,7 +82,9 @@ class Plugin(BasePlugin):
             row = []
             for node_name in self.node_names:
                 row.append(self.adjust_node(xml_findone(node, node_name)))
-            rows.append(row)
+            self.sanity_check_node_row(node, row)
+
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

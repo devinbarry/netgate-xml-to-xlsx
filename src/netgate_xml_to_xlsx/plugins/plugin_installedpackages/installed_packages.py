@@ -104,8 +104,7 @@ class Plugin(BasePlugin):
 
                 row.append(value)
 
-            self.sanity_check_node_row(node, row)
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

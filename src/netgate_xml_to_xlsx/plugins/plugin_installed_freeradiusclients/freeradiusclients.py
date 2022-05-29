@@ -58,7 +58,8 @@ class Plugin(BasePlugin):
             row = []
             for node_name in self.node_names:
                 row.append(self.adjust_node(xml_findone(node, node_name)))
-            rows.append(row)
+
+            rows.append(self.sanity_check_node_row(node, row))
 
         rows.sort(key=lambda x: x[0].casefold())
         yield SheetData(

@@ -229,8 +229,8 @@ class Plugin(BasePlugin):
             for node_name in node_names:
                 value = self.adjust_node(xml_findone(node, node_name))
                 row.append(value)
-            self.sanity_check_node_row(node, row)
-            rows.append(row)
+
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name="HAProxy Pools",

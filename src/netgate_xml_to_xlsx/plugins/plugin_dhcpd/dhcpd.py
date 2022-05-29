@@ -104,8 +104,8 @@ class Plugin(BasePlugin):
 
                 row.append(self.adjust_nodes(xml_findall(node, node_name)))
 
-            self.sanity_check_node_row(node, row)
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
+
         rows.sort()
 
         yield SheetData(

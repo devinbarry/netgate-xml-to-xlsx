@@ -152,8 +152,7 @@ class Plugin(BasePlugin):
                 continue
 
             row = [key, self.adjust_nodes(xml_findall(system_node, key))]
-            self.sanity_check_node_row(system_node, row)
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(system_node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

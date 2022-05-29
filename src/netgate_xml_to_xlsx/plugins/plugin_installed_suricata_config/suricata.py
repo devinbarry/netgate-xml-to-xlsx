@@ -17,7 +17,7 @@ NODE_NAMES = (
     "file_store_retention,forcekeepsettings,gplv2_custom_url,hide_deprecated_rules,http_log_limit_size,"  # NOQA
     "http_log_retention,live_swap_updates,log_to_systemlog,log_to_systemlog_facility,maxmind_geoipdb_key,"  # NOQA
     "oinkcode,rm_blocked,sid_changes_log_limit_size,sid_changes_log_retention,sid_list_migration,"
-    "snort_custom_url,snort_rules_file,snortcommunityrules,stats_log_limit_size,stats_log_retention,"
+    "snort_custom_url,snort_rules_file,snortcommunityrules,stats_log_limit_size,stats_log_retention,"  # NOQA
     "suricata_config_ver,suricataloglimit,suricataloglimitsize,tls_certs_store_retention,tls_log_limit_size,"  # NOQA
     "tls_log_retention"
 )
@@ -60,7 +60,6 @@ class Plugin(BasePlugin):
             row = []
             row.append(node_name)
             row.append(self.adjust_node(xml_findone(node, node_name)))
-            rows.append(row)
 
         yield SheetData(
             sheet_name=self.display_name,

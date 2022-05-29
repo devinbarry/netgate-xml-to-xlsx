@@ -6,7 +6,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall, xml_node_exists
+from ..support.elements import xml_findall
 
 NODE_NAMES = (
     "disabled,name,groupname,scope,expires,"
@@ -52,9 +52,7 @@ class Plugin(BasePlugin):
 
                 row.append("\n".join(values))
 
-            # The existence of the disabled element indicates user is disabled.
-            row[1] = "Yes" if xml_node_exists(node, "disabled") else "Yes"
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,

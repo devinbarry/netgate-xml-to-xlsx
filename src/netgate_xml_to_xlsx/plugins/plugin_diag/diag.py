@@ -48,8 +48,7 @@ class Plugin(BasePlugin):
                     continue
                 row.append(self.adjust_node(xml_findone(node, node_name)))
 
-            self.sanity_check_node_row(node, row)
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
 
         rows.sort()
 

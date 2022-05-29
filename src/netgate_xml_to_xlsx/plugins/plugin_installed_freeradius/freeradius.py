@@ -64,7 +64,7 @@ class Plugin(BasePlugin):
         for node_name in self.node_names:
             row.append(node_name)
             row.append(self.adjust_node(xml_findone(node, node_name)))
-            rows.append(row)
+            rows.append(self.sanity_check_node_row(node, row))
             row = []
 
         yield SheetData(

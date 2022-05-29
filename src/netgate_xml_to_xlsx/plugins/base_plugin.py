@@ -255,7 +255,7 @@ class BasePlugin(ABC):
 
         return "\n".join(cell)
 
-    def sanity_check_node_row(self, node: Node, row: list) -> None:
+    def sanity_check_node_row(self, node: Node, row: list) -> list[str]:
         """
         Ensure no row items are an XML node.
 
@@ -263,15 +263,21 @@ class BasePlugin(ABC):
             node: Node being processed so we can grab the tag.
             row: List items ready to write to spreadsheet
 
+        Returns:
+            Row list with the bad_items replaced by 'WIP'.
+
         """
         errors = []
         bad_items = [x for x in row if isinstance(x, lxml.etree._Element)]
         if not bad_items:
-            return
+            row
 
         for item in bad_items:
             errors.append(f"Unprocessed {self.node_path(node)}:{item.tag}")
             self.logger.warning("\n".join(errors))
+
+        sanitized = ["WIP" if isinstance(x, lxml.etree._Element) else x for x in row]
+        return sanitized
 
     def extract_node_elements(self, node: Node) -> dict[str, str]:
         """Create dictionary of node children's tag:value."""
