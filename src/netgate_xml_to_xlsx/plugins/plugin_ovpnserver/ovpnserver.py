@@ -10,7 +10,7 @@ from ..support.elements import xml_findone
 
 # No named top-level nodes.
 # Using top-level tags.
-NODE_NAMES = "name,details"
+NODE_NAMES = "name,data"
 WIDTHS = "60,100"
 
 

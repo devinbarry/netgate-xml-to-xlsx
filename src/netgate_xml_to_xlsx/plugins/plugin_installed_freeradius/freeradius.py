@@ -69,7 +69,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row="name,detail".split(","),
+            header_row="name,data".split(","),
             data_rows=rows,
             column_widths=self.column_widths,
         )
