@@ -1,6 +1,5 @@
 # TODO
 
-* Use `load_cell` when loading individual cells with multiple nodes.
 * Restructure plugin so that the base loads the individual plugins and keeps a registry.
   Removes the need to pass `plugins_list` to the report plugins.
 

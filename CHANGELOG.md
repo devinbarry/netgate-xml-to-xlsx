@@ -2,15 +2,18 @@
 
 ## Release 0.9.9 -- ??
 * Name installed package plugins as `plugin_installed_xxx`.
-* Installed packages:
+* Replace (most) `print` instances with `logger`.
+* Processing installed packages:
   * FreeRADIUS components
   * lightsquid
   * menu
   * pf components
   * service
   * servicewatchdog
+  * vpn\_openvpn\_export
   * zabbixagentlts
 * Added Zabbix custom sanitization.
+* Added pf custom sanitization.
 * Reports
   * Unknown packages.
 
