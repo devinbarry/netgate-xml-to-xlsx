@@ -10,6 +10,7 @@
   * pf components
   * service
   * servicewatchdog
+  * Squid and SquidGuard components
   * Suricata components
   * vpn\_openvpn\_export
   * zabbixagentlts

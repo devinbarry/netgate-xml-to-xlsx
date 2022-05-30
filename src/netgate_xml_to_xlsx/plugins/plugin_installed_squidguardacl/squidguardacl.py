@@ -1,12 +1,6 @@
-"""
-Suricata SID Management plugin.
-
-Our XML examples clearly do not use the urlsafe b64 encoding as they contain '+'s.
-
-"""
+"""SquidGuard ACL plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-import datetime
 from base64 import b64decode
 from typing import Generator
 
@@ -15,9 +9,13 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-NODE_NAMES = "name,modtime,content"
+NODE_NAMES = (
+    "name,description,disabled,dest,enablelog,"
+    "notallowingip,overrewrite,redirect,redirect_mode,rewrite,"
+    "safesearch,source,time"
+)
 
-WIDTHS = "40,40,100"
+WIDTHS = "40,60,30,60,30,30,40,30,30,30,30,60,30"
 
 
 class Plugin(BasePlugin):
@@ -25,7 +23,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "Suricata SID Mgmt",
+        display_name: str = "SquidGuard (ACL)",
         node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
@@ -42,25 +40,9 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
-            case "modtime":
-                value = node.text.strip()
-                if value == "":
-                    return ""
-
-                match node.tag:
-                    case "enable":
-                        # Override base one as Suricata stores the value.
-                        return node.value
-
-                    case "libhtp_policy" | "host_os_policy":
-                        return self.wip(node)
-
-                return datetime.datetime.fromtimestamp(int(value)).strftime(
-                    "%Y-%m-%d %H-%M-%S"
-                )
-
-            case "content":
-                return b64decode(node.text).decode("utf-8")
+            case "dest" | "source":
+                els = node.text.split(" ")
+                return "\n".join(els)
 
         return super().adjust_node(node)
 
@@ -68,21 +50,18 @@ class Plugin(BasePlugin):
         """Gather information."""
         rows = []
 
-        suricata_node = xml_findone(parsed_xml, "installedpackages,suricata")
-        if suricata_node is None:
+        squid_node = xml_findone(parsed_xml, "installedpackages,squidguardacl")
+        if squid_node is None:
             return
-        self.report_unknown_node_elements(
-            suricata_node, "config,passlist,rule,sid_mgmt_lists".split(",")
-        )
+        self.report_unknown_node_elements(squid_node, "config".split(","))
 
-        nodes = xml_findall(suricata_node, "sid_mgmt_lists,item")
+        nodes = xml_findall(squid_node, "config")
 
         for node in nodes:
             self.report_unknown_node_elements(node)
             row = []
             for node_name in self.node_names:
                 row.append(self.adjust_node(xml_findone(node, node_name)))
-            self.sanity_check_node_row(node, row)
 
             rows.append(self.sanity_check_node_row(node, row))
 

@@ -87,7 +87,7 @@ class Plugin(BasePlugin):
                 return "\n".join(els)
 
             case "file_store_logdir":
-                return b64decode(node.text)
+                return b64decode(node.text).decode("utf-8")
 
             case "host_os_policy" | "libhtp_policy":
                 if node.tag == "host_os_policy":
