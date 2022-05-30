@@ -79,6 +79,7 @@ plugins = [
     "installed_suricata",
     "installed_suricata_rule",
     "installed_suricata_sid_mgmt_lists",
+    "installed_suricatasync",
     "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",
 

@@ -1,4 +1,4 @@
-"""Squid Sync Plugin."""
+"""Suricata Sync Plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from typing import Generator
@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-NODE_NAMES = "synconchanges,synctimeout,row"
+NODE_NAMES = "vardownloadrules,varsynconchanges,varsynctimeout,rule"
 
 
 class Plugin(BasePlugin):
@@ -16,7 +16,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "Squid (sync)",
+        display_name: str = "Suricata (sync)",
         node_names: str = NODE_NAMES,
         column_widths: str = "",
     ) -> None:
@@ -32,7 +32,11 @@ class Plugin(BasePlugin):
             case "row":
                 # I expect this is going to have multiple rows in some installations.
                 return self.load_cell(
-                    node, "syncprotocol,ipaddress,syncport,username,password".split(",")
+                    node,
+                    (
+                        "varsyncprotocol,varsyncipaddress,varsyncport,varsyncpassword,"
+                        "varsyncsuricatastart"
+                    ).split(","),
                 )
 
         return super().adjust_node(node)
@@ -41,7 +45,7 @@ class Plugin(BasePlugin):
         """Gather information."""
         rows = []
 
-        suricata_node = xml_findone(parsed_xml, "installedpackages,squidsync")
+        suricata_node = xml_findone(parsed_xml, "installedpackages,suricatasync")
         if suricata_node is None:
             return
         self.report_unknown_node_elements(suricata_node, "config".split("<"))
