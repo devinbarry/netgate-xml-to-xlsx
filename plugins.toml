@@ -1,4 +1,7 @@
 plugins = [
+    # Reports. Run first to display what's not processed.
+    "report_unknown_installedpackages",
+
     # Standard, in alphabetical order.
     "aliases",
     "ca",
@@ -77,8 +80,5 @@ plugins = [
     "installed_suricata_sid_mgmt_lists",
     "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",
-
-    # Reports.
-    "report_unknown_installedpackages",
 
 ]

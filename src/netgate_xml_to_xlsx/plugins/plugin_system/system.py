@@ -154,9 +154,11 @@ class Plugin(BasePlugin):
             row = [key, self.adjust_nodes(xml_findall(system_node, key))]
             rows.append(self.sanity_check_node_row(system_node, row))
 
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row="name,data".split(","),
-            data_rows=rows,
-            column_widths=self.column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

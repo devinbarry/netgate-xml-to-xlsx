@@ -52,16 +52,12 @@ class Plugin(BasePlugin):
             row.append(self.adjust_node(xml_findone(node, node_name)))
 
         rows.append(self.sanity_check_node_row(node, row))
-        vertical_rows = self.rotate_rows(rows)
 
-        col_widths = [60]
-        col_widths.extend([40 for x in range(len(vertical_rows[0]) - 1)])
-        header_row = ["name"]
-        header_row.extend(["data" for x in range(len(vertical_rows[0]) - 1)])
-
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row=header_row,
-            data_rows=vertical_rows,
-            column_widths=col_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

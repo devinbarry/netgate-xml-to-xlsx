@@ -375,10 +375,22 @@ class BasePlugin(ABC):
         self.logger.warning(f"WIP: {self.display_name}/{node.tag}.")
         return "WIP"
 
-    def rotate_rows(self, rows: list[list[str]]) -> list[list[str]]:
-        """Rotate horizontal headers and rows into vertical columns."""
-        vertical_rows = list(zip(self.node_names, *rows))
-        return vertical_rows
+    def rotate_rows(self, data: SheetData) -> SheetData:
+        """
+        Rotate horizontal headers and rows into vertical columns.
+
+        Set header_row to "name,data,..."
+        Calculate proper number of column widths and header columns.
+
+        """
+        data.data_rows = list(zip(data.header_row, *data.data_rows))
+
+        data.header_row = ["name"]
+        data.header_row.extend(["data" for x in range(len(data.data_rows[0]) - 1)])
+        data.column_widths = [60]
+        data.column_widths.extend([80 for x in range(len(data.data_rows[0]) - 1)])
+
+        return data
 
     @abstractmethod
     def run(

@@ -8,11 +8,6 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-# No named top-level nodes.
-# Using top-level tags.
-NODE_NAMES = "name,data"
-WIDTHS = "60,100"
-
 
 class Plugin(BasePlugin):
     """Gather information."""
@@ -20,8 +15,8 @@ class Plugin(BasePlugin):
     def __init__(
         self,
         display_name: str = "OpenVPN Server",
-        node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
+        node_names: str = "",
+        column_widths: str = "",
     ) -> None:
         """Initialize."""
         super().__init__(display_name, node_names, column_widths)
@@ -38,10 +33,12 @@ class Plugin(BasePlugin):
 
         match node.tag:
             case "step1":
+                self.node_names.append(node.tag)
                 node_names = "type".split(",")
                 return self.load_cell(node, node_names)
 
             case "step6":
+                self.node_names.append(node.tag)
                 node_names = (
                     "authcertca,certca,city,country,email,"
                     "keylength,lifetime,organization,state,uselist"
@@ -49,6 +46,7 @@ class Plugin(BasePlugin):
                 return self.load_cell(node, node_names)
 
             case "step9":
+                self.node_names.append(node.tag)
                 node_names = (
                     "authcertca,certca,authcertname,certname,city,country,email,"
                     "keylength,lifetime,organization,state,uselist"
@@ -56,6 +54,7 @@ class Plugin(BasePlugin):
                 return self.load_cell(node, node_names)
 
             case "step10":
+                self.node_names.append(node.tag)
                 node_names = (
                     "descr,crypto,concurrentcon,dhkey,digest,"
                     "dns1,dns2,dns3,dynip,engine,"
@@ -65,6 +64,7 @@ class Plugin(BasePlugin):
                 return self.load_cell(node, node_names)
 
             case "step11":
+                self.node_names.append(node.tag)
                 node_names = "ovpnrule,ovpnallow".split(",")
                 return self.load_cell(node, node_names)
 
@@ -78,16 +78,17 @@ class Plugin(BasePlugin):
         if node is None:
             return
 
+        row = []
         for child in node.getchildren():
-            row = []
-            row.append(child.tag)  # name
             row.append(self.adjust_node(child))
 
-            rows.append(self.sanity_check_node_row(node, row))
+        rows.append(self.sanity_check_node_row(node, row))
 
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row=self.node_names,
-            data_rows=rows,
-            column_widths=self.column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

@@ -61,9 +61,11 @@ class Plugin(BasePlugin):
             row.append(self.adjust_node(xml_findone(node, node_name)))
             rows.append(self.sanity_check_node_row(node, row))
 
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row="name,data".split(","),
-            data_rows=rows,
-            column_widths=self.column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

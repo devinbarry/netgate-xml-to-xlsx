@@ -22,7 +22,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "HAProxy",
+        display_name: str = "HAProxy-OFF",
         node_names: str = "",
         column_widths: str = "",
     ) -> None:
@@ -145,11 +145,13 @@ class Plugin(BasePlugin):
         self.sanity_check_node_row(node, row)
         rows = list(zip(node_names, row))
 
-        yield SheetData(
-            sheet_name="HAProxy",
-            header_row=header_row,
-            data_rows=rows,
-            column_widths=column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name="HAProxy",
+                header_row=node_names,
+                data_rows=rows,
+                column_widths=column_widths,
+            )
         )
 
     def _backends(self, nodes: list[Node]) -> Generator[SheetData, None, None]:
@@ -181,11 +183,13 @@ class Plugin(BasePlugin):
             self.sanity_check_node_row(node, row)
             rows.append(row)
 
-        yield SheetData(
-            sheet_name="HAProxy Backends",
-            header_row=node_names,
-            data_rows=rows,
-            column_widths=column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name="HAProxy Backends",
+                header_row=node_names,
+                data_rows=rows,
+                column_widths=column_widths,
+            )
         )
 
     def _pools(self, nodes: list[Node]) -> Generator[SheetData, None, None]:
@@ -232,9 +236,11 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
-        yield SheetData(
-            sheet_name="HAProxy Pools",
-            header_row=node_names,
-            data_rows=rows,
-            column_widths=column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name="HAProxy (pools)",
+                header_row=node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

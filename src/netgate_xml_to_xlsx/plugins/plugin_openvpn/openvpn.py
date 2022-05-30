@@ -39,7 +39,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "OpenVPN Servers",
+        display_name: str = "OpenVPN",
         node_names: str = NODE_NAMES,
         column_widths: str = WIDTHS,
     ) -> None:
@@ -76,9 +76,11 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row=self.node_names,
-            data_rows=rows,
-            column_widths=self.column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

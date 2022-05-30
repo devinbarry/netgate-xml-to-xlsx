@@ -41,7 +41,7 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=self.node_names,
+            header_row=["Program Name"],
             data_rows=rows,
             column_widths=self.column_widths,
         )

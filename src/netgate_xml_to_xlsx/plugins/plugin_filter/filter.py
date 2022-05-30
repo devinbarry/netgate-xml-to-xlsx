@@ -83,9 +83,11 @@ class Plugin(BasePlugin):
         # Sort by: interface(2), source(3), destination(4), descr(5)
         rows.sort(key=lambda x: (x[2] + x[3] + x[4] + x[5]).casefold())
 
-        yield SheetData(
-            sheet_name=self.display_name,
-            header_row=self.node_names,
-            data_rows=rows,
-            column_widths=self.column_widths,
+        yield self.rotate_rows(
+            SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
+                column_widths=self.column_widths,
+            )
         )

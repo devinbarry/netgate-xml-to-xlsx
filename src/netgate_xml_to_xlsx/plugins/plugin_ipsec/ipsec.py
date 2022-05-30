@@ -210,11 +210,14 @@ class Plugin(BasePlugin):
         rows = self.gather_top(node)
         if rows is not None and len(rows) > 0:
             keep_processing = True
-            yield SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-                column_widths=self.column_widths,
+
+            yield self.rotate_rows(
+                SheetData(
+                    sheet_name=self.display_name,
+                    header_row=self.node_names,
+                    data_rows=rows,
+                    column_widths=self.column_widths,
+                )
             )
 
         if not keep_processing:
@@ -225,11 +228,13 @@ class Plugin(BasePlugin):
         self.column_widths = CLIENT_WIDTHS.split(",")
         rows = self.gather_client(node)
         if rows is not None and len(rows) > 0:
-            yield SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-                column_widths=self.column_widths,
+            yield self.rotate_rows(
+                SheetData(
+                    sheet_name=self.display_name,
+                    header_row=self.node_names,
+                    data_rows=rows,
+                    column_widths=self.column_widths,
+                )
             )
 
         self.display_name = "IPSEC Phase 1"
@@ -237,11 +242,13 @@ class Plugin(BasePlugin):
         self.column_widths = PHASE1_WIDTHS.split(",")
         rows = self.gather_phase1s(node)
         if rows is not None and len(rows) > 0:
-            yield SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-                column_widths=self.column_widths,
+            yield self.rotate_rows(
+                SheetData(
+                    sheet_name=self.display_name,
+                    header_row=self.node_names,
+                    data_rows=rows,
+                    column_widths=self.column_widths,
+                )
             )
 
         self.display_name = "IPSEC Phase 2"
@@ -249,9 +256,11 @@ class Plugin(BasePlugin):
         self.column_widths = PHASE2_WIDTHS.split(",")
         rows = self.gather_phase2s(node)
         if rows is not None and len(rows) > 0:
-            yield SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-                column_widths=self.column_widths,
+            yield self.rotate_rows(
+                SheetData(
+                    sheet_name=self.display_name,
+                    header_row=self.node_names,
+                    data_rows=rows,
+                    column_widths=self.column_widths,
+                )
             )
