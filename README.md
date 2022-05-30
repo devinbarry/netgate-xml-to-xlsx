@@ -1,4 +1,10 @@
-# Netgate Firewall Converter
+# Convert Netgate XML Firewall Exports
+
+## Note
+ This project has no relationship with Netgate, the company.
+It is an internal project developed by Appropriate Solutions, Inc.
+
+## Overview
 
 The `netgate-xml-to-xlsx` application converts a standard Netgate firewall .xml configuration file to an .xlsx spreadsheet with multiple tabs.
 
@@ -7,9 +13,21 @@ We've run the current implementation on a handful of our own XML firewall rules,
 If you have a piece of XML that doesn't parse please extract a minimal portion (starting at the pfsense root) and open a ticket (better yet, modify the plugin and provide a pull request).
 
 ## What is implemented?
-* First pass of XML elements in a base Netgate firewall installation.
+* First pass of XML elements in the base Netgate firewall installation.
 * Installed packages:
+  * FreeRADIUS components
   * haproxy
+  * lightsquid
+  * menu
+  * pf components
+  * service
+  * servicewatchdog
+  * Squid and SquidGuard components
+  * Suricata components
+  * vpn\_openvpn\_export
+  * zabbixagentlts
+
+Note there are a number of nodes not implemented as they do not appear in our internal XML samples.
 
 ## Requirements
 * Python 3.10+.
