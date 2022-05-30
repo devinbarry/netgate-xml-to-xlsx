@@ -39,6 +39,9 @@ class Plugin(BasePlugin):
 
         yield SheetData(
             sheet_name=self.display_name,
-            header_row=["Program Name"],
+            header_row=["Package"],
             data_rows=rows,
+            column_widths=[
+                60,
+            ],
         )

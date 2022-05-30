@@ -57,4 +57,7 @@ class Plugin(BasePlugin):
             sheet_name=self.display_name,
             header_row=self.node_names,
             data_rows=rows,
+            column_widths=[
+                60,
+            ],
         )
