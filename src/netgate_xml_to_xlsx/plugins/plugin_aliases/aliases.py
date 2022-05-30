@@ -48,9 +48,8 @@ class Plugin(BasePlugin):
             rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-                column_widths="40,40,80,80,80,40,80,80".split(",")
-            )
-
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
+            column_widths="40,40,80,80,80,40,80,80".split(","),
+        )
