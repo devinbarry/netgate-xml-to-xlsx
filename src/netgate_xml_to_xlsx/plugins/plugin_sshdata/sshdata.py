@@ -22,7 +22,12 @@ class Plugin(BasePlugin):
         column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(
+            display_name,
+            node_names,
+            column_widths,
+            el_paths_to_sanitize=["pfsense,sshdata,sshkeyfile,xmldata"],
+        )
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather ssh data information."""
