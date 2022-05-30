@@ -7,11 +7,12 @@ from importlib.metadata import version
 from pathlib import Path
 
 
-def filter_infiles(in_files: list[str], include: bool = True) -> list[str]:
-    """Return list of in_files that include or exclude 'sanitized'."""
+def filter_infiles(in_files: list[str], include: bool = True) -> list[Path]:
+    """Return list of Paths that are files and include or exclude 'sanitized'."""
+    files = [Path(x) for x in in_files]
     if include:
-        return [x for x in in_files if "sanitized" in x]
-    return [x for x in in_files if "sanitized" not in x]
+        return [x for x in files if "sanitized" in x.name and x.is_file()]
+    return [x for x in files if "sanitized" not in x.name and x.is_file()]
 
 
 def parse_args() -> argparse.Namespace:
@@ -77,11 +78,6 @@ def parse_args() -> argparse.Namespace:
     if not args.in_files:
         print(msg)
         sys.exit(-1)
-
-    # Convert list of in_files to list of Path objects.
-    # Ensure they are files, not directories.
-    args.in_files = [Path(x) for x in args.in_files]
-    args.in_files = [x for x in args.in_files if x.is_file()]
 
     # Convert output-dir to path and optionally create path.
     out_dir = Path(args.output_dir)
