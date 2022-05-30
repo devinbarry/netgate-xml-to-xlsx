@@ -9,7 +9,6 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
 NODE_NAMES = "tag"
-WIDTHS = "80"
 
 
 class Plugin(BasePlugin):
@@ -19,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Installed Packages List",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Document the installed packages by node tag."""
@@ -43,5 +41,4 @@ class Plugin(BasePlugin):
             sheet_name=self.display_name,
             header_row=["Program Name"],
             data_rows=rows,
-            column_widths=self.column_widths,
         )

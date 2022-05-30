@@ -14,7 +14,6 @@ NODE_NAMES = (
     "system_domain_local_zone_type,sslcertref,dnssec,tlsport,hideidentity,"
     "forwarding"
 )
-WIDTHS = "10,50,50,20,20,20,20,20,20,20,40,20,20,20,20,20"
 
 
 class Plugin(BasePlugin):
@@ -24,10 +23,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Unbound",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Custom node adjustments."""
@@ -80,6 +78,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

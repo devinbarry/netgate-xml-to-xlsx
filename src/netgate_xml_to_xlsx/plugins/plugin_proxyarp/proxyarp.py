@@ -13,7 +13,6 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
 NODE_NAMES = ""
-WIDTHS = ""
 
 
 class Plugin(BasePlugin):
@@ -23,10 +22,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "proxyarp",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""

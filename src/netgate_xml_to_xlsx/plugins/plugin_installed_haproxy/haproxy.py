@@ -24,14 +24,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "HAProxy-OFF",
         node_names: str = "",
-        column_widths: str = "",
     ) -> None:
-        """Ignore node_names and column_widths as we create them individually."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
-            ["pfsense,installedpackages,haproxy,advanced"],
+            el_paths_to_sanitize=["pfsense,installedpackages,haproxy,advanced"],
         )
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
@@ -129,8 +126,6 @@ class Plugin(BasePlugin):
             "email_mailers,email_level,email_myhostname,email_from,email_to,"
             "config,files,advanced"
         ).split(",")
-        header_row: list[str] = "name,value".split(",")
-        column_widths: list[int] = split_commas("50,80")
 
         all_node_names = node_names[:]
         all_node_names.extend("ha_backends,ha_pools".split(","))
@@ -150,7 +145,6 @@ class Plugin(BasePlugin):
                 sheet_name="HAProxy",
                 header_row=node_names,
                 data_rows=rows,
-                column_widths=column_widths,
             )
         )
 
@@ -161,12 +155,6 @@ class Plugin(BasePlugin):
             "dontlognull,log-detailed,socket-stats,a_extaddr,ha_certificates,"  # 10
             "clientcert_ca,clientcert_crl,a_actionitems,a_errorfiles,dcertadv,"  # 15
             "ssloffloadcert,forwardfor,advanced,ha_acls,httpclose"  # 19
-        )
-        column_widths: list[int] = split_commas(
-            "25,20,20,25,25,"  # 5
-            "20,20,20,30,20,"  # 10
-            "20,20,20,20,50,"  # 15
-            "20,40,20,20,20"  # 19
         )
 
         rows = []
@@ -188,7 +176,6 @@ class Plugin(BasePlugin):
                 sheet_name="HAProxy Backends",
                 header_row=node_names,
                 data_rows=rows,
-                column_widths=column_widths,
             )
         )
 
@@ -215,15 +202,6 @@ class Plugin(BasePlugin):
             "cookie_attribute_secure,email_level,email_to,agent_inter"
         )
 
-        column_widths: list[int] = split_commas(
-            "20,20,80,20,20,30,25,20,20,25,"
-            "25,20,20,20,20,25,25,30,20,25,"
-            "25,25,20,25,20,20,20,25,20,20,"
-            "25,30,25,30,25,40,25,25,30,25,"
-            "30,30,30,30,30,30,30,30,30,30,"
-            "30,30,30,30,30,30,30,20,20,30"
-        )
-
         rows = []
 
         for node in nodes:
@@ -241,6 +219,5 @@ class Plugin(BasePlugin):
                 sheet_name="HAProxy (pools)",
                 header_row=node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

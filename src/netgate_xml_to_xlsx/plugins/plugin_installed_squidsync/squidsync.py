@@ -18,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Squid (sync)",
         node_names: str = NODE_NAMES,
-        column_widths: str = "",
     ) -> None:
         """Gather information."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -60,6 +59,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

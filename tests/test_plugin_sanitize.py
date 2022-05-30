@@ -41,10 +41,11 @@ class LocalPlugin(BasePlugin):
         self,
         display_name: str,
         field_names: str,
-        column_widths: str,
         el_paths_to_sanitize: list[str] | None,
     ) -> None:
-        super().__init__(display_name, field_names, column_widths, el_paths_to_sanitize)
+        super().__init__(
+            display_name, field_names, el_paths_to_sanitize=el_paths_to_sanitize
+        )
 
     def run(self, pfsense):
         pass
@@ -61,7 +62,7 @@ class LocalPlugin(BasePlugin):
 def test_sanitize_paths(name, xml: str, el_paths: list[str] | None):
     parsed_xml = etree.XML(xml)
     expected_xml = xml.replace("TARGET", "SANITIZED")
-    plugin = LocalPlugin("name", "", "", el_paths)
+    plugin = LocalPlugin("name", "", el_paths)
     plugin.sanitize(parsed_xml)
     sanitized_xml = etree.tostring(parsed_xml, pretty_print=True).decode("utf8")
     assert sanitized_xml == expected_xml

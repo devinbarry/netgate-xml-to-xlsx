@@ -15,7 +15,6 @@ NODE_NAMES = (
     "media,track6-interface,track6-prefix-id,dhcp6-duid,dhcp6-ia-pd-len,"
     "dhcp6cvpt,mediaopt,adv_dhcp6_prefix_selected_interface"
 )
-WIDTHS = "20,40,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,20,60"
 
 
 class Plugin(BasePlugin):
@@ -25,10 +24,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Interfaces",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Custom node adjustment."""
@@ -73,6 +71,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

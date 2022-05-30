@@ -14,7 +14,6 @@ NODE_NAMES = (
     "timeout,tlsaccept,tlscafile,tlscaso,tlscertfile,"
     "tlsconnect,tlscrlfile,tlspskfile,tlspskidentity,userparams"
 )
-WIDTHS = "20,20,20,40,20,20,20,20,20,20,20,20,20,20,20,20,20,20,40,20"
 
 
 class Plugin(BasePlugin):
@@ -24,13 +23,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Zabbix Agent",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
             el_paths_to_sanitize=[
                 "installedpackages,zabbixagentlts,config,tlspskfile",
                 "installedpackages,zabbixagentlts,config,userparams",
@@ -61,6 +58,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

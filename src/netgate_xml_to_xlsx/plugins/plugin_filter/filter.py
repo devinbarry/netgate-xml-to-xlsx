@@ -19,14 +19,6 @@ NODE_NAMES = (
     "allowopts,associated-rule-id,log,nopfsync,tag,"
     "tagged,tracker,id,created,updated"
 )
-WIDTHS = (
-    "20,20,20,60,60,"
-    "80,20,20,20,20,"
-    "20,20,20,20,20,"
-    "20,20,20,20,20,"
-    "20,40,20,20,20,"
-    "20,20,20,30,30"
-)
 
 
 class Plugin(BasePlugin):
@@ -36,10 +28,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Filter Rules",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local adjustments."""
@@ -88,6 +79,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

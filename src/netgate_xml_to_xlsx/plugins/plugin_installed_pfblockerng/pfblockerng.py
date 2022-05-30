@@ -16,7 +16,6 @@ NODE_NAMES = (
     "pfb_hour,pfb_interval,pfb_keep,pfb_min,skipfeed,"
     "suppression"
 )
-WIDTHS = "40,40"
 
 
 class Plugin(BasePlugin):
@@ -26,13 +25,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "PF Block RNG",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
             el_paths_to_sanitize=[
                 "pfsense,installedpackages,pfblockerng,config,maxmind_key"
             ],
@@ -66,6 +63,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

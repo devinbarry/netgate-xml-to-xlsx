@@ -15,10 +15,6 @@ NODE_NAMES = (
 )
 
 
-# Vertical list.
-WIDTHS = ""
-
-
 class Plugin(BasePlugin):
     """Gather information."""
 
@@ -26,13 +22,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "SquidGuard (gen)",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
         )
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
@@ -58,6 +52,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

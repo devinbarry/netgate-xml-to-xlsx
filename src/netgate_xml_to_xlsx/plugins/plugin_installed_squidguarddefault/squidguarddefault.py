@@ -13,8 +13,6 @@ NODE_NAMES = (
     "redirect_mode,rewrite,safesearch"
 )
 
-WIDTHS = "40,40,30,30,30,30,30,30"
-
 
 class Plugin(BasePlugin):
     """Gather information."""
@@ -23,13 +21,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "SquidGuard (default)",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
         )
 
     def adjust_node(self, node: Node) -> str:
@@ -67,6 +63,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

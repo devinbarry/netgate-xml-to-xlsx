@@ -13,7 +13,6 @@ NODE_NAMES = (
     "descr,ipsecpk,uid,cert,bcrypt-hash,"
     "authorizedkeys,ipsecpsk,priv,dashboardcolumns,webguicss"
 )
-WIDTHS = "12,40,40,20,20,60,20,10,20,20,20,20,40,40,60"
 
 
 class Plugin(BasePlugin):
@@ -23,10 +22,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "System Users",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """
@@ -59,6 +57,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

@@ -23,15 +23,6 @@ NODE_NAMES = (
     "ocspurl,ecdh_curve,dns_server1,cert_depth,strictusercn,allow_compression,"
     "dns_server2,dns_server3,dns_server4"
 )
-WIDTHS = (
-    "20,20,20,20,20,30,20,20,30,20,"  # 10
-    "40,20,20,30,30,30,30,20,20,30,"  # 20
-    "20,20,20,30,20,20,20,20,40,40,"  # 30
-    "40,40,40,50,20,20,20,20,20,20,"  # 40
-    "20,20,20,30,30,20,20,20,30,30,"  # 50
-    "20,20,20,20,20,40,40,40,20,20,"  # 60
-    "20,20,20,20,20,20,40,20,20,20"
-)
 
 
 class Plugin(BasePlugin):
@@ -41,10 +32,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "OpenVPN",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -81,6 +71,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

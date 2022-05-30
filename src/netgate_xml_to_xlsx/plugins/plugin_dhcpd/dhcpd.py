@@ -18,16 +18,6 @@ NODE_NAMES = (
     "ntpserver,numberoptions,rootpath,staticmap,tftp"
 )
 
-WIDTHS = (
-    "20,20,40,40,20,"
-    "40,40,40,40,40,"
-    "40,40,40,40,40,"
-    "40,40,40,40,20,"
-    "20,20,20,20,20,"
-    "20,20,20,20,20,"
-    "40,20,40,60,40"
-)
-
 
 class Plugin(BasePlugin):
     """Gather dhcpd information."""
@@ -36,10 +26,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "DHCPD",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -113,6 +102,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

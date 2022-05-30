@@ -21,7 +21,6 @@ NODE_NAMES = (
     "timeservers,timezone,use_mfs_tmp_size,use_mfs_var_size,version,"
     "webgui"
 )
-WIDTHS = "80,100"
 
 
 class Plugin(BasePlugin):
@@ -31,10 +30,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "System",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_nodes(self, nodes: list[Node]) -> str:
         """Custom node adjustments."""
@@ -159,6 +157,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

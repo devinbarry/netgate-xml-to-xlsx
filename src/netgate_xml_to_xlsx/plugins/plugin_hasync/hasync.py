@@ -12,7 +12,6 @@ NODE_NAMES = (
     "pfsyncenabled,pfsyncenabled,pfsyncinterface,pfsyncpeerip,synchronizetoip,"
     "username,password"
 )
-WIDTHS = "20,20,40,40,40,40,40,40"
 
 
 class Plugin(BasePlugin):
@@ -22,10 +21,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "HA Sync",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather hasync information."""
@@ -52,6 +50,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

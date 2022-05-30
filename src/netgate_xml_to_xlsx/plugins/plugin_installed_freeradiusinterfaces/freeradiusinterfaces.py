@@ -13,9 +13,6 @@ NODE_NAMES = (
 )
 
 
-WIDTHS = "60,30,30,30,30"
-
-
 class Plugin(BasePlugin):
     """Gather information."""
 
@@ -23,10 +20,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "FreeRADIUS Interfaces",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -65,6 +61,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

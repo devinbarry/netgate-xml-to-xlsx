@@ -15,7 +15,6 @@ NODE_NAMES = (
     # package-specific information
     "ha_backends,ha_pools,config"
 )
-WIDTHS = "40,40,20,80,40,20,80,80,80,80,80,80,80,60,60,60,60"
 
 
 def name_sort(node: Node) -> str:
@@ -33,10 +32,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Installed Packages",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node customizations."""
@@ -111,6 +109,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

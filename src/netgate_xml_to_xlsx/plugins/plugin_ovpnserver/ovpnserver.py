@@ -16,10 +16,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "OpenVPN Server",
         node_names: str = "",
-        column_widths: str = "",
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """
@@ -89,6 +88,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

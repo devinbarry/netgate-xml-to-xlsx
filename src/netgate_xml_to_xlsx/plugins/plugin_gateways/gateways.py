@@ -12,7 +12,6 @@ NODE_NAMES = (
     "name,interface,gateway,defaultgw4,defaultgw6,weight,ipprotocol,monitor_disable,"
     "action_disable,descr"
 )
-WIDTHS = "40,20,20,20,30," "10,20,20,20,80"
 
 
 class Plugin(BasePlugin):
@@ -22,10 +21,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Gateways",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
         self.default_gateways = {"defaultgw4": None, "defaultgw6": None}
         self.gateway_name = None
 
@@ -98,6 +96,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

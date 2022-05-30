@@ -13,7 +13,6 @@ NODE_NAMES = (
     "lightsquid_skipurl,lightsquid_template,lighttpd_ls_password,lighttpd_ls_port,"
     "lighttpd_ls_ssl,lighttpd_ls_user"
 )
-WIDTHS = "40,60,20,60,60,60,60,20,20,20"
 
 
 class Plugin(BasePlugin):
@@ -23,10 +22,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "LightSquid",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""
@@ -51,6 +49,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

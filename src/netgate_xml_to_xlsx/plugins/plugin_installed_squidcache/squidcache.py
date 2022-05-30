@@ -15,8 +15,6 @@ NODE_NAMES = (
     "memory_replacement_policy,minimum_object_size"
 )
 
-WIDTHS = "30,40,30,30,30,30,30,30,60,30,30,30,30,40,30,40,30"
-
 
 class Plugin(BasePlugin):
     """Gather information."""
@@ -25,13 +23,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Squid (cache)",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
         )
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
@@ -58,6 +54,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

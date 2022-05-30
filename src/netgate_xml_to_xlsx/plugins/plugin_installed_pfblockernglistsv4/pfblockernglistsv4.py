@@ -17,15 +17,6 @@ NODE_NAMES = (
     "header,row,state,stateremoval,url,"
     "whois_convert"
 )
-WIDTHS = (
-    "40,60,20,20,20,"
-    "20,20,20,20,20,"
-    "20,20,20,20,20,"
-    "20,20,20,20,20,"
-    "20,20,20,20,20,"
-    "30,60,30,30,60,"
-    "40"
-)
 
 
 class Plugin(BasePlugin):
@@ -35,13 +26,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "PF Block Lists v4",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
         )
 
     def adjust_node(self, node: Node) -> str:
@@ -85,6 +74,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

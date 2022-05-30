@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-NODE_NAMES = "vardownloadrules,varsynconchanges,varsynctimeout,rule"
+NODE_NAMES = "vardownloadrules,varsynconchanges,varsynctimeout,row"
 
 
 class Plugin(BasePlugin):
@@ -18,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Suricata (sync)",
         node_names: str = NODE_NAMES,
-        column_widths: str = "",
     ) -> None:
         """Gather information."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -64,6 +63,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

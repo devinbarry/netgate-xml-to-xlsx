@@ -9,7 +9,6 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = "name,description,rcfile,executable,starts_on_sync"
-WIDTHS = "40,80,60,60"
 
 
 class Plugin(BasePlugin):
@@ -19,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Service",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def adjust_node(self, node: Node) -> str:
         if node is None:
@@ -57,6 +55,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

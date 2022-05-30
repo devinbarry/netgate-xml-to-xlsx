@@ -14,7 +14,6 @@ NODE_NAMES = (
     "autoaddrnot_in,autoaddrnot_out,autonot_in,autonot_out,autoports_in,"
     "autoports_out,autoproto_in,autoproto_out,countries4,countries6"
 )
-WIDTHS = "40,20,20,20,20," "20,20,20,20,20," "20,20,20,20,20," "20,20,20,20,20"
 
 
 class Plugin(BasePlugin):
@@ -24,13 +23,11 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "PF Block Top Spammers",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
         super().__init__(
             display_name,
             node_names,
-            column_widths,
         )
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
@@ -57,6 +54,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

@@ -9,7 +9,6 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = "ssl_ca_cert,ssl_server_cert"
-WIDTHS = "40,40"
 
 
 class Plugin(BasePlugin):
@@ -19,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "FreeRADIUS AP",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Gather information."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Gather information."""
@@ -49,6 +47,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

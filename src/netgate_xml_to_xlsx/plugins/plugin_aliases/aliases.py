@@ -9,7 +9,6 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall
 
 NODE_NAMES = "name,type,address,url,aliasurl,updatefreq,descr,detail"
-WIDTHS = "40,40,40,80,80,20,80,80"
 
 
 class Plugin(BasePlugin):
@@ -19,10 +18,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "Aliases",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
         """Aliases sheet."""
@@ -50,6 +48,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )

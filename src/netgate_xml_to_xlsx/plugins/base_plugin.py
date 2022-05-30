@@ -53,13 +53,13 @@ class SheetData:
         sheet_name: str,
         header_row: list[str],
         data_rows: list[list],
-        column_widths: list[int],
+        column_widths: list[int] | None = None,
     ) -> None:
         """Gather all necessary information."""
         self.sheet_name = sheet_name
         self.header_row = header_row
         self.data_rows = data_rows
-        self.column_widths = column_widths
+        self.column_widths = [] if column_widths is None else column_widths
 
 
 class BasePlugin(ABC):
@@ -69,19 +69,18 @@ class BasePlugin(ABC):
         self,
         display_name: str,
         node_names: str,
-        column_widths: str | list[int],
         el_paths_to_sanitize: list[str] | None = None,
     ) -> None:
         """
         Initialize base plugin.
 
         Args:
+            display_name:
+                Show on the output (spreadsheet, etc.)
+
             node_names:
                 Comma-delimited list of nodes to obtain.
                 Also used for the sheet's header row.
-
-            column_widths:
-                Comma-delimited list of sheet column widths.
 
             el_paths_to_sanitize:
                 List of comma-delimited elements to santitize
@@ -89,9 +88,6 @@ class BasePlugin(ABC):
         """
         self.display_name: str = display_name
         self.node_names: list[str] = cast(list[str], split_commas(node_names))
-        self.column_widths: list[int] = cast(
-            list[int], split_commas(column_widths, make_int=True)
-        )
         self.el_paths_to_sanitize = el_paths_to_sanitize
         self.logger = logging.getLogger()
 

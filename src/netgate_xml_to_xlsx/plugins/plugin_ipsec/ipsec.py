@@ -9,10 +9,8 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import unescape, xml_findall, xml_findone
 
 TOP_NODE_NAMES = "async_crypto,logging,uniqueids,vtimaps"
-TOP_WIDTHS = "30,30,30,30"
 
 CLIENT_NODENAMES = ""
-CLIENT_WIDTHS = ""
 
 PHASE1_NODENAMES = (
     "descr,authentication_method,caref,certref,closeaction,"
@@ -22,22 +20,12 @@ PHASE1_NODENAMES = (
     "protocol,remote-gateway,mode,rekey_time,reauth_time,"
     "rand_time,pkcs11certref,pkcs11pin"
 )
-PHASE1_WIDTHS = (
-    "40,30,10,10,20,"  # 5
-    "20,20,60,10,10,"  # 10
-    "30,10,10,20,20,"  # 15
-    "20,20,20,20,20,"  # 20
-    "20,40,10,20,20,"  # 25
-    "20,40,40"
-)
 
 PHASE2_NODENAMES = (
     "descr,encryption-algorithm-option,hash-algorithm-option,ikeid,lifetime,"
     "localid,mode,pfsgroup,pinghost,protocol,"
     "rekey_time,rand_time,remoteid,reqid,uniqid"
 )
-
-PHASE2_WIDTHS = "40,40,30,20,20,20,20,20,20,20,20,40,40,20,30"
 
 
 class Plugin(BasePlugin):
@@ -47,10 +35,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "IPSEC",
         node_names: str = TOP_NODE_NAMES,
-        column_widths: str = TOP_WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
 
     def should_process(self, node: Node) -> bool:
         """
@@ -216,7 +203,6 @@ class Plugin(BasePlugin):
                     sheet_name=self.display_name,
                     header_row=self.node_names,
                     data_rows=rows,
-                    column_widths=self.column_widths,
                 )
             )
 
@@ -225,7 +211,6 @@ class Plugin(BasePlugin):
 
         self.display_name = "IPSEC Client"
         self.node_names = CLIENT_NODENAMES.split(",")
-        self.column_widths = CLIENT_WIDTHS.split(",")
         rows = self.gather_client(node)
         if rows is not None and len(rows) > 0:
             yield self.rotate_rows(
@@ -233,13 +218,11 @@ class Plugin(BasePlugin):
                     sheet_name=self.display_name,
                     header_row=self.node_names,
                     data_rows=rows,
-                    column_widths=self.column_widths,
                 )
             )
 
         self.display_name = "IPSEC Phase 1"
         self.node_names = PHASE1_NODENAMES.split(",")
-        self.column_widths = PHASE1_WIDTHS.split(",")
         rows = self.gather_phase1s(node)
         if rows is not None and len(rows) > 0:
             yield self.rotate_rows(
@@ -247,13 +230,11 @@ class Plugin(BasePlugin):
                     sheet_name=self.display_name,
                     header_row=self.node_names,
                     data_rows=rows,
-                    column_widths=self.column_widths,
                 )
             )
 
         self.display_name = "IPSEC Phase 2"
         self.node_names = PHASE2_NODENAMES.split(",")
-        self.column_widths = PHASE2_WIDTHS.split(",")
         rows = self.gather_phase2s(node)
         if rows is not None and len(rows) > 0:
             yield self.rotate_rows(
@@ -261,6 +242,5 @@ class Plugin(BasePlugin):
                     sheet_name=self.display_name,
                     header_row=self.node_names,
                     data_rows=rows,
-                    column_widths=self.column_widths,
                 )
             )

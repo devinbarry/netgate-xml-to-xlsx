@@ -16,7 +16,6 @@ RULE_NAMES = (
 )
 
 NODE_NAMES = "direction,mode," + RULE_NAMES
-WIDTHS = "20,20,20,60,20,20,40,20,30,30,20,40,20,20,20,60,30,60,60"
 
 
 class Plugin(BasePlugin):
@@ -26,10 +25,9 @@ class Plugin(BasePlugin):
         self,
         display_name: str = "NAT",
         node_names: str = NODE_NAMES,
-        column_widths: str = WIDTHS,
     ) -> None:
         """Initialize."""
-        super().__init__(display_name, node_names, column_widths)
+        super().__init__(display_name, node_names)
         self.local_data = {}
 
     def adjust_node(self, node: Node) -> str:
@@ -101,6 +99,5 @@ class Plugin(BasePlugin):
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
-                column_widths=self.column_widths,
             )
         )
