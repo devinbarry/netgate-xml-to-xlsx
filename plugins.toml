@@ -1,6 +1,7 @@
 plugins = [
-    # Reports. Run first to display what's not processed.
+    # Show what isn't and is processed.
     "report_unknown_installedpackages",
+    "installedpackages_list",
 
     # Standard, in alphabetical order.
     "aliases",
@@ -15,7 +16,6 @@ plugins = [
     "gateways",
     "hasync",
     "ifgroups",
-    "installedpackages_list",
     "installedpackages",
     "interfaces",
     "ipsec",
