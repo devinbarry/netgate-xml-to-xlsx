@@ -12,16 +12,16 @@ from ..support.elements import xml_findall, xml_findone
 # Looks like a difference between versions 21 and 22?
 # TODO: Determine if they can be combined based on the version number.
 NODE_NAMES = (
-    "disabled,enabled,descr,source,destination,"
-    "interface,direction,type,protocol,ipprotocol,"
+    "disabled,enabled,interface,source,destination,"
+    "descr,direction,type,protocol,ipprotocol,"
     "quick,icmptype,statetype,statetimeout,floating,"
     "max,max-src-conn,max-src-nodes,max-src-states,os,"
     "allowopts,associated-rule-id,log,nopfsync,tag,"
     "tagged,tracker,id,created,updated"
 )
 WIDTHS = (
-    "20,20,80,60,60,"
-    "20,20,20,20,20,"
+    "20,20,20,60,60,"
+    "80,20,20,20,20,"
     "20,20,20,20,20,"
     "20,20,20,20,20,"
     "20,40,20,20,20,"
@@ -79,6 +79,9 @@ class Plugin(BasePlugin):
                 row.append(value)
 
             rows.append(self.sanity_check_node_row(node, row))
+
+        # Sort by: interface(2), source(3), destination(4), descr(5)
+        rows.sort(key=lambda x: (x[2] + x[3] + x[4] + x[5]).casefold())
 
         yield SheetData(
             sheet_name=self.display_name,
