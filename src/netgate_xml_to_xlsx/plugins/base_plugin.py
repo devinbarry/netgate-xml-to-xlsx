@@ -295,7 +295,7 @@ class BasePlugin(ABC):
         path.reverse()
         return "/".join(path)
 
-    def load_cell(self, node, node_names) -> str:
+    def load_cell(self, node: Node, node_names: list[str]) -> str:
         """Load node elements into a single cell."""
         if node is None:
             return ""

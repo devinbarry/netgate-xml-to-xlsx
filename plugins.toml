@@ -73,6 +73,7 @@ plugins = [
     "installed_squidreversegeneral",
     "installed_squidreversepeer",
     "installed_squidreverseuri",
+    "installed_squidsync",
     "installed_squidtraffic",
     "installed_squidusers",
     "installed_suricata",
