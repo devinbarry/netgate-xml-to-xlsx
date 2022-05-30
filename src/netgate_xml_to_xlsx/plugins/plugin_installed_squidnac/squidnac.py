@@ -7,7 +7,7 @@ from typing import Generator
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import nice_address_sort, xml_findall, xml_findone
+from ..support.elements import nice_address_sort, xml_findone
 
 NODE_NAMES = (
     "allowed_subnets,unrestricted_hosts,banned_hosts,blacklist,whitelist,"

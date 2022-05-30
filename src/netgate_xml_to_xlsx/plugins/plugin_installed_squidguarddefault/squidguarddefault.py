@@ -1,13 +1,12 @@
 """SquidGuard Default plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from base64 import b64decode
 from typing import Generator
 
 from netgate_xml_to_xlsx.mytypes import Node
 
 from ..base_plugin import BasePlugin, SheetData
-from ..support.elements import xml_findall, xml_findone
+from ..support.elements import xml_findone
 
 NODE_NAMES = (
     "dest,deniedmessage,enablelog,notallowingip,redirect,"

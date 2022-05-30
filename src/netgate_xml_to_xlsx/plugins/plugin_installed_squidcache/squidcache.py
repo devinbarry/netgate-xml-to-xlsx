@@ -1,7 +1,6 @@
 """Squid Cache plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-from base64 import b64decode
 from typing import Generator
 
 from netgate_xml_to_xlsx.mytypes import Node
