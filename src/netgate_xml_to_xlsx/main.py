@@ -29,17 +29,19 @@ def _main() -> None:
     LOGGER = logger = create_logger(args)
     in_files = args.in_files
     config = toml.load("./plugins.toml")
+    config["args"] = args
 
     if args.sanitize:
         logger.info("Sanitizing files.")
 
     for in_filename in in_files:
-        pfsense = PfSense(args, in_filename)
+        pfsense = PfSense(config, in_filename)
 
         if args.sanitize:
             pfsense.sanitize(config["plugins"])
 
         LOGGER.info(f"Output path: {pfsense.ss_output_path}.")
+        LOGGER.info(f"Output format: {args.output_format}.")
 
         # Run plugins in order.
         for plugin_to_run in config["plugins"]:

@@ -9,6 +9,7 @@ from typing import Generator, cast
 import lxml  # nosec
 
 from netgate_xml_to_xlsx.mytypes import Node
+from netgate_xml_to_xlsx.sheetdata import SheetData
 
 from .support.elements import nice_address_sort, unescape, xml_findall, xml_findone
 
@@ -42,24 +43,6 @@ def split_commas(data: str | list, make_int: bool = False) -> list[int | str]:
     # Yes, we know it is a list[str]...
     # Without cast mypy thinks we're returning list[Any].
     return cast(list[int | str], data)
-
-
-class SheetData:
-    """All information required to display a worksheet."""
-
-    def __init__(
-        self,
-        *,
-        sheet_name: str,
-        header_row: list[str],
-        data_rows: list[list],
-        column_widths: list[int] | None = None,
-    ) -> None:
-        """Gather all necessary information."""
-        self.sheet_name = sheet_name
-        self.header_row = header_row
-        self.data_rows = data_rows
-        self.column_widths = [] if column_widths is None else column_widths
 
 
 class BasePlugin(ABC):

@@ -2,8 +2,10 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import argparse
+import datetime
 import logging
 import os
+from html import escape
 from pathlib import Path
 from typing import cast
 
@@ -16,37 +18,47 @@ from netgate_xml_to_xlsx.mytypes import Node
 
 from .plugin_tools import discover_plugins
 from .plugins.support.elements import sanitize_xml
+from .sheetdata import SheetData
 from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 
 
 class PfSense:
     """Handle all pfSense parsing and conversion."""
 
-    def __init__(self, args: argparse.Namespace, in_filename: str) -> None:
+    def __init__(self, config: dict, in_filename: str) -> None:
         """
         Initialize and load XML.
 
         Technically a bit too much work to do in an init (since it can fail).
         """
-        self.args = args
+        self.config = config
+        self.args = config["args"]
         self.in_file = (in_path := Path(in_filename))
         self.raw_xml: str = ""
         self.parsed_xml: Node = None
         self.workbook: Workbook = Workbook()
 
-        # ss_filename is expected to be overwritten by
         self.ss_output_path = self._get_output_path(in_path)
         self._init_styles()
         self.default_alignment = Alignment(wrap_text=True, vertical="top")
 
         self.plugins = discover_plugins()
         self.logger = logging.getLogger()
+        # Only used for non-xlsx at the moment.
+        self.output_fh = None
+
+        if self.args.output_format != "xlsx":
+            self.output_fh = open(self.output_path, "w", encoding="utf-8")
+
         self._load()
 
     def _get_output_path(self, in_path: Path) -> Path:
         """Generate output path based on args and in_filename."""
-        out_path = cast(Path, self.args.output_dir) / Path(f"{in_path.name}.xlsx")
-        return out_path
+        self.output_path = cast(Path, self.args.output_dir) / Path(
+            f"{in_path.name}.{self.args.output_format}"
+        )
+
+        return self.output_path
 
     def _init_styles(self) -> None:
         """Iniitalized worksheet styles."""
@@ -179,6 +191,32 @@ class PfSense:
         self.in_file.unlink()
         self.logger.info(f"Deleted original file: {self.in_file}.")
 
+    def _write_html_chapter(self, sheet_data: SheetData) -> None:
+        self.output_fh.write(f"<h2>{sheet_data.sheet_name}</h2>\n\n")
+        self.output_fh.flush()
+
+    def _write_html_table(self, sheet_data: SheetData) -> None:
+        self.output_fh.write("<table>\n")
+        self.output_fh.write("  <thead>\n")
+        for header in sheet_data.header_row:
+            self.output_fh.write(f"    <th>{escape(header)}</th>\n")
+
+        for row in sheet_data.data_rows:
+            self.output_fh.write("  <tr>\n")
+            for col in row:
+                self.output_fh.write("    <td>\n")
+                sub_rows = "<br />".join([escape(x) for x in col.splitlines()])
+                self.output_fh.write(f"      {sub_rows}")
+                self.output_fh.write("\n    </td>\n\n")
+            self.output_fh.write("  </tr>\n\n")
+
+        self.output_fh.write("  </thead>\n")
+        self.output_fh.write("</table>\n\n")
+
+    def _write_html(self, sheet_data: SheetData) -> None:
+        self._write_html_chapter(sheet_data)
+        self._write_html_table(sheet_data)
+
     def run(self, plugin_name: str) -> None:
         """
         Run specific plugin and write sheet(s).
@@ -192,27 +230,38 @@ class PfSense:
                 if sheet_data is None or not sheet_data.data_rows:
                     continue
 
-                self._write_sheet(
-                    sheet_name=sheet_data.sheet_name,
-                    header_row=sheet_data.header_row,
-                    column_widths=sheet_data.column_widths,
-                    rows=sheet_data.data_rows,
-                )
+                if self.args.output_format == "xlsx":
+                    self._write_sheet(
+                        sheet_name=sheet_data.sheet_name,
+                        header_row=sheet_data.header_row,
+                        column_widths=sheet_data.column_widths,
+                        rows=sheet_data.data_rows,
+                    )
+                else:
+                    self._write_html(sheet_data)
         else:
             for sheet_data in plugin.run(self.parsed_xml):
                 if sheet_data is None or not sheet_data.data_rows:
                     continue
 
-                self._write_sheet(
-                    sheet_name=sheet_data.sheet_name,
-                    header_row=sheet_data.header_row,
-                    column_widths=sheet_data.column_widths,
-                    rows=sheet_data.data_rows,
-                )
+                if self.args.output_format == "xlsx":
+                    self._write_sheet(
+                        sheet_name=sheet_data.sheet_name,
+                        header_row=sheet_data.header_row,
+                        column_widths=sheet_data.column_widths,
+                        rows=sheet_data.data_rows,
+                    )
+                else:
+                    self._write_html(sheet_data)
 
     def save(self) -> None:
         """Delete empty first sheet and then save Workbook."""
-        sheets = self.workbook.sheetnames
-        del self.workbook[sheets[0]]
-        out_path = self.ss_output_path
-        self.workbook.save(out_path)
+        if self.args.output_format == "xlsx":
+            sheets = self.workbook.sheetnames
+            del self.workbook[sheets[0]]
+            out_path = self.ss_output_path
+            self.workbook.save(out_path)
+            return
+
+        if self.output_fh is not None:
+            self.output_fh.close()

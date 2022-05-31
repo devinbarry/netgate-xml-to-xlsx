@@ -34,6 +34,16 @@ def parse_args() -> argparse.Namespace:
         "in_files", nargs="+", help="One or more Netgate .xml files to process."
     )
 
+    choices = ["xlsx", "html"]
+    default = "xlsx"
+    parser.add_argument(
+        "--output-format",
+        "-F",
+        default=default,
+        choices=choices,
+        help=f"""Output format: {", ".join(choices)}. Default: {default}.""",
+    )
+
     parser.add_argument(
         "--sanitize",
         action="store_true",
