@@ -110,6 +110,7 @@ class PfSense:
             (
                 "version,lastchange,revision,aliases,ca,"
                 "cert,cron,dhcpd,dhcpdv6,diag,"
+                "dhcrelay,dhcrelay6,"
                 "dnshaper,filter,gateways,hasync,ifgroups,"
                 "installedpackages,interfaces,ipsec,nat,notifications,"
                 "ntpd,openvpn,ovpnserver,ppps,proxyarp,"

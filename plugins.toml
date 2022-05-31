@@ -10,6 +10,8 @@ plugins = [
     "cron",
     "dhcpd",
     "dhcpdv6",
+    "dhcrelay",
+    "dhcrelay6",
     "diag",
     "dnshaper",
     "filter",
