@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-NODE_NAMES = "name,description,rcfile,executable"
+NODE_NAMES = "name,description,id,mode,rcfile,vpnid,executable"
 
 
 class Plugin(BasePlugin):

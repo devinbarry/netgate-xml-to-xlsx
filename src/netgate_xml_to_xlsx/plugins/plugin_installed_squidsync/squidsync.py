@@ -31,7 +31,10 @@ class Plugin(BasePlugin):
             case "row":
                 # I expect this is going to have multiple rows in some installations.
                 return self.load_cell(
-                    node, "syncprotocol,ipaddress,syncport,username,password".split(",")
+                    node,
+                    "syncprotocol,ipaddress,syncport,syncdestinenable,username,password".split(
+                        ","
+                    ),
                 )
 
         return super().adjust_node(node)

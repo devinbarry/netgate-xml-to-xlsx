@@ -11,7 +11,8 @@ from ..support.elements import nice_address_sort, xml_findone
 
 NODE_NAMES = (
     "allowed_subnets,unrestricted_hosts,banned_hosts,blacklist,whitelist,"
-    "addtl_ports,addtl_sslports,block_reply_mime_type,block_user_agent"
+    "addtl_ports,addtl_sslports,block_reply_mime_type,block_user_agent,"
+    "google_accounts,youtube_restrict"
 )
 
 

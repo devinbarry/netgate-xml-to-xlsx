@@ -9,12 +9,13 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
 NODE_NAMES = (
-    "alert_log_limit_size,active_interface,admin_email,allow_interface,custom_options,custom_options_squid3,"  # NOQA
+    "alert_log_limit_size,active_interface,admin_email,allow_interface,carpstatusvid,"
+    "custom_options,custom_options_squid3,"
     "custom_options2_squid3,custom_options3_squid3,dca,defined_ip_proxy_off,defined_ip_proxy_off_dest,"  # NOQA
     "dhparams_size,disable_pinger,disable_squidversion,disable_via,dns_nameservers,"
-    "dns_v4_first,enable_squid,error_language,icp_port,interception_adapt,"
-    "interception_checks,keep_squid_data,log_dir,log_enabled,log_rotate,"
-    "log_sqd,private_subnet_proxy_off,proxy_port,ssl_active_interface,ssl_proxy,"
+    "dns_v4_first,enable_squid,error_language,extraca,icp_port,interception_adapt,"
+    "interception_checks,keep_squid_data,listenproto,log_dir,log_enabled,log_rotate,"
+    "log_sqd,outgoing_interface,private_subnet_proxy_off,proxy_port,ssl_active_interface,ssl_proxy,"
     "ssl_proxy_port,sslcrtd_children,sslproxy_compatibility_mode,sslproxy_mitm_mode,transparent_active_interface,"  # NOQA
     "transparent_proxy,uri_whitespace,visible_hostname,xforward_mode,update_notify"
 )

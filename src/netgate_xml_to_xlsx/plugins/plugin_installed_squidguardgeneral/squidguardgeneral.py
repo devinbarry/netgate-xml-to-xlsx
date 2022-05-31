@@ -10,8 +10,9 @@ from ..support.elements import xml_findone
 
 NODE_NAMES = (
     "adv_blankimg,blacklist,blacklist_proxy,blacklist_url,enable_guilog,"
-    "enable_log,ldap_enable,ldapbinddn,ldapbindpass,ldapversion,"
-    "log_rotation,squidguard_enable,stripntdomain,striprealm"
+    "enable_log,ldapcachetime,ldap_enable,ldapbinddn,ldapbindpass,ldapversion,"
+    "log_rotation,rewrite_children,rewrite_children_idle,rewrite_children_startup,"
+    "squidguard_enable,stripntdomain,striprealm"
 )
 
 
