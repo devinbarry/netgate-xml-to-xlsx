@@ -84,5 +84,6 @@ plugins = [
     "installed_suricata_sid_mgmt_lists",
     "installed_suricatasync",
     "installed_zabbixagentlts",
+    "installed_zabbixproxylts",
 
 ]
