@@ -9,8 +9,11 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = (
-    "pfsyncenabled,pfsyncenabled,pfsyncinterface,pfsyncpeerip,synchronizetoip,"
-    "username,password"
+    "pfsyncenabled,pfsyncenabled,pfsyncinterface,pfsyncpeerip,synchronizealiases,"
+    "synchronizeauthservers,synchronizecaptiveportal,synchronizecerts,synchronizedhcpd,synchronizednsforwarder,"  # NOQA
+    "synchronizeipsec,synchronizenat,synchronizeopenvpn,synchronizerules,synchronizeschedules,"
+    "synchronizestaticroutes,synchronizetoip,synchronizetrafficshaper,synchronizetrafficshaperlimiter,synchronizeusers,"  # NOQA
+    "synchronizevirtualip,synchronizewol,username,password"
 )
 
 
