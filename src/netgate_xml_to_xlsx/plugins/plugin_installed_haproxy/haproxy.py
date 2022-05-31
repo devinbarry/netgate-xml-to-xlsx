@@ -111,14 +111,11 @@ class Plugin(BasePlugin):
         return super().adjust_node(node)
 
     def _overview(self, node: Node) -> Generator[SheetData, None, None]:
-        """
-        Top-level haproxy elements.
+        """Top-level haproxy elements."""
+        rows = []
 
-        Display two columns (node, value).
-
-        """
         node_names: list[str] = (
-            "enable,configversion,nbproc,nbthread,maxconn,carpdev,"
+            "enable,configversion,enablesync,nbproc,nbthread,maxconn,carpdev,"
             "logfacility,loglevel,log-send-hostname,remotesyslog,"
             "localstats_refreshtime,localstats_sticktable_refreshtime"
             ",dns_resolvers,resolver_retries,resolver_timeoutretry,resolver_holdvalid,"
@@ -128,17 +125,16 @@ class Plugin(BasePlugin):
         ).split(",")
 
         all_node_names = node_names[:]
+
         all_node_names.extend("ha_backends,ha_pools".split(","))
         self.report_unknown_node_elements(node, all_node_names)
         row = []
 
         for node_name in node_names:
-            value = self.adjust_node(xml_findone(node, node_name))
-
-            row.append(value)
+            row.append(self.adjust_node(xml_findone(node, node_name)))
 
         self.sanity_check_node_row(node, row)
-        rows = list(zip(node_names, row))
+        rows.append(row)
 
         yield self.rotate_rows(
             SheetData(
