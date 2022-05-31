@@ -52,6 +52,7 @@ plugins = [
     "installed_haproxy",
     "installed_lightsquid",
     "installed_menu",
+    "installed_vpn_openvpn_export",
     "installed_pfblockerng",
     "installed_pfblockerngdnsbl",
     "installed_pfblockernglistsv4",
@@ -80,7 +81,6 @@ plugins = [
     "installed_suricata_rule",
     "installed_suricata_sid_mgmt_lists",
     "installed_suricatasync",
-    "installed_vpn_openvpn_export",
     "installed_zabbixagentlts",
 
 ]
