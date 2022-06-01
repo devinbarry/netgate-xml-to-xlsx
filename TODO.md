@@ -2,7 +2,6 @@
 
 * Restructure plugin so that the base loads the individual plugins and keeps a registry.
   Removes the need to pass `plugins_list` to the report plugins.
-* Generate markdown.
 
 
 
