@@ -47,6 +47,7 @@ plugins = [
     "wol",
 
     # Installed packages, in alphabetical order.
+    "installed_acme",
     "installed_freeradius",
     "installed_freeradiuseapconf",
     "installed_freeradiusclients",
@@ -58,6 +59,7 @@ plugins = [
     "installed_pfblockerng",
     "installed_pfblockerngdnsbl",
     "installed_pfblockernglistsv4",
+    "installed_pfblockerngsync",
     "installed_pfblockerngtopspammers",
     "installed_service",
     "installed_servicewatchdog",

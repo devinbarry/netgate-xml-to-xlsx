@@ -1,8 +1,6 @@
 """PfSense class."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
-import argparse
-import datetime
 import logging
 import os
 from html import escape

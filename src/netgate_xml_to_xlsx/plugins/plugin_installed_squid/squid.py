@@ -15,7 +15,7 @@ NODE_NAMES = (
     "dhparams_size,disable_pinger,disable_squidversion,disable_via,dns_nameservers,"
     "dns_v4_first,enable_squid,error_language,extraca,icp_port,interception_adapt,"
     "interception_checks,keep_squid_data,listenproto,log_dir,log_enabled,log_rotate,"
-    "log_sqd,outgoing_interface,private_subnet_proxy_off,proxy_port,ssl_active_interface,ssl_proxy,"
+    "log_sqd,outgoing_interface,private_subnet_proxy_off,proxy_port,ssl_active_interface,ssl_proxy,"  # NOQA
     "ssl_proxy_port,sslcrtd_children,sslproxy_compatibility_mode,sslproxy_mitm_mode,transparent_active_interface,"  # NOQA
     "transparent_proxy,uri_whitespace,visible_hostname,xforward_mode,update_notify"
 )

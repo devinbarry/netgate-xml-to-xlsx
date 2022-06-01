@@ -287,6 +287,16 @@ class BasePlugin(ABC):
             )
         return "\n".join(cell)
 
+    def load_cells(self, nodes: list[Node], node_names: list[str]) -> str:
+        """Load multiple cells with space between them."""
+        cell = []
+        for node in nodes:
+            cell.append(self.load_cell(node, node_names))
+            cell.append("")
+        if len(cell) > 0 and cell[:-1] == "":
+            cell = cell[:-1]
+        return "\n".join(cell)
+
     def yes(self, node: Node) -> str:
         """
         Return YES because the node exists.
@@ -311,6 +321,16 @@ class BasePlugin(ABC):
             return self.wip(node)
 
         return "YES"
+
+    def decode_datetime(self, node: Node) -> str:
+        """Decode datetime value and log warning if unable to."""
+        try:
+            return str(datetime.datetime.fromtimestamp(int(node.text)))
+        except TypeError:
+            self.logger.warning(
+                f"Node {self.node_path(node)} has unparseable timestamp: {node.text}."
+            )
+            return ""
 
     def report_unknown_node_elements(
         self, node: Node, node_names: list[str] | None = None
