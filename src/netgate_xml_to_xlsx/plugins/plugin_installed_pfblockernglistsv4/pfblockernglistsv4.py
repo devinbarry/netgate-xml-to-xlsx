@@ -69,10 +69,8 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

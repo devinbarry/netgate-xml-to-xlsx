@@ -106,7 +106,7 @@ class BasePlugin(ABC):
                     ).strftime("%Y-%m-%d %H-%M-%S")
                     result.append(date_time)
                 case _:
-                    self.loggger.warning(f"Unknown tag: {self.node_path(node)}")
+                    self.logger.warning(f"Unknown tag: {self.node_path(node)}")
                     return self.wip(node)
 
         return "\n".join(result)
@@ -188,6 +188,9 @@ class BasePlugin(ABC):
                     value = unescape(node.text)
                     value = value.replace("||", "\n")
                     lines = [x.strip() for x in value.split("\n")]
+
+                    # Remove blank lines.
+                    lines = [x for x in lines if x]
                     return "\n".join(lines)
 
                 case "disable" | "disabled" | "enable" | "blockpriv" | "blockbogons":  # NOQA
@@ -373,23 +376,6 @@ class BasePlugin(ABC):
         """Output a WIP warning."""
         self.logger.warning(f"WIP: {self.display_name}/{node.tag}.")
         return "WIP"
-
-    def rotate_rows(self, data: SheetData) -> SheetData:
-        """
-        Rotate horizontal headers and rows into vertical columns.
-
-        Set header_row to "name,data,..."
-        Calculate proper number of column widths and header columns.
-
-        """
-        data.data_rows = list(zip(data.header_row, *data.data_rows))
-
-        data.header_row = ["name"]
-        data.header_row.extend(["data" for x in range(len(data.data_rows[0]) - 1)])
-        data.column_widths = [60]
-        data.column_widths.extend([80 for x in range(len(data.data_rows[0]) - 1)])
-
-        return data
 
     @abstractmethod
     def run(

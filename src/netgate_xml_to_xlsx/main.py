@@ -33,6 +33,8 @@ def _main() -> None:
 
     if args.sanitize:
         logger.info("Sanitizing files.")
+    else:
+        LOGGER.info(f"Output format: {args.output_format}.")
 
     for in_filename in in_files:
         pfsense = PfSense(config, in_filename)
@@ -41,7 +43,6 @@ def _main() -> None:
             pfsense.sanitize(config["plugins"])
 
         LOGGER.info(f"Output path: {pfsense.output_path}.")
-        LOGGER.info(f"Output format: {args.output_format}.")
 
         pfsense.run_all_plugins(config["plugins"])
 

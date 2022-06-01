@@ -11,11 +11,14 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-NODE_NAMES = "type,smtp,settings"
+NODE_NAMES = (
+    "type,disable,ipaddress,port,timeout,notifyemailaddress,username,password,"
+    "authentication_mechanism,fromaddress"
+)
 
 
 class Plugin(BasePlugin):
-    """Gather notifications information."""
+    """Gather information."""
 
     def __init__(
         self,
@@ -34,50 +37,33 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
-            case "smtp":
-                node_names = (
-                    "disable,ipaddress,port,timeout,notifyemailaddress,username,password,"
-                    "authentication_mechanism,fromaddress"
-                ).split(",")
-                cell = []
-                for node_name in node_names:
-                    cell.append(
-                        f"{node_name}: {self.adjust_node(xml_findone(node, node_name))}"
-                    )
-
-                return "\n".join(cell)
-
             case "disable":
                 return self.yes(node)
 
         return super().adjust_node(node)
 
     def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
-        """Gather ntpd information."""
+        """Gather information."""
         rows = []
 
         node = xml_findone(parsed_xml, "notifications")
         if node is None:
             return
 
-        self.report_unknown_node_elements(node)
+        self.report_unknown_node_elements(node, "smtp".split(","))
         children = node.getchildren()
         if len(children) == 0:
             return
 
-        row = []
-
         for child in children:
-            row.append(child.tag)
-            value = self.adjust_node(child)
-            row.append(value)
+            row = []
+            for name in self.node_names:
+                row.append(self.adjust_node(xml_findone(child, name)))
 
-        rows.append(self.sanity_check_node_row(node, row))
+            rows.append(self.sanity_check_node_row(node, row))
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

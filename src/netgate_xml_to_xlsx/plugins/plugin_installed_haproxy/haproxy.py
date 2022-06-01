@@ -22,7 +22,7 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "HAProxy-OFF",
+        display_name: str = "HAProxy",
         node_names: str = "",
     ) -> None:
         super().__init__(
@@ -136,12 +136,10 @@ class Plugin(BasePlugin):
         self.sanity_check_node_row(node, row)
         rows.append(row)
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name="HAProxy",
-                header_row=node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=node_names,
+            data_rows=rows,
         )
 
     def _backends(self, nodes: list[Node]) -> Generator[SheetData, None, None]:
@@ -167,12 +165,10 @@ class Plugin(BasePlugin):
             self.sanity_check_node_row(node, row)
             rows.append(row)
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name="HAProxy Backends",
-                header_row=node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=f"{self.display_name} (backends)",
+            header_row=node_names,
+            data_rows=rows,
         )
 
     def _pools(self, nodes: list[Node]) -> Generator[SheetData, None, None]:
@@ -210,10 +206,8 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name="HAProxy (pools)",
-                header_row=node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=f"{self.display_name} (pools)",
+            header_row=node_names,
+            data_rows=rows,
         )

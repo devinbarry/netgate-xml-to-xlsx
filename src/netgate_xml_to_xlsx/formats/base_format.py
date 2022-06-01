@@ -3,6 +3,8 @@
 
 from abc import ABC, abstractmethod
 
+from netgate_xml_to_xlsx.sheetdata import SheetData
+
 
 class BaseFormat(ABC):
     """Base of all formats."""
@@ -14,7 +16,6 @@ class BaseFormat(ABC):
         Args:
             ctx: Context containing necessary initialization information.
         """
-        pass
 
     @abstractmethod
     def start(self) -> None:
@@ -30,3 +31,31 @@ class BaseFormat(ABC):
     def finish(self) -> None:
         """Perform cleanup, saving, etc."""
         raise NotImplementedError
+
+    def rotate_rows(self, data: SheetData) -> SheetData:
+        """
+        Rotate horizontal headers and rows into vertical columns.
+
+        Set header_row to "name,data,..."
+        Calculate proper number of column widths and header columns.
+
+        """
+        data.data_rows = list(zip(data.header_row, *data.data_rows))
+
+        data.header_row = ["name"]
+        data.header_row.extend(["data" for x in range(len(data.data_rows[0]) - 1)])
+        data.column_widths = [60]
+        data.column_widths.extend([80 for x in range(len(data.data_rows[0]) - 1)])
+
+        return data
+
+    def check_row_length(self, row: list[str]) -> None:
+        """Log warnings for any unmatched header_row/row lengths."""
+        row_length = len(row)
+        if row_length != self.header_row_length and not self.logged_row_length_warning:
+            msg = (
+                f"{self.sheet_data.sheet_name} has mismatched header "
+                f"({self.header_row_length}) and row ({row_length})."
+            )
+            self.logger.warning("%s", msg)
+            self.logged_row_length_warning = True

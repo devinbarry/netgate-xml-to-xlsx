@@ -34,15 +34,12 @@ class Plugin(BasePlugin):
         row = []
 
         for node_name in self.node_names:
-            value = self.adjust_node(xml_findone(node, node_name))
-            row.append(value)
+            row.append(self.adjust_node(xml_findone(node, node_name)))
 
-            rows.append(self.sanity_check_node_row(node, row))
+        rows.append(self.sanity_check_node_row(node, row))
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

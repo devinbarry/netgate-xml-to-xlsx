@@ -60,4 +60,5 @@ class Plugin(BasePlugin):
             column_widths=[
                 60,
             ],
+            ok_to_rotate=False,
         )

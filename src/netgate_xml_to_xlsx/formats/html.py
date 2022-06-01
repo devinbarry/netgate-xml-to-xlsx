@@ -3,6 +3,7 @@
 
 import datetime
 from html import escape
+import logging
 
 from netgate_xml_to_xlsx.sheetdata import SheetData
 
@@ -13,6 +14,11 @@ class HtmlFormat(BaseFormat):
     def __init__(self, ctx: dict) -> None:
         self.ctx = ctx
         self.output_fh = None
+        self.sheet_data = None
+
+        self.logger = logging.getLogger()
+        self.header_row_length = 0
+        self.logged_row_length_warning = False
 
     def start(self):
         """Create output file and write HTML boilerplate."""
@@ -23,6 +29,10 @@ class HtmlFormat(BaseFormat):
     def out(self, sheet_data: SheetData) -> None:
         if sheet_data is None or not sheet_data.data_rows:
             return
+
+        self.logged_row_length_warning = False
+        self.header_row_length = len(sheet_data.header_row)
+        self.sheet_data = sheet_data
 
         self._write_header(sheet_data)
         self._write_table(sheet_data)
@@ -40,23 +50,35 @@ class HtmlFormat(BaseFormat):
         self.output_fh.write(f"<h2>{sheet_data.sheet_name}</h2>\n\n")
 
     def _write_table(self, sheet_data: SheetData) -> None:
-        """HTML Table."""
-        self.output_fh.write("<table>\n")
-        self.output_fh.write("  <thead>\n")
-        for header in sheet_data.header_row:
-            self.output_fh.write(f"    <th>{escape(header)}</th>\n")
+        """
+        HTML Table.
+
+        Structure this like the .txt output showing node and value.
+        """
+        if sheet_data is None or not sheet_data.data_rows:
+            return
 
         for row in sheet_data.data_rows:
-            self.output_fh.write("  <tr>\n")
-            for col in row:
-                self.output_fh.write("    <td>\n")
-                sub_rows = "<br />".join([escape(x) for x in col.splitlines()])
-                self.output_fh.write(f"      {sub_rows}")
-                self.output_fh.write("\n    </td>\n\n")
-            self.output_fh.write("  </tr>\n\n")
+            self.check_row_length(row)
+            self.output_fh.write("<table>\n")
+            for row in sheet_data.data_rows:
+                self._write_row(row)
+            self.output_fh.write("</table>\n")
+            self.output_fh.write("<hr />\n\n")
 
-        self.output_fh.write("  </thead>\n")
-        self.output_fh.write("</table>\n\n")
+    def _write_row(self, row) -> None:
+        """
+        Write one data row's information.
+
+        Write each element on a single line in format:
+            sheet_name: header: value (flattened into a single line)
+        """
+        # Flatten the data.
+        data = [escape(x).replace("\n", "; ") for x in row]
+
+        for node, value in zip(self.sheet_data.header_row, data):
+            self.output_fh.write(f"<tr><td>{node}</td><td>{value}</td></tr>\n")
+        self.output_fh.flush()
 
 
 HTML_TOP = """\
@@ -64,6 +86,11 @@ HTML_TOP = """\
   <header>
   </header>
   <body>
+    <h1>pfSense Output</h1>
+    <div>
+       TODO: Information from configuration file.
+    </div>
+
 """
 
 HTML_BOTTOM = """\

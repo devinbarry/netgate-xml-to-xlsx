@@ -130,12 +130,11 @@ class Plugin(BasePlugin):
         System-level information.
 
         Only showing interesting information (at least to me at the moment).
-        TODO: Needs custom report_unknown_node_elements.
-
         """
         rows = []
 
         top_level = {}
+
         # Version and change information is at top level.
         for key in "version,lastchange".split(","):
             top_level[key] = self.adjust_node(xml_findone(parsed_xml, key))
@@ -144,18 +143,18 @@ class Plugin(BasePlugin):
         if system_node is None:
             return
 
+        row = []
         for key in self.node_names:
             if key in top_level:
-                rows.append([key, top_level[key]])
+                row.append(top_level[key])
                 continue
 
-            row = [key, self.adjust_nodes(xml_findall(system_node, key))]
-            rows.append(self.sanity_check_node_row(system_node, row))
+            row.append(self.adjust_nodes(xml_findall(system_node, key)))
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        rows.append(self.sanity_check_node_row(system_node, row))
+
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

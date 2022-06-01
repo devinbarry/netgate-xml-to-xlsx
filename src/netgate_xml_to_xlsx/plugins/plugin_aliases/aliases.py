@@ -52,4 +52,5 @@ class Plugin(BasePlugin):
             header_row=self.node_names,
             data_rows=rows,
             column_widths="40,40,80,80,80,40,80,80".split(","),
+            ok_to_rotate=False,
         )

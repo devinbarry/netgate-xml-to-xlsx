@@ -54,10 +54,8 @@ class Plugin(BasePlugin):
 
         rows.sort()
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name=self.display_name,
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

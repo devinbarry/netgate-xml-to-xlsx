@@ -198,12 +198,10 @@ class Plugin(BasePlugin):
         if rows is not None and len(rows) > 0:
             keep_processing = True
 
-            yield self.rotate_rows(
-                SheetData(
-                    sheet_name=self.display_name,
-                    header_row=self.node_names,
-                    data_rows=rows,
-                )
+            yield SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
             )
 
         if not keep_processing:
@@ -213,34 +211,28 @@ class Plugin(BasePlugin):
         self.node_names = CLIENT_NODENAMES.split(",")
         rows = self.gather_client(node)
         if rows is not None and len(rows) > 0:
-            yield self.rotate_rows(
-                SheetData(
-                    sheet_name=self.display_name,
-                    header_row=self.node_names,
-                    data_rows=rows,
-                )
+            yield sSheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
             )
 
         self.display_name = "IPSEC Phase 1"
         self.node_names = PHASE1_NODENAMES.split(",")
         rows = self.gather_phase1s(node)
         if rows is not None and len(rows) > 0:
-            yield self.rotate_rows(
-                SheetData(
-                    sheet_name=self.display_name,
-                    header_row=self.node_names,
-                    data_rows=rows,
-                )
+            yield SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
             )
 
         self.display_name = "IPSEC Phase 2"
         self.node_names = PHASE2_NODENAMES.split(",")
         rows = self.gather_phase2s(node)
         if rows is not None and len(rows) > 0:
-            yield self.rotate_rows(
-                SheetData(
-                    sheet_name=self.display_name,
-                    header_row=self.node_names,
-                    data_rows=rows,
-                )
+            yield SheetData(
+                sheet_name=self.display_name,
+                header_row=self.node_names,
+                data_rows=rows,
             )

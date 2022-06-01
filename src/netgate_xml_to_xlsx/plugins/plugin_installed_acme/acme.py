@@ -103,12 +103,10 @@ class Plugin(BasePlugin):
         self.sanity_check_node_row(node, row)
         rows.append(row)
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name="ACME",
-                header_row=node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name="ACME",
+            header_row=node_names,
+            data_rows=rows,
         )
 
     def _certificates(self, node: Node) -> Generator[SheetData, None, None]:
@@ -135,10 +133,8 @@ class Plugin(BasePlugin):
 
         rows.sort()
 
-        yield self.rotate_rows(
-            SheetData(
-                sheet_name="ACME Certificates",
-                header_row=self.node_names,
-                data_rows=rows,
-            )
+        yield SheetData(
+            sheet_name=self.display_name,
+            header_row=self.node_names,
+            data_rows=rows,
         )

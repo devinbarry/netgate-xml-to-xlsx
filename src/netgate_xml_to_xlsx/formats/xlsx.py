@@ -2,6 +2,7 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import datetime
+import logging
 
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
@@ -21,6 +22,7 @@ class XlsxFormat(BaseFormat):
         self._init_styles()
         self.default_alignment = Alignment(wrap_text=True, vertical="top")
         self.sheet = None
+        self.logger = logging.getLogger()
 
     def start(self):
         """Initialization is sufficient."""
@@ -29,6 +31,10 @@ class XlsxFormat(BaseFormat):
     def out(self, sheet_data: SheetData) -> None:
         if sheet_data is None or not sheet_data.data_rows:
             return
+
+        self.logger.debug("%s", sheet_data.sheet_name)
+        if sheet_data.ok_to_rotate:
+            sheet_data = self.rotate_rows(sheet_data)
 
         self.sheet = self.workbook.create_sheet(sheet_data.sheet_name)
         self._sheet_header(self.sheet, sheet_data)

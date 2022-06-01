@@ -3,6 +3,7 @@
 
 import datetime
 from html import escape
+import logging
 
 from netgate_xml_to_xlsx.sheetdata import SheetData
 
@@ -23,21 +24,34 @@ class TextFormat(BaseFormat):
         self.output_fh = None
         self.sheet_data = None
 
+        self.logger = logging.getLogger()
+        self.header_row_length = 0
+        self.logged_row_length_warning = False
+
     def start(self):
         """Create output file."""
         self.output_fh = open(self.ctx["output_path"], "w", encoding="utf-8")
 
     def out(self, sheet_data: SheetData) -> None:
+        """
+        Generate one chunk of data.
+
+        Log warning if length of header_row and any data_row differs.
+        """
         if sheet_data is None or not sheet_data.data_rows:
             return
 
+        row_separator = f"""{"-"*20}\n\n"""
+        section_separator = f"""{"="*20}\n\n"""
+        self.logged_row_length_warning = False
+        self.header_row_length = len(sheet_data.header_row)
         self.sheet_data = sheet_data
         for row in sheet_data.data_rows:
+            self.check_row_length(row)
             self._write_row(row)
+            self.output_fh.write(row_separator)
 
-        # Add a separator
-        separator = "-" * 20
-        self.output_fh.write(f"\n{separator}\n\n")
+        self.output_fh.write(section_separator)
 
     def finish(self) -> None:
         """Write trailer and save file."""
@@ -46,9 +60,15 @@ class TextFormat(BaseFormat):
         self.output_fh.close()
 
     def _write_row(self, row: list[str]) -> None:
-        """Write one data row of information."""
-        cols = [f"{self.sheet_data.sheet_name}:"]
-        cols.extend([escape(x).replace("\n", "; ") for x in row])
-        self.output_fh.write("\t".join(cols))
-        self.output_fh.write("\n")
+        """
+        Write one data row's information.
+
+        Write each element on a single line in format:
+            sheet_name: header: value (flattened into a single line)
+        """
+        # Flatten the data.
+        data = [escape(x).replace("\n", "; ") for x in row]
+
+        for node, value in zip(self.sheet_data.header_row, data):
+            self.output_fh.write(f"{self.sheet_data.sheet_name}: {node}: {value}\n")
         self.output_fh.flush()
