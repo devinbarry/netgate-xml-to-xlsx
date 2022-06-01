@@ -2,8 +2,8 @@
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 import datetime
-from html import escape
 import logging
+from html import escape
 
 from netgate_xml_to_xlsx.sheetdata import SheetData
 

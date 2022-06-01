@@ -211,7 +211,7 @@ class Plugin(BasePlugin):
         self.node_names = CLIENT_NODENAMES.split(",")
         rows = self.gather_client(node)
         if rows is not None and len(rows) > 0:
-            yield sSheetData(
+            yield SheetData(
                 sheet_name=self.display_name,
                 header_row=self.node_names,
                 data_rows=rows,
