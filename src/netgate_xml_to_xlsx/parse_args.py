@@ -34,7 +34,7 @@ def parse_args() -> argparse.Namespace:
         "in_files", nargs="+", help="One or more Netgate .xml files to process."
     )
 
-    choices = ["xlsx", "html"]
+    choices = ["xlsx", "html", "txt"]
     default = "xlsx"
     parser.add_argument(
         "--output-format",
