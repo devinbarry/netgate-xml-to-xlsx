@@ -55,6 +55,7 @@ plugins = [
     "installed_haproxy",
     "installed_lightsquid",
     "installed_menu",
+    "installed_ntopng",
     "installed_vpn_openvpn_export",
     "installed_pfblockerng",
     "installed_pfblockerngdnsbl",
