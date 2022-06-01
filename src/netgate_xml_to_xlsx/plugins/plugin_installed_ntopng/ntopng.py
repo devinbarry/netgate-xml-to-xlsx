@@ -9,7 +9,10 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-NODE_NAMES = "enable,keepdata,interface_array,dns_mode,local_networks,row,redis_password,redis_passwordagain"
+NODE_NAMES = (
+    "enable,keepdata,interface_array,dns_mode,local_networks,row,redis_password,"
+    "redis_passwordagain"
+)
 
 
 class Plugin(BasePlugin):
