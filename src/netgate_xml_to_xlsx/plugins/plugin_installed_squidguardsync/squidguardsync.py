@@ -1,4 +1,4 @@
-"""Squid Sync Plugin."""
+"""SquidGuard Sync Plugin."""
 # Copyright © 2022 Appropriate Solutions, Inc. All rights reserved.
 
 from typing import Generator
@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
-NODE_NAMES = "synconchanges,synctimeout,row"
+NODE_NAMES = "varsyncenablexmlrpc,varsynctimeout,row"
 
 
 class Plugin(BasePlugin):
@@ -16,11 +16,17 @@ class Plugin(BasePlugin):
 
     def __init__(
         self,
-        display_name: str = "Squid (sync)",
+        display_name: str = "SquidGuard (sync)",
         node_names: str = NODE_NAMES,
     ) -> None:
         """Gather information."""
-        super().__init__(display_name, node_names)
+        super().__init__(
+            display_name,
+            node_names,
+            el_paths_to_sanitize=[
+                "pfsense,installedpackages,squidguardsync,config,row",
+            ],
+        )
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""
@@ -32,9 +38,10 @@ class Plugin(BasePlugin):
                 # I expect this is going to have multiple rows in some installations.
                 return self.load_cell(
                     node,
-                    "syncprotocol,ipaddress,syncport,syncdestinenable,username,password".split(
-                        ","
-                    ),
+                    (
+                        "varsyncdestinenable,varsyncprotocol,varsyncipaddress,"
+                        "varsyncport,varsyncpassword"
+                    ).split(","),
                 )
 
         return super().adjust_node(node)
@@ -43,7 +50,7 @@ class Plugin(BasePlugin):
         """Gather information."""
         rows = []
 
-        squidguard_node = xml_findone(parsed_xml, "installedpackages,squidsync")
+        squidguard_node = xml_findone(parsed_xml, "installedpackages,squidguardsync")
         if squidguard_node is None:
             return
         self.report_unknown_node_elements(squidguard_node, "config".split("<"))

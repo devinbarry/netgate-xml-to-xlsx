@@ -72,6 +72,7 @@ plugins = [
     "installed_squidguarddest",
     "installed_squidguardgeneral",
     "installed_squidguardrewrite",
+    "installed_squidguardsync",
     "installed_squidguardtime",
     "installed_squidnac",
     "installed_squidremote",
