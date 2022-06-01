@@ -8,16 +8,13 @@ from pathlib import Path
 from typing import cast
 
 from lxml import etree  # nosec
-from openpyxl import Workbook
-from openpyxl.styles import Border, Font, NamedStyle, PatternFill, Side
-from openpyxl.styles.alignment import Alignment
 
 from netgate_xml_to_xlsx.mytypes import Node
 
+from .formats import XlsxFormat
 from .plugin_tools import discover_plugins
 from .plugins.support.elements import sanitize_xml
 from .sheetdata import SheetData
-from .spreadsheet import sheet_footer, sheet_header, write_ss_row
 
 
 class PfSense:
@@ -31,76 +28,25 @@ class PfSense:
         """
         self.config = config
         self.args = config["args"]
-        self.in_file = (in_path := Path(in_filename))
+        self.input_path = (input_path := Path(in_filename))
         self.raw_xml: str = ""
         self.parsed_xml: Node = None
-        self.workbook: Workbook = Workbook()
 
-        self.ss_output_path = self._get_output_path(in_path)
-        self._init_styles()
-        self.default_alignment = Alignment(wrap_text=True, vertical="top")
+        self.output_path = self._get_output_path(input_path)
 
         self.plugins = discover_plugins()
+        self.output_format = None
         self.logger = logging.getLogger()
-        # Only used for non-xlsx at the moment.
-        self.output_fh = None
-
-        if self.args.output_format != "xlsx":
-            self.output_fh = open(self.output_path, "w", encoding="utf-8")
 
         self._load()
 
-    def _get_output_path(self, in_path: Path) -> Path:
+    def _get_output_path(self, input_path: Path) -> Path:
         """Generate output path based on args and in_filename."""
         self.output_path = cast(Path, self.args.output_dir) / Path(
-            f"{in_path.name}.{self.args.output_format}"
+            f"{input_path.name}.{self.args.output_format}"
         )
 
         return self.output_path
-
-    def _init_styles(self) -> None:
-        """Iniitalized worksheet styles."""
-        xlsx_header_font = Font(name="Calibri", size=16, italic=True, bold=True)
-        xlsx_body_font = Font(name="Calibri", size=16)
-        xlsx_footer_font = Font(name="Calibri", size=12, italic=True)
-
-        body_border = Border(
-            bottom=Side(border_style="dotted", color="00000000"),
-            top=Side(border_style="dotted", color="00000000"),
-            left=Side(border_style="dotted", color="00000000"),
-            right=Side(border_style="dotted", color="00000000"),
-        )
-
-        alignment = Alignment(wrap_text=True, vertical="top")
-
-        header = NamedStyle(name="header")
-        header.alignment = alignment
-        header.fill = PatternFill(
-            "lightTrellis", fgColor="00339966"
-        )  # fgColor="000000FF")  #fgColor="0000FF00")
-        header.font = xlsx_header_font
-        header.border = Border(
-            bottom=Side(border_style="thin", color="00000000"),
-            top=Side(border_style="thin", color="00000000"),
-            left=Side(border_style="dotted", color="00000000"),
-            right=Side(border_style="dotted", color="00000000"),
-        )
-
-        normal = NamedStyle(name="normal")
-        normal.alignment = alignment
-        normal.border = body_border
-        normal.fill = PatternFill("solid", fgColor="FFFFFFFF")
-        normal.font = xlsx_body_font
-
-        footer = NamedStyle("footer")
-        footer.alignment = Alignment(wrap_text=False, vertical="top")
-        footer.border = body_border
-        normal.fill = PatternFill("solid", fgColor="FFFFFFFF")
-        footer.font = xlsx_footer_font
-
-        self.workbook.add_named_style(header)
-        self.workbook.add_named_style(normal)
-        self.workbook.add_named_style(footer)
 
     def _sanity_check_root_node(self) -> None:
         """Check for unknown root elements."""
@@ -130,26 +76,9 @@ class PfSense:
 
         Return pfsense keys.
         """
-        self.raw_xml = self.in_file.read_text(encoding="utf-8")
+        self.raw_xml = self.input_path.read_text(encoding="utf-8")
         self.parsed_xml = etree.XML(self.raw_xml)
         self._sanity_check_root_node()
-
-    def _write_sheet(
-        self,
-        *,
-        sheet_name: str,
-        header_row: list[str],
-        column_widths: list[int],
-        rows: list[list],
-    ) -> None:
-        sheet = self.workbook.create_sheet(sheet_name)
-        sheet_header(sheet, header_row, column_widths)
-
-        # Define starting row num in case there are no rows to display.
-        row_num = 2
-        for row_num, row in enumerate(rows, start=row_num):
-            write_ss_row(sheet, row, row_num)
-        sheet_footer(sheet, row_num)
 
     def sanitize(self, plugins_to_run) -> None:
         """
@@ -178,7 +107,7 @@ class PfSense:
         self.raw_xml = etree.tostring(self.parsed_xml, pretty_print=True).decode("utf8")
 
         # Save sanitized XML
-        parts = os.path.splitext(self.in_file)
+        parts = os.path.splitext(self.input_path)
         if len(parts) == 1:
             out_path = Path(f"{parts[0]}-sanitized")
         else:
@@ -187,8 +116,8 @@ class PfSense:
         self.logger.info(f"Sanitized file written: {out_path}.")
 
         # Delete the unsanitized file.
-        self.in_file.unlink()
-        self.logger.info(f"Deleted original file: {self.in_file}.")
+        self.input_path.unlink()
+        self.logger.info(f"Deleted original file: {self.input_path}.")
 
     def _write_html_chapter(self, sheet_data: SheetData) -> None:
         self.output_fh.write(f"<h2>{sheet_data.sheet_name}</h2>\n\n")
@@ -216,51 +145,25 @@ class PfSense:
         self._write_html_chapter(sheet_data)
         self._write_html_table(sheet_data)
 
-    def run(self, plugin_name: str) -> None:
-        """
-        Run specific plugin and write sheet(s).
+    def run_all_plugins(self, plugin_names: list[str]) -> None:
+        """Run each plugin in order."""
+        self.output_format = XlsxFormat(
+            ctx={"input_path": self.input_path, "output_path": self.output_path}
+        )
+        self.output_format.start()
 
-        Plugins yield a SheetData object.
-        Continue iterating if it is None.
-        """
+        for plugin_name in plugin_names:
+            self.logger.verbose(f"Plugin: {plugin_name}")
+            self.run_plugin(plugin_name)
+
+        self.output_format.finish()
+
+    def run_plugin(self, plugin_name: str) -> None:
+        """Run specific plugin and generate output."""
         plugin = self.plugins[plugin_name]
         if plugin_name.startswith("report"):
             for sheet_data in plugin.run(self.parsed_xml, self.plugins):
-                if sheet_data is None or not sheet_data.data_rows:
-                    continue
-
-                if self.args.output_format == "xlsx":
-                    self._write_sheet(
-                        sheet_name=sheet_data.sheet_name,
-                        header_row=sheet_data.header_row,
-                        column_widths=sheet_data.column_widths,
-                        rows=sheet_data.data_rows,
-                    )
-                else:
-                    self._write_html(sheet_data)
+                self.output_format.out(sheet_data)
         else:
             for sheet_data in plugin.run(self.parsed_xml):
-                if sheet_data is None or not sheet_data.data_rows:
-                    continue
-
-                if self.args.output_format == "xlsx":
-                    self._write_sheet(
-                        sheet_name=sheet_data.sheet_name,
-                        header_row=sheet_data.header_row,
-                        column_widths=sheet_data.column_widths,
-                        rows=sheet_data.data_rows,
-                    )
-                else:
-                    self._write_html(sheet_data)
-
-    def save(self) -> None:
-        """Delete empty first sheet and then save Workbook."""
-        if self.args.output_format == "xlsx":
-            sheets = self.workbook.sheetnames
-            del self.workbook[sheets[0]]
-            out_path = self.ss_output_path
-            self.workbook.save(out_path)
-            return
-
-        if self.output_fh is not None:
-            self.output_fh.close()
+                self.output_format.out(sheet_data)

@@ -40,14 +40,10 @@ def _main() -> None:
         if args.sanitize:
             pfsense.sanitize(config["plugins"])
 
-        LOGGER.info(f"Output path: {pfsense.ss_output_path}.")
+        LOGGER.info(f"Output path: {pfsense.output_path}.")
         LOGGER.info(f"Output format: {args.output_format}.")
 
-        # Run plugins in order.
-        for plugin_to_run in config["plugins"]:
-            logger.verbose(f"Plugin: {plugin_to_run}")
-            pfsense.run(plugin_to_run)
-        pfsense.save()
+        pfsense.run_all_plugins(config["plugins"])
 
     logger.info("Done.")
 
