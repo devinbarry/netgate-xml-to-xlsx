@@ -3,7 +3,6 @@
 
 import logging
 import os
-from html import escape
 from pathlib import Path
 from typing import cast
 
@@ -11,10 +10,9 @@ from lxml import etree  # nosec
 
 from netgate_xml_to_xlsx.mytypes import Node
 
-from .formats import XlsxFormat
+from .formats import HtmlFormat, XlsxFormat
 from .plugin_tools import discover_plugins
 from .plugins.support.elements import sanitize_xml
-from .sheetdata import SheetData
 
 
 class PfSense:
@@ -119,35 +117,10 @@ class PfSense:
         self.input_path.unlink()
         self.logger.info(f"Deleted original file: {self.input_path}.")
 
-    def _write_html_chapter(self, sheet_data: SheetData) -> None:
-        self.output_fh.write(f"<h2>{sheet_data.sheet_name}</h2>\n\n")
-        self.output_fh.flush()
-
-    def _write_html_table(self, sheet_data: SheetData) -> None:
-        self.output_fh.write("<table>\n")
-        self.output_fh.write("  <thead>\n")
-        for header in sheet_data.header_row:
-            self.output_fh.write(f"    <th>{escape(header)}</th>\n")
-
-        for row in sheet_data.data_rows:
-            self.output_fh.write("  <tr>\n")
-            for col in row:
-                self.output_fh.write("    <td>\n")
-                sub_rows = "<br />".join([escape(x) for x in col.splitlines()])
-                self.output_fh.write(f"      {sub_rows}")
-                self.output_fh.write("\n    </td>\n\n")
-            self.output_fh.write("  </tr>\n\n")
-
-        self.output_fh.write("  </thead>\n")
-        self.output_fh.write("</table>\n\n")
-
-    def _write_html(self, sheet_data: SheetData) -> None:
-        self._write_html_chapter(sheet_data)
-        self._write_html_table(sheet_data)
-
     def run_all_plugins(self, plugin_names: list[str]) -> None:
         """Run each plugin in order."""
-        self.output_format = XlsxFormat(
+        formats = {"xlsx": XlsxFormat, "html": HtmlFormat}
+        self.output_format = formats[self.args.output_format](
             ctx={"input_path": self.input_path, "output_path": self.output_path}
         )
         self.output_format.start()

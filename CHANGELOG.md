@@ -20,6 +20,9 @@
 * Reports
   * Unknown packages.
 
+* Output Formats
+  * Basic HTML
+
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
 * Complete first pass of all base XML elements.
