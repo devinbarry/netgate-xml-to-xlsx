@@ -24,15 +24,16 @@ class XlsxFormat(BaseFormat):
         self.sheet = None
         self.logger = logging.getLogger()
 
-    def start(self):
+    def start(self) -> None:
         """Initialization is sufficient."""
         pass
 
     def out(self, sheet_data: SheetData) -> None:
-        if sheet_data is None or not sheet_data.data_rows:
+        self.logger.debug("%s", sheet_data.sheet_name)
+        if not len(sheet_data.data_rows):
+            # Nothing to write
             return
 
-        self.logger.debug("%s", sheet_data.sheet_name)
         if sheet_data.ok_to_rotate:
             sheet_data = self.rotate_rows(sheet_data)
 

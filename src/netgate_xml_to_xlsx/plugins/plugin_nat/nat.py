@@ -28,7 +28,7 @@ class Plugin(BasePlugin):
     ) -> None:
         """Initialize."""
         super().__init__(display_name, node_names)
-        self.local_data = {}
+        self.local_data: dict[str, str] = {}
 
     def adjust_node(self, node: Node) -> str:
         """Local node adjustments."""

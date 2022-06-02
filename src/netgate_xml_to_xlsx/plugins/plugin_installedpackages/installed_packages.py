@@ -21,7 +21,7 @@ def name_sort(node: Node) -> str:
     """Extract element name for sorting."""
     if node is None:
         return ""
-    value = unescape(xml_findone(node, "name").text).casefold()
+    value = str(unescape(xml_findone(node, "name").text).casefold())
     return value
 
 

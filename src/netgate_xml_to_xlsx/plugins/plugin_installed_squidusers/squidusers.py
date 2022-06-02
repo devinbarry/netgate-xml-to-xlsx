@@ -36,4 +36,4 @@ class Plugin(BasePlugin):
         self.report_unknown_node_elements(node, [])
 
         # Need the yield so this is a generator
-        yield None
+        yield SheetData()

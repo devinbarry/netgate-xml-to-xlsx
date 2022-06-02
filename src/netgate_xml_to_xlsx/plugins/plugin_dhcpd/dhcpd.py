@@ -56,7 +56,7 @@ class Plugin(BasePlugin):
 
         return super().adjust_node(node)
 
-    def adjust_nodes(self, nodes: list[Node]) -> list[str]:
+    def adjust_nodes(self, nodes: list[Node]) -> str:
         """Local nodes adjustment."""
 
         if nodes is None or len(nodes) == 0:

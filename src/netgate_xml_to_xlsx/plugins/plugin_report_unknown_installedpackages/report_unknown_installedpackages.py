@@ -23,7 +23,7 @@ class Plugin(BasePlugin):
         super().__init__(display_name, node_names)
 
     def run(
-        self, parsed_xml: Node, installed_plugins: dict | None
+        self, parsed_xml: Node, installed_plugins: dict
     ) -> Generator[SheetData, None, None]:
         """
         Gather information.
@@ -35,9 +35,9 @@ class Plugin(BasePlugin):
         node = xml_findone(parsed_xml, "installedpackages")
         if node is None:
             self.logger.warning("No packages are installed.")
-            yield None
+            yield SheetData()
 
-        child_tags = set([x.tag for x in node.getchildren()])
+        child_tags = {x.tag for x in node.getchildren()}
         plugin_tags = set(installed_plugins.keys())
 
         for child_tag in child_tags:

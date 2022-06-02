@@ -38,4 +38,4 @@ class Plugin(BasePlugin):
         if len(children) > 0:
             self.wip(node)
 
-        yield None
+        yield SheetData()

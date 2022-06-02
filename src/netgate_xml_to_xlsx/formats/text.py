@@ -21,8 +21,8 @@ class TextFormat(BaseFormat):
 
     def __init__(self, ctx: dict) -> None:
         self.ctx = ctx
-        self.output_fh = None
-        self.sheet_data = None
+        self.output_fh = 0
+        self.sheet_data = SheetData()
 
         self.logger = logging.getLogger()
         self.header_row_length = 0
@@ -38,7 +38,8 @@ class TextFormat(BaseFormat):
 
         Log warning if length of header_row and any data_row differs.
         """
-        if sheet_data is None or not sheet_data.data_rows:
+        if not len(sheet_data.data_rows):
+            # Nothing to write
             return
 
         row_separator = f"""{"-"*20}\n\n"""

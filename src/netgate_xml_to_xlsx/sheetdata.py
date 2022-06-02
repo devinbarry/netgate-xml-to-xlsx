@@ -8,10 +8,10 @@ class SheetData:
     def __init__(
         self,
         *,
-        sheet_name: str,
-        header_row: list[str],
-        data_rows: list[list],
-        column_widths: list[int] | None = None,
+        sheet_name: str = "",
+        header_row: list[str] = [],
+        data_rows: list[list[str]] = [],
+        column_widths: list[int] = [],
         ok_to_rotate: bool = True,
     ) -> None:
         """

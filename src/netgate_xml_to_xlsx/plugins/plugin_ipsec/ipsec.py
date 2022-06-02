@@ -118,9 +118,9 @@ class Plugin(BasePlugin):
 
         return super().adjust_node(node)
 
-    def gather_top(self, node: Node) -> list[str]:
+    def gather_top(self, node: Node) -> list[list[str]]:
         """Gather single row of top-level ipsec data."""
-        rows = []
+        rows: list[list[str]] = []
 
         if node is None or not self.should_process(node):
             return rows
@@ -143,11 +143,11 @@ class Plugin(BasePlugin):
 
         return rows
 
-    def gather_client(self, node_in: Node) -> list[str]:
+    def gather_client(self, node_in: Node) -> list[list[str]]:
         """Not implemented, but check if there's data."""
         client_node = xml_findone(node_in, "client")
         if client_node is None:
-            return
+            return []
         if self.should_process(client_node):
             self.logger.warning(
                 f"WARNING: {self.node_path(client_node)} is unimplemented."
@@ -155,7 +155,7 @@ class Plugin(BasePlugin):
 
         return []
 
-    def gather_phase1s(self, node_in: Node) -> list[str]:
+    def gather_phase1s(self, node_in: Node) -> list[list[str]]:
         """IPSEC Phase 1 information."""
         rows = []
 
@@ -171,7 +171,7 @@ class Plugin(BasePlugin):
         rows.sort()
         return rows
 
-    def gather_phase2s(self, node_in: Node) -> list[str]:
+    def gather_phase2s(self, node_in: Node) -> list[list[str]]:
         """IPSEC Phase 2 information."""
         rows = []
 

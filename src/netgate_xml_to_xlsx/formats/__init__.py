@@ -5,4 +5,4 @@ from .html import HtmlFormat  # NOQA
 from .text import TextFormat  # NOQA
 from .xlsx import XlsxFormat  # NOQA
 
-__all__ = []
+__all__: list = []

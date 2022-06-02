@@ -1,5 +1,4 @@
 plugins = [
-    "aliases",
     # Show what isn't and is processed.
     "report_unknown_installedpackages",
     "installedpackages_list",

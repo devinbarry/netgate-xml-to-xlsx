@@ -4,7 +4,7 @@
 import datetime
 import logging
 from abc import ABC, abstractmethod
-from typing import Generator, cast
+from typing import Callable, Generator, cast
 
 import lxml  # nosec
 
@@ -143,7 +143,7 @@ class BasePlugin(ABC):
                 result.append(address)
         return "\n".join(result)
 
-    def adjust_node(self, node: Node) -> str | Node:
+    def adjust_node(self, node: Node) -> str:
         """
         Adjust a node based children and tag name.
 
@@ -377,24 +377,21 @@ class BasePlugin(ABC):
         self.logger.warning(f"WIP: {self.display_name}/{node.tag}.")
         return "WIP"
 
+    run: Callable[..., Generator[SheetData, None, None]]
+
     @abstractmethod
     def run(
-        self, parsed_xml: Node, installed_plugins: dict | None
-    ) -> Generator[SheetData, None, None]:
+        self, parsed_xml: Node, installed_plugins: dict | None = None
+    ) -> Generator[SheetData, None, None]:  # type: ignore
         """
         Run plugin.
 
         Args:
-            pfsense:
+            parsed_xml:
                 Root of the parsed XML file.
 
-            plugins_list:
-                List of loaded plugins.
-                Only used by reports.
-                TODO: Use 'Self' type when available.
-
         Returns:
-            List of rows to write to spreadsheet.
+            A sheet's worth of data to output.
 
         """
         raise NotImplementedError

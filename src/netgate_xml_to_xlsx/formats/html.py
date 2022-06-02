@@ -13,21 +13,22 @@ from .base_format import BaseFormat
 class HtmlFormat(BaseFormat):
     def __init__(self, ctx: dict) -> None:
         self.ctx = ctx
-        self.output_fh = None
-        self.sheet_data = None
+        self.output_fh = 0
+        self.sheet_data = SheetData()
 
         self.logger = logging.getLogger()
         self.header_row_length = 0
         self.logged_row_length_warning = False
 
-    def start(self):
+    def start(self) -> None:
         """Create output file and write HTML boilerplate."""
         self.output_fh = open(self.ctx["output_path"], "w", encoding="utf-8")
 
         self.output_fh.write(HTML_TOP)
 
     def out(self, sheet_data: SheetData) -> None:
-        if sheet_data is None or not sheet_data.data_rows:
+        if not len(sheet_data.data_rows):
+            # Nothing to write
             return
 
         self.logged_row_length_warning = False

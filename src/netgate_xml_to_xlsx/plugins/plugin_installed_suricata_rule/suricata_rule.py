@@ -70,11 +70,12 @@ class Plugin(BasePlugin):
         """Local node adjustments."""
         if node is None:
             return ""
+        assert node is not None
 
         match node.tag:
             case "enable":
                 # Override base.
-                return node.text
+                return str(node.text) if node.text is not None else ""
 
             case "eve_log_http_extended_headers" | "eve_log_smtp_extended_fields":
                 els = [x.strip() for x in node.text.split(",")]

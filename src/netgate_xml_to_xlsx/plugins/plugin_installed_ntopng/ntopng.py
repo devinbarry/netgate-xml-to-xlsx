@@ -41,7 +41,7 @@ class Plugin(BasePlugin):
         match node.tag:
             case "enable":
                 # Override system enable.
-                return node.text if node.text is not None else ""
+                return str(node.text) if node.text is not None else ""
 
             case "row":
                 # Samples aren't configured.

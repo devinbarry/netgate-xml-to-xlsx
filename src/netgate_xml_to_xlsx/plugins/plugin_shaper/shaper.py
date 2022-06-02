@@ -26,7 +26,7 @@ class Plugin(BasePlugin):
         """Initialize."""
         super().__init__(display_name, node_names)
 
-    def run(self, parsed_xml: Node) -> Generator[SheetData, None, None]:
+    def run(self, parsed_xml: Node) -> Generator[SheetData | None, None, None]:
         """Gather information."""
         node = xml_findone(parsed_xml, "shaper")
         if node is None:
@@ -35,5 +35,4 @@ class Plugin(BasePlugin):
         # Report when data arrives.
         self.report_unknown_node_elements(node, [])
 
-        # Need the yield so this is a generator
-        yield None
+        yield SheetData()

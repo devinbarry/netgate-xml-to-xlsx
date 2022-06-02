@@ -7,11 +7,11 @@ import logging.handlers as handlers
 from pathlib import Path
 
 
-def custom_log_level():
+def custom_log_level() -> None:
     """Create a custom verbose log level between info and debug."""
     verbose_level = logging.INFO - 5
 
-    def verbose(self, message, *args, **kwargs):
+    def verbose(self, message: str, *args, **kwargs) -> None:
         if self.isEnabledFor(verbose_level):
             # Yes, args vs. *args.
             self._log(  # pylint: disable=protected-access
