@@ -10,7 +10,7 @@ from lxml import etree  # nosec
 
 from netgate_xml_to_xlsx.mytypes import Node
 
-from .formats import HtmlFormat, TextFormat, XlsxFormat
+from .formats import TextFormat, XlsxFormat
 from .plugin_tools import discover_plugins
 from .plugins.support.elements import sanitize_xml
 
@@ -119,7 +119,7 @@ class PfSense:
 
     def run_all_plugins(self, plugin_names: list[str]) -> None:
         """Run each plugin in order."""
-        formats = {"txt": TextFormat, "xlsx": XlsxFormat, "html": HtmlFormat}
+        formats = {"txt": TextFormat, "xlsx": XlsxFormat}
         self.output_format = formats[self.args.output_format](
             ctx={"input_path": self.input_path, "output_path": self.output_path}
         )

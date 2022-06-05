@@ -21,9 +21,7 @@
   * Unknown packages.
 
 * Gathered output formats into a module.
-* Added Output Formats
-  * HTML
-  * Text
+* Added text (txt) output format.
 
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
