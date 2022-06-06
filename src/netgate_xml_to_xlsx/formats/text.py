@@ -3,7 +3,6 @@
 
 import datetime
 import logging
-from html import escape
 
 from netgate_xml_to_xlsx.sheetdata import SheetData
 
@@ -68,7 +67,7 @@ class TextFormat(BaseFormat):
             sheet_name: header: value (flattened into a single line)
         """
         # Flatten the data.
-        data = [escape(x).replace("\n", "; ") for x in row]
+        data = [x.replace("\n", "; ") for x in row]
 
         for node, value in zip(self.sheet_data.header_row, data):
             self.output_fh.write(f"{self.sheet_data.sheet_name}: {node}: {value}\n")
