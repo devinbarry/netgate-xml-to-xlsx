@@ -9,8 +9,8 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
 NODE_NAMES = (
-    "vpnid,disable,mode,protocol,dev_mode,interface,ipaddr,local_port,"
-    "description,custom_options,shared_key,digest,engine,tunnel_network,"
+    "vpnid,description,disable,mode,protocol,dev_mode,interface,ipaddr,local_port,"
+    "custom_options,shared_key,digest,engine,tunnel_network,"
     "tunnel_networkv6,remote_network,remote_networkv6,gwredir,gwredir6,"
     "local_network,local_networkv6,maxclients,compression,compression_push,passtos,"
     "client2client,dynamic_ip,topology,serverbridge_dhcp,serverbridge_interface,"
