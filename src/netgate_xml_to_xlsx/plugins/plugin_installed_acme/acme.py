@@ -134,7 +134,7 @@ class Plugin(BasePlugin):
         rows.sort()
 
         yield SheetData(
-            sheet_name=self.display_name,
+            sheet_name=f"{self.display_name} (certs)",
             header_row=self.node_names,
             data_rows=rows,
         )
