@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findall, xml_findone
 
-NODE_NAMES = "minute,hour,mday,month,wday,who,command"
+NODE_NAMES = "command,who,minute,hour,mday,month,wday"
 
 
 class Plugin(BasePlugin):
@@ -38,6 +38,7 @@ class Plugin(BasePlugin):
 
             rows.append(self.sanity_check_node_row(node, row))
 
+        rows.sort()
         yield SheetData(
             sheet_name=self.display_name,
             header_row=self.node_names,
