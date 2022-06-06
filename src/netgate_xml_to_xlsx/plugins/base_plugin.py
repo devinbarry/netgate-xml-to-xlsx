@@ -143,7 +143,7 @@ class BasePlugin(ABC):
                 result.append(address)
         return "\n".join(result)
 
-    def adjust_node(self, node: Node) -> str:
+    def adjust_node(self, node: Node) -> Node | str:
         """
         Adjust a node based children and tag name.
 
@@ -197,7 +197,7 @@ class BasePlugin(ABC):
                     return self.yes(node)
 
                 case _:
-                    return node.text or ""
+                    return unescape(node.text) or ""
 
         # Process
         match node.tag:
