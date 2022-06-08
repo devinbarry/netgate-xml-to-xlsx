@@ -1,8 +1,8 @@
 # Convert Netgate XML Firewall Exports
 
 ## Note
- This project has no relationship with Netgate, the company.
-It is an internal project developed by Appropriate Solutions, Inc.
+This is a project solely developed by Appropriate Solutions, Inc. (“ASI”) using open source or other publicly available information.
+ASI has no affiliation or other relationship with Rubicon Communications LLC. d/b/a Netgate other than being a satisfied customer of their Netgate firewall.
 
 ## Overview
 
