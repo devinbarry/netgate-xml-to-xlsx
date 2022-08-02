@@ -22,6 +22,7 @@
 
 * Gathered output formats into a module.
 * Added text (txt) output format.
+* Support blank `vpn_openvpn_export/config` element.
 
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
