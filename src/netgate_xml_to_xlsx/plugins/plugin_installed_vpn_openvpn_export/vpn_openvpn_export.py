@@ -43,7 +43,7 @@ class Plugin(BasePlugin):
             return
 
         self.report_unknown_node_elements(
-            vpn_node, "defaultsettings,serverconfig".split(",")
+            vpn_node, "defaultsettings,serverconfig,config".split(",")
         )
 
         # Default settings.
@@ -72,6 +72,19 @@ class Plugin(BasePlugin):
 
                     row.append(self.adjust_node(xml_findone(node, node_name)))
                 rows.append(self.sanity_check_node_row(node, row))
+
+        # Config.
+        node = xml_findone(vpn_node, "config")
+        if node is not None:
+            self.report_unknown_node_elements(node)
+            row = []
+            for node_name in self.node_names:
+                if node_name == "node":
+                    row.append("defaultsettings")
+                    continue
+
+                row.append(self.adjust_node(xml_findone(node, node_name)))
+            rows.append(self.sanity_check_node_row(node, row))
 
         yield SheetData(
             sheet_name=self.display_name,
