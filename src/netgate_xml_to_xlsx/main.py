@@ -41,6 +41,7 @@ def _main() -> None:
 
         if args.sanitize:
             pfsense.sanitize(config["plugins"])
+            continue
 
         LOGGER.info(f"Output path: {pfsense.output_path}.")
 
