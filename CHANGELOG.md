@@ -25,6 +25,7 @@
 * Support blank `vpn_openvpn_export/config` element.
 * Made .txt format the default.
 * Exit immediately after sanitizing.
+* Add '.REPORT.' to output files.
 
 ## Release 0.9.8 -- 2022-05-27
 * Support per-plugin sanitize method (see haproxy plugin for example).
