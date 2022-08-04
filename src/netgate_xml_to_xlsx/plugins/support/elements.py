@@ -25,6 +25,7 @@ def sanitize_xml(raw_xml: str) -> str:
         re.compile("(<bcrypt-hash>).*?(</bcrypt-hash>)"),
         re.compile("(<clientcert_ca>).*?(</clientcert_ca>)"),
         re.compile("(<clientcert_crl>).*?(</clientcert_crl>)"),
+        re.compile("(<encryption_password>).*(</encryption_password>)"),
         re.compile("(<ha_certificates>).*?(</ha_certificates>)"),
         re.compile("(<lighttpd_ls_password>).*?(</lighttpd_ls_password>)"),
         re.compile("(<password>).*?(</password>)"),
