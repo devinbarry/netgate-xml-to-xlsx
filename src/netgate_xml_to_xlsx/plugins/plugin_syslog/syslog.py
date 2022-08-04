@@ -9,7 +9,7 @@ from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import xml_findone
 
 NODE_NAMES = (
-    "enable,logall,filterdescriptions,ipproto,nentries,"
+    "enable,logall,filterdescriptions,ipproto,nentries,disablelocallogging,"
     "remoteserver,remoteserver2,remoteserver3,reverse,sourceip,"
     "format,rotatecount,nologdefaultblock,nologbogons,nologprivatenets,"
     "logcompressiontype"
@@ -33,7 +33,7 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
-            case "logall" | "nologdefaultblock" | "nologbogons" | "nologprivatenets":
+            case "logall" | "nologdefaultblock" | "nologbogons" | "nologprivatenets" | "disablelocallogging":  # NOQA
                 self.yes(node)
 
         return super().adjust_node(node)

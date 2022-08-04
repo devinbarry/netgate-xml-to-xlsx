@@ -37,6 +37,7 @@ def _main() -> None:
         LOGGER.info(f"Output format: {args.output_format}.")
 
     for in_filename in in_files:
+        logger.info(f"Processing: {in_filename}")
         pfsense = PfSense(config, in_filename)
 
         if args.sanitize:
