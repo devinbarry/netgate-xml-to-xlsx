@@ -8,7 +8,7 @@ from netgate_xml_to_xlsx.mytypes import Node
 from ..base_plugin import BasePlugin, SheetData
 from ..support.elements import unescape, xml_findall, xml_findone
 
-TOP_NODE_NAMES = "async_crypto,logging,uniqueids,vtimaps"
+TOP_NODE_NAMES = "async_crypto,logging,uniqueids,vtimaps,filtermode,bypassrules"
 
 CLIENT_NODENAMES = ""
 
@@ -59,6 +59,11 @@ class Plugin(BasePlugin):
             return ""
 
         match node.tag:
+            case "bypassrules":
+                if self.report_unknown_node_elements(node, []):
+                    return "UNKNOWN"
+                return ""
+
             case "encryption":
                 cell = []
                 node_names = (

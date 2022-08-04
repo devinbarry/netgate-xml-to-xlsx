@@ -46,7 +46,7 @@ NODE_NAMES = (
     "reassembly_memcap,reassembly_to_client_chunk,reassembly_to_server_chunk,rfb_parser,rule_sid_off,"  # NOQA
     "rulesets,runmode,sgh_mpm_context,sip_parser,smb_parser,"
     "smtp_parser,smtp_parser_compute_body_md5,smtp_parser_decode_base64,smtp_parser_decode_mime,smtp_parser_decode_quoted_printable,"  # NOQA
-    "smtp_parser_extract_urls,snmp_parser,ssh_parser,stats_upd_interval,stream_memcap,"
+    "smtp_parser_extract_urls,snmp_parser,ssh_parser,stats_upd_interval,stream_bypass,stream_drop_invalid,stream_memcap,"  # NOQA
     "stream_prealloc_sessions,suppresslistname,tftp_parser,tls_detect_ports,tls_encrypt_handling,"  # NOQA
     "tls_ja3_fingerprint,tls_log_extended,tls_parser,uuid"
 )
