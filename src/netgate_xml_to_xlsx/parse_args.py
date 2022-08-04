@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     )
 
     choices = ["xlsx", "txt"]
-    default = "xlsx"
+    default = "txt"
     parser.add_argument(
         "--output-format",
         "-F",
