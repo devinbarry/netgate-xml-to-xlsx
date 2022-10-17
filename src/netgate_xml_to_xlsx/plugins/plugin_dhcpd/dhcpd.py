@@ -13,7 +13,7 @@ NODE_NAMES = (
     "ddnsdomainkey,ddnsdomainkeyalgorithm,ddnsdomainkeyname,ddnsdomainprimary,ddnsdomainsecondary,"  # NOQA
     "defaultleasetime,denyunknown,dhcpleaseinlocaltime,dnsserver,domain,"
     "domainsearchlist,failover_peerip,filename,filename32,filename32arm,"
-    "filename64,filename64arm,gateway,ignorebootp,ldap,"
+    "filename64,filename64arm,gateway,ignorebootp,ldap,uefihttpboot,"
     "mac_allow,mac_deny,maxleasetime,netmask,nextserver,"
     "ntpserver,numberoptions,rootpath,staticmap,tftp"
 )
